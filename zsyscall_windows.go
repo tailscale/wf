@@ -46,6 +46,11 @@ var (
 	procFwpmLayerCreateEnumHandle0     = modfwpuclnt.NewProc("FwpmLayerCreateEnumHandle0")
 	procFwpmLayerDestroyEnumHandle0    = modfwpuclnt.NewProc("FwpmLayerDestroyEnumHandle0")
 	procFwpmLayerEnum0                 = modfwpuclnt.NewProc("FwpmLayerEnum0")
+	procFwpmProviderAdd0               = modfwpuclnt.NewProc("FwpmProviderAdd0")
+	procFwpmProviderCreateEnumHandle0  = modfwpuclnt.NewProc("FwpmProviderCreateEnumHandle0")
+	procFwpmProviderDeleteByKey0       = modfwpuclnt.NewProc("FwpmProviderDeleteByKey0")
+	procFwpmProviderDestroyEnumHandle0 = modfwpuclnt.NewProc("FwpmProviderDestroyEnumHandle0")
+	procFwpmProviderEnum0              = modfwpuclnt.NewProc("FwpmProviderEnum0")
 	procFwpmSubLayerAdd0               = modfwpuclnt.NewProc("FwpmSubLayerAdd0")
 	procFwpmSubLayerCreateEnumHandle0  = modfwpuclnt.NewProc("FwpmSubLayerCreateEnumHandle0")
 	procFwpmSubLayerDeleteByKey0       = modfwpuclnt.NewProc("FwpmSubLayerDeleteByKey0")
@@ -92,6 +97,46 @@ func fwpmLayerDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows
 
 func fwpmLayerEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmLayer0, numEntriesReturned *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procFwpmLayerEnum0.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmProviderAdd0(engineHandle windows.Handle, provider *fwpmProvider0, nilForNow *uintptr) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmProviderAdd0.Addr(), 3, uintptr(engineHandle), uintptr(unsafe.Pointer(provider)), uintptr(unsafe.Pointer(nilForNow)))
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmProviderCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpmProviderEnumTemplate0, handle *windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmProviderCreateEnumHandle0.Addr(), 3, uintptr(engineHandle), uintptr(unsafe.Pointer(enumTemplate)), uintptr(unsafe.Pointer(handle)))
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmProviderDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmProviderDeleteByKey0.Addr(), 2, uintptr(engineHandle), uintptr(unsafe.Pointer(guid)), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmProviderDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmProviderDestroyEnumHandle0.Addr(), 2, uintptr(engineHandle), uintptr(enumHandle), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmProviderEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmProvider0, numEntriesReturned *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procFwpmProviderEnum0.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
 	}

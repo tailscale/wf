@@ -21,3 +21,13 @@ package winfirewall
 //sys fwpmSubLayerAdd0(engineHandle windows.Handle, sublayer *fwpmSublayer0, nilForNow *uintptr) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerAdd0
 
 //sys fwpmSubLayerDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerDeleteByKey0
+
+//sys fwpmProviderCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpmProviderEnumTemplate0, handle *windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmProviderCreateEnumHandle0
+
+//sys fwpmProviderDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmProviderDestroyEnumHandle0
+
+//sys fwpmProviderEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmProvider0, numEntriesReturned *uint32) (err error) [failretval!=0] = fwpuclnt.FwpmProviderEnum0
+
+//sys fwpmProviderAdd0(engineHandle windows.Handle, provider *fwpmProvider0, nilForNow *uintptr) (err error) [failretval!=0] = fwpuclnt.FwpmProviderAdd0
+
+//sys fwpmProviderDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) [failretval!=0] = fwpuclnt.FwpmProviderDeleteByKey0
