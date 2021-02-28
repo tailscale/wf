@@ -10,4 +10,12 @@ package winfirewall
 
 //sys fwpmLayerEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmLayer0, numEntriesReturned *uint32) (err error) [failretval!=0] = fwpuclnt.FwpmLayerEnum0
 
+//sys fwpmSubLayerCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpmSublayerEnumTemplate0, handle *windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerCreateEnumHandle0
+
+//sys fwpmSubLayerDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerDestroyEnumHandle0
+
+//sys fwpmSubLayerEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmSublayer0, numEntriesReturned *uint32) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerEnum0
+
 //sys fwpmFreeMemory0(p uintptr) = fwpuclnt.FwpmFreeMemory0
+
+//sys fwpmSubLayerAdd0(engineHandle windows.Handle, sublayer *fwpmSublayer0, nilForNow *uintptr) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerAdd0

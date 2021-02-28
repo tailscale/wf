@@ -40,12 +40,16 @@ func errnoErr(e syscall.Errno) error {
 var (
 	modfwpuclnt = windows.NewLazySystemDLL("fwpuclnt.dll")
 
-	procFwpmEngineClose0            = modfwpuclnt.NewProc("FwpmEngineClose0")
-	procFwpmEngineOpen0             = modfwpuclnt.NewProc("FwpmEngineOpen0")
-	procFwpmFreeMemory0             = modfwpuclnt.NewProc("FwpmFreeMemory0")
-	procFwpmLayerCreateEnumHandle0  = modfwpuclnt.NewProc("FwpmLayerCreateEnumHandle0")
-	procFwpmLayerDestroyEnumHandle0 = modfwpuclnt.NewProc("FwpmLayerDestroyEnumHandle0")
-	procFwpmLayerEnum0              = modfwpuclnt.NewProc("FwpmLayerEnum0")
+	procFwpmEngineClose0               = modfwpuclnt.NewProc("FwpmEngineClose0")
+	procFwpmEngineOpen0                = modfwpuclnt.NewProc("FwpmEngineOpen0")
+	procFwpmFreeMemory0                = modfwpuclnt.NewProc("FwpmFreeMemory0")
+	procFwpmLayerCreateEnumHandle0     = modfwpuclnt.NewProc("FwpmLayerCreateEnumHandle0")
+	procFwpmLayerDestroyEnumHandle0    = modfwpuclnt.NewProc("FwpmLayerDestroyEnumHandle0")
+	procFwpmLayerEnum0                 = modfwpuclnt.NewProc("FwpmLayerEnum0")
+	procFwpmSubLayerAdd0               = modfwpuclnt.NewProc("FwpmSubLayerAdd0")
+	procFwpmSubLayerCreateEnumHandle0  = modfwpuclnt.NewProc("FwpmSubLayerCreateEnumHandle0")
+	procFwpmSubLayerDestroyEnumHandle0 = modfwpuclnt.NewProc("FwpmSubLayerDestroyEnumHandle0")
+	procFwpmSubLayerEnum0              = modfwpuclnt.NewProc("FwpmSubLayerEnum0")
 )
 
 func fwpmEngineClose0(engineHandle windows.Handle) (err error) {
@@ -87,6 +91,38 @@ func fwpmLayerDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows
 
 func fwpmLayerEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmLayer0, numEntriesReturned *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procFwpmLayerEnum0.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmSubLayerAdd0(engineHandle windows.Handle, sublayer *fwpmSublayer0, nilForNow *uintptr) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmSubLayerAdd0.Addr(), 3, uintptr(engineHandle), uintptr(unsafe.Pointer(sublayer)), uintptr(unsafe.Pointer(nilForNow)))
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmSubLayerCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpmSublayerEnumTemplate0, handle *windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmSubLayerCreateEnumHandle0.Addr(), 3, uintptr(engineHandle), uintptr(unsafe.Pointer(enumTemplate)), uintptr(unsafe.Pointer(handle)))
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmSubLayerDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmSubLayerDestroyEnumHandle0.Addr(), 2, uintptr(engineHandle), uintptr(enumHandle), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmSubLayerEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmSublayer0, numEntriesReturned *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procFwpmSubLayerEnum0.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
 	}
