@@ -45,16 +45,6 @@ func (s *Session) Close() error {
 	return fwpmEngineClose0(s.handle)
 }
 
-// LayerFlags are flags associated with a layer.
-type LayerFlags uint32
-
-const (
-	LayerFlagsKernel         LayerFlags = 1 << iota // classification occurs in kernel mode
-	LayerFlagsBuiltin                               // built-in layer, cannot be deleted
-	LayerFlagsClassifyMostly                        // optimized for classifying not enumerating
-	LayerFlagsBuffered                              // buffered?
-)
-
 type FieldType uint32
 
 const (
@@ -72,7 +62,10 @@ type Layer struct {
 	ID                 uint16
 	Name               string
 	Description        string
-	Flags              LayerFlags
+	InKernel           bool
+	Builtin            bool
+	ClassifyMostly     bool
+	Buffered           bool
 	DefaultSublayerKey windows.GUID
 	Fields             []*Field
 }
@@ -118,7 +111,10 @@ func (s *Session) Layers() ([]*Layer, error) {
 				ID:                 layer.LayerID,
 				Name:               windows.UTF16PtrToString(layer.DisplayData.Name),
 				Description:        windows.UTF16PtrToString(layer.DisplayData.Description),
-				Flags:              layer.Flags,
+				InKernel:           (layer.Flags & fwpmLayerFlagsKernel) != 0,
+				Builtin:            (layer.Flags & fwpmLayerFlagsBuiltin) != 0,
+				ClassifyMostly:     (layer.Flags & fwpmLayerFlagsClassifyMostly) != 0,
+				Buffered:           (layer.Flags & fwpmLayerFlagsBuffered) != 0,
 				DefaultSublayerKey: layer.DefaultSublayerKey,
 			}
 			for _, field := range fields {
