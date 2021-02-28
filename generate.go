@@ -3,7 +3,7 @@ package wf
 //go:generate go run generators/gen_guids.go includes/fwpmu.h zguids.go
 //go:generate go run golang.org/x/sys/windows/mkwinsyscall -output zsyscall_windows.go syscall.go
 
-//go:generate stringer -output=zlayerflags_strings.go -type=LayerFlags -trimprefix=LayerFlags
+//go:generate stringer -output=zlayerflags_strings.go -type=fwpmLayerFlags -trimprefix=fwpmLayerFlags
 //go:generate stringer -output=zfieldtype_strings.go -type=FieldType -trimprefix=Fieldtype
 //go:generate stringer -output=zsublayerflags_strings.go -type=SublayerFlags -trimprefix=SublayerFlags
 //go:generate stringer -output=zfilterenumtype_strings.go -type=FilterEnumType -trimprefix=FilterEnumType
