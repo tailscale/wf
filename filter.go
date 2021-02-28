@@ -1,4 +1,4 @@
-package winfirewall
+package wf
 
 import (
 	"fmt"
@@ -6,6 +6,63 @@ import (
 	"unsafe"
 
 	"golang.org/x/sys/windows"
+)
+
+type FilterEnumType uint32
+
+const (
+	FilterEnumTypeFullyContained FilterEnumType = iota
+	FilterEnumTypeOverlapping
+)
+
+type FilterEnumFlags uint32
+
+const (
+	FilterEnumFlagsBestTerminatingMatch FilterEnumFlags = iota + 1
+	FilterEnumFlagsSorted
+	FilterEnumFlagsBootTimeOnly
+	FilterEnumFlagsIncludeBootTime
+	FilterEnumFlagsIncludeDisabled
+)
+
+type ActionType uint32
+
+const (
+	ActionTypeBlock              ActionType = 0x1001
+	ActionTypePermit                        = 0x1002
+	ActionTypeCalloutTerminating            = 0x5003
+	ActionTypeCalloutInspection             = 0x6004
+	ActionTypeCalloutUnknown                = 0x4005
+)
+
+type MatchType uint32
+
+const (
+	MatchEqual MatchType = iota
+	MatchGreater
+	MatchLess
+	MatchGreaterOrEqual
+	MatchLessOrEqual
+	MatchRange
+	MatchFlagsAllSet
+	MatchFlagsAnySet
+	MatchFlagsNoneSet
+	MatchEqualCaseInsensitive
+	MatchNotEqual
+	MatchPrefix
+	MatchNotPrefix
+)
+
+type FilterFlags uint32
+
+const (
+	FilterFlagsPersistent FilterFlags = 1 << iota
+	FilterFlagsBootTime
+	FilterFlagsHasProviderContext
+	FilterFlagsClearActionRight
+	FilterFlagsPermitIfCalloutUnregistered
+	FilterFlagsDisabled
+	FilterFlagsIndexed
 )
 
 type Filter struct {

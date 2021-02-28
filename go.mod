@@ -1,4 +1,4 @@
-module inet.af/winfirewall
+module inet.af/wf
 
 go 1.15
 

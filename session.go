@@ -1,4 +1,4 @@
-package winfirewall
+package wf
 
 import (
 	"golang.org/x/sys/windows"
