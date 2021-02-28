@@ -7,21 +7,12 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-type LayerFlags uint32
-
-const (
-	LayerFlagsKernel         = fwpmLayerFlagsKernel
-	LayerFlagsBuiltin        = fwpmLayerFlagsBuiltin
-	LayerFlagsClassifyMostly = fwpmLayerFlagsClassifyMostly
-	LayerFlagsBuffered       = fwpmLayerFlagsBuffered
-)
-
 type Layer struct {
 	Key                windows.GUID
 	ID                 uint16
 	Name               string
 	Description        string
-	Flags              uint32
+	Flags              LayerFlags
 	DefaultSublayerKey windows.GUID
 }
 
@@ -48,8 +39,7 @@ func (s *Session) Layers() ([]*Layer, error) {
 		sh.Len = int(num)
 		sh.Data = uintptr(unsafe.Pointer(layersArray))
 
-		for i := uintptr(0); i < uintptr(num); i++ {
-			var layer *fwpmLayer0 = *(**fwpmLayer0)(unsafe.Pointer(uintptr(unsafe.Pointer(layersArray)) + i*unsafe.Sizeof((*fwpmLayer0)(nil))))
+		for _, layer := range layers {
 			ret = append(ret, &Layer{
 				Key:                layer.LayerKey,
 				ID:                 layer.LayerID,
