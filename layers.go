@@ -118,19 +118,13 @@ func (s *Session) Sublayers(provider *windows.GUID) ([]*Sublayer, error) {
 		sh.Data = uintptr(unsafe.Pointer(sublayersArray))
 
 		for _, sublayer := range sublayers {
-			var providerData []uint8
-			sh = (*reflect.SliceHeader)(unsafe.Pointer(&providerData))
-			sh.Cap = int(sublayer.ProviderData.Size)
-			sh.Len = sh.Cap
-			sh.Data = uintptr(unsafe.Pointer(sublayer.ProviderData.Data))
-
 			l := &Sublayer{
 				Key:          sublayer.SublayerKey,
 				Name:         windows.UTF16PtrToString(sublayer.DisplayData.Name),
 				Description:  windows.UTF16PtrToString(sublayer.DisplayData.Description),
 				Flags:        sublayer.Flags,
 				Provider:     sublayer.ProviderKey,
-				ProviderData: append([]byte(nil), providerData...),
+				ProviderData: getByteBlob(sublayer.ProviderData),
 				Weight:       sublayer.Weight,
 			}
 			ret = append(ret, l)
@@ -184,4 +178,17 @@ func mkByteBlob(bs []byte) fwpByteBlob {
 		Size: uint32(len(bs)),
 		Data: &bs[0],
 	}
+}
+
+func getByteBlob(bb fwpByteBlob) []byte {
+	if bb.Size == 0 {
+		return nil
+	}
+
+	var blob []uint8
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&blob))
+	sh.Cap = int(bb.Size)
+	sh.Len = sh.Cap
+	sh.Data = uintptr(unsafe.Pointer(bb.Data))
+	return append([]byte(nil), blob...)
 }
