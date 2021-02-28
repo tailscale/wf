@@ -42,6 +42,9 @@ var (
 
 	procFwpmEngineClose0               = modfwpuclnt.NewProc("FwpmEngineClose0")
 	procFwpmEngineOpen0                = modfwpuclnt.NewProc("FwpmEngineOpen0")
+	procFwpmFilterCreateEnumHandle0    = modfwpuclnt.NewProc("FwpmFilterCreateEnumHandle0")
+	procFwpmFilterDestroyEnumHandle0   = modfwpuclnt.NewProc("FwpmFilterDestroyEnumHandle0")
+	procFwpmFilterEnum0                = modfwpuclnt.NewProc("FwpmFilterEnum0")
 	procFwpmFreeMemory0                = modfwpuclnt.NewProc("FwpmFreeMemory0")
 	procFwpmLayerCreateEnumHandle0     = modfwpuclnt.NewProc("FwpmLayerCreateEnumHandle0")
 	procFwpmLayerDestroyEnumHandle0    = modfwpuclnt.NewProc("FwpmLayerDestroyEnumHandle0")
@@ -56,6 +59,9 @@ var (
 	procFwpmSubLayerDeleteByKey0       = modfwpuclnt.NewProc("FwpmSubLayerDeleteByKey0")
 	procFwpmSubLayerDestroyEnumHandle0 = modfwpuclnt.NewProc("FwpmSubLayerDestroyEnumHandle0")
 	procFwpmSubLayerEnum0              = modfwpuclnt.NewProc("FwpmSubLayerEnum0")
+	procFwpmTransactionAbort0          = modfwpuclnt.NewProc("FwpmTransactionAbort0")
+	procFwpmTransactionBegin0          = modfwpuclnt.NewProc("FwpmTransactionBegin0")
+	procFwpmTransactionCommit0         = modfwpuclnt.NewProc("FwpmTransactionCommit0")
 )
 
 func fwpmEngineClose0(engineHandle windows.Handle) (err error) {
@@ -68,6 +74,30 @@ func fwpmEngineClose0(engineHandle windows.Handle) (err error) {
 
 func fwpmEngineOpen0(mustBeNil *uint16, authnService authnService, authIdentity *uintptr, session *fwpmSession0, engineHandle *windows.Handle) (err error) {
 	r1, _, e1 := syscall.Syscall6(procFwpmEngineOpen0.Addr(), 5, uintptr(unsafe.Pointer(mustBeNil)), uintptr(authnService), uintptr(unsafe.Pointer(authIdentity)), uintptr(unsafe.Pointer(session)), uintptr(unsafe.Pointer(engineHandle)), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmFilterCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpmFilterEnumTemplate0, handle *windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmFilterCreateEnumHandle0.Addr(), 3, uintptr(engineHandle), uintptr(unsafe.Pointer(enumTemplate)), uintptr(unsafe.Pointer(handle)))
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmFilterDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmFilterDestroyEnumHandle0.Addr(), 2, uintptr(engineHandle), uintptr(enumHandle), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmFilterEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmFilter0, numEntriesReturned *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procFwpmFilterEnum0.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
 	}
@@ -177,6 +207,30 @@ func fwpmSubLayerDestroyEnumHandle0(engineHandle windows.Handle, enumHandle wind
 
 func fwpmSubLayerEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmSublayer0, numEntriesReturned *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procFwpmSubLayerEnum0.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmTransactionAbort0(engineHandle windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmTransactionAbort0.Addr(), 1, uintptr(engineHandle), 0, 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmTransactionBegin0(engineHandle windows.Handle, flags uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmTransactionBegin0.Addr(), 2, uintptr(engineHandle), uintptr(flags), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmTransactionCommit0(engineHandle windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmTransactionCommit0.Addr(), 1, uintptr(engineHandle), 0, 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
 	}

@@ -31,3 +31,13 @@ package winfirewall
 //sys fwpmProviderAdd0(engineHandle windows.Handle, provider *fwpmProvider0, nilForNow *uintptr) (err error) [failretval!=0] = fwpuclnt.FwpmProviderAdd0
 
 //sys fwpmProviderDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) [failretval!=0] = fwpuclnt.FwpmProviderDeleteByKey0
+
+//sys fwpmFilterCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpmFilterEnumTemplate0, handle *windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmFilterCreateEnumHandle0
+
+//sys fwpmFilterDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmFilterDestroyEnumHandle0
+
+//sys fwpmFilterEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmFilter0, numEntriesReturned *uint32) (err error) [failretval!=0] = fwpuclnt.FwpmFilterEnum0
+
+//sys fwpmTransactionBegin0(engineHandle windows.Handle, flags uint32) (err error) [failretval!=0] = fwpuclnt.FwpmTransactionBegin0
+//sys fwpmTransactionCommit0(engineHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmTransactionCommit0
+//sys fwpmTransactionAbort0(engineHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmTransactionAbort0
