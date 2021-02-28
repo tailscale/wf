@@ -64,8 +64,8 @@ func fwpmEngineOpen0(mustBeNil *uint16, authnService authnService, authIdentity 
 	return
 }
 
-func fwpmFreeMemory0(p **uintptr) {
-	syscall.Syscall(procFwpmFreeMemory0.Addr(), 1, uintptr(unsafe.Pointer(p)), 0, 0)
+func fwpmFreeMemory0(p uintptr) {
+	syscall.Syscall(procFwpmFreeMemory0.Addr(), 1, uintptr(p), 0, 0)
 	return
 }
 

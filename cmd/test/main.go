@@ -13,5 +13,11 @@ func main() {
 	}
 	defer sess.Close()
 	fmt.Println("open!")
-	sess.Test()
+	layers, err := sess.Layers()
+	if err != nil {
+		panic(err)
+	}
+	for _, layer := range layers {
+		fmt.Printf("%#v\n", layer)
+	}
 }

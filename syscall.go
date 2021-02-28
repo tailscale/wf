@@ -10,4 +10,4 @@ package winfirewall
 
 //sys fwpmLayerEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmLayer0, numEntriesReturned *uint32) (err error) [failretval!=0] = fwpuclnt.FwpmLayerEnum0
 
-//sys fwpmFreeMemory0(p **uintptr) = fwpuclnt.FwpmFreeMemory0
+//sys fwpmFreeMemory0(p uintptr) = fwpuclnt.FwpmFreeMemory0
