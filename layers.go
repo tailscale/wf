@@ -1,4 +1,4 @@
-package winfirewall
+package wf
 
 import (
 	"errors"
@@ -7,6 +7,28 @@ import (
 
 	"golang.org/x/sys/windows"
 )
+
+// LayerFlags are flags associated with a layer.
+type LayerFlags uint32
+
+const (
+	LayerFlagsKernel         = 1 // classification occurs in kernel mode
+	LayerFlagsBuiltin        = 2 // built-in layer, cannot be deleted
+	LayerFlagsClassifyMostly = 4 // optimized for classifying not enumerating
+	LayerFlagsBuffered       = 8 // buffered?
+)
+
+type FieldType uint32
+
+const (
+	FieldTypeRawData FieldType = iota
+	FieldTypeIPAddress
+	FieldTypeFlags
+)
+
+type SublayerFlags uint32
+
+const SublayerFlagsPersistent = 1
 
 type Layer struct {
 	Key                windows.GUID

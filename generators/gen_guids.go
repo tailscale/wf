@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"go/format"
 	"io"
 	"io/ioutil"
 	"os"
@@ -29,7 +30,7 @@ func main() {
 	r := bufio.NewReader(f)
 
 	var out bytes.Buffer
-	out.WriteString(`package winfirewall
+	out.WriteString(`package wf
 
 import "golang.org/x/sys/windows"
 
@@ -70,12 +71,12 @@ Data4: [8]byte{%s},
 	}
 	out.WriteString("}\n")
 
-	// bs, err := format.Source(out.Bytes())
-	// if err != nil {
-	// 	fatalf("formatting source code: %v", err)
-	// }
+	bs, err := format.Source(out.Bytes())
+	if err != nil {
+		fatalf("formatting source code: %v", err)
+	}
 
-	if err := ioutil.WriteFile(outPath, out.Bytes(), 0644); err != nil {
+	if err := ioutil.WriteFile(outPath, bs, 0644); err != nil {
 		fatalf("writing generated file: %v", err)
 	}
 }

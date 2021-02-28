@@ -1,4 +1,4 @@
-package winfirewall
+package wf
 
 import (
 	"math/bits"
@@ -8,6 +8,32 @@ import (
 
 	"golang.org/x/sys/windows"
 	"inet.af/netaddr"
+)
+
+type DataType uint32
+
+const (
+	DataTypeEmpty DataType = iota
+	DataTypeUint8
+	DataTypeUint16
+	DataTypeUint32
+	DataTypeUint64
+	DataTypeInt8
+	DataTypeInt16
+	DataTypeInt32
+	DataTypeInt64
+	DataTypeFloat
+	DataTypeDouble
+	DataTypeByteArray16
+	DataTypeByteBlob
+	DataTypeSID
+	DataTypeSecurityDescriptor
+	DataTypeTokenInformation
+	DataTypeTokenAccessInformation
+	DataTypeUnicodeString
+	DataTypeV4AddrMask = 0x100 + iota
+	DataTypeV6AddrMask
+	DataTypeRange
 )
 
 type Value interface{}
