@@ -35,19 +35,20 @@ type fwpmLayerEnumTemplate0 struct {
 	reserved uint64
 }
 
-type fwpmLayerFlags uint32
+// LayerFlags are flags associated with a layer.
+type LayerFlags uint32
 
 const (
-	fwpmLayerFlagsKernel         = 1
-	fwpmLayerFlagsBuiltin        = 2
-	fwpmLayerFlagsClassifyMostly = 4
-	fwpmLayerFlagsBuffered       = 8
+	LayerFlagsKernel             = 1 // classification occurs in kernel mode
+	fwpmLayerFlagsBuiltin        = 2 // built-in layer, cannot be deleted
+	fwpmLayerFlagsClassifyMostly = 4 // optimized for classifying not enumerating
+	fwpmLayerFlagsBuffered       = 8 // buffered?
 )
 
 type fwpmLayer0 struct {
 	LayerKey           windows.GUID
 	DisplayData        fwpmDisplayData0
-	Flags              fwpmLayerFlags
+	Flags              LayerFlags
 	NumFields          uint32
 	Field              *fwpmField0
 	DefaultSublayerKey windows.GUID
