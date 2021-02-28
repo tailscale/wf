@@ -44,4 +44,13 @@ func main() {
 	for _, layer := range layers {
 		fmt.Printf("%#v\n", layer)
 	}
+
+	if err := sess.DeleteSublayer(guid); err != nil {
+		panic(err)
+	}
+	layers, err = sess.Sublayers(nil)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("after layers2", len(layers))
 }

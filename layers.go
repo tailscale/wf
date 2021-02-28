@@ -161,6 +161,14 @@ func (s *Session) AddSublayer(sublayer *Sublayer) error {
 	return fwpmSubLayerAdd0(s.handle, &sl, nil)
 }
 
+func (s *Session) DeleteSublayer(id windows.GUID) error {
+	if id == (windows.GUID{}) {
+		return errors.New("GUID cannot be zero")
+	}
+
+	return fwpmSubLayerDeleteByKey0(s.handle, &id)
+}
+
 func mkDisplayData(name, description string) fwpmDisplayData0 {
 	return fwpmDisplayData0{
 		Name:        windows.StringToUTF16Ptr(name),
