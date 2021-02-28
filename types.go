@@ -50,47 +50,69 @@ type fwpmLayer0 struct {
 	DisplayData        fwpmDisplayData0
 	Flags              LayerFlags
 	NumFields          uint32
-	Field              *fwpmField0
+	Fields             *fwpmField0
 	DefaultSublayerKey windows.GUID
 	LayerID            uint16
 }
 
 type fwpmField0 struct {
 	FieldKey *windows.GUID
-	Type     fwpmFieldType
-	DataType fwpmDataType
+	Type     FieldType
+	DataType DataType
 }
 
-type fwpmFieldType uint32
+type FieldType uint32
 
 const (
-	fwpmFieldTypeRawData fwpmFieldType = iota
-	fwpmFieldTypeIPAddress
-	fwpmFieldTypeFlags
+	FieldTypeRawData FieldType = iota
+	FieldTypeIPAddress
+	FieldTypeFlags
 )
 
-type fwpmDataType uint32
+type DataType uint32
 
 const (
-	fwpmDataTypeEmpty fwpmDataType = iota
-	fwpmDataTypeUint8
-	fwpmDataTypeUint6
-	fwpmDataTypeUint2
-	fwpmDataTypeUint64
-	fwpmDataTypeInt8
-	fwpmDataTypeInt16
-	fwpmDataTypeInt32
-	fwpmDataTypeInt64
-	fwpmDataTypeFloat
-	fwpmDataTypeDouble
-	fwpmDataTypeByteArray16
-	fwpmDataTypeByteBlob
-	fwpmDataTypeSID
-	fwpmDataTypeSecurityDescriptor
-	fwpmDataTypeTokenInformation
-	fwpmDataTypeTokenAccessInformation
-	fwpmDataTypeUnicodeString
-	fwpmDataTypeV4AddrMask = 0x100 + iota
-	fwpmDataTypeV6AddrMask
-	fwpmDataTypeRange
+	DataTypeEmpty DataType = iota
+	DataTypeUint8
+	DataTypeUint6
+	DataTypeUint2
+	DataTypeUint64
+	DataTypeInt8
+	DataTypeInt16
+	DataTypeInt32
+	DataTypeInt64
+	DataTypeFloat
+	DataTypeDouble
+	DataTypeByteArray16
+	DataTypeByteBlob
+	DataTypeSID
+	DataTypeSecurityDescriptor
+	DataTypeTokenInformation
+	DataTypeTokenAccessInformation
+	DataTypeUnicodeString
+	DataTypeV4AddrMask = 0x100 + iota
+	DataTypeV6AddrMask
+	DataTypeRange
 )
+
+type fwpmSublayerEnumTemplate0 struct {
+	ProviderKey *windows.GUID
+}
+
+type SublayerFlags uint32
+
+const SublayerFlagsPersistent = 1
+
+type fwpByteBlob struct {
+	Size uint32
+	Data *uint8
+}
+
+type fwpmSublayer0 struct {
+	SublayerKey  windows.GUID
+	DisplayData  fwpmDisplayData0
+	Flags        SublayerFlags
+	ProviderKey  *windows.GUID
+	ProviderData fwpByteBlob
+	Weight       uint16
+}
