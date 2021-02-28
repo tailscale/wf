@@ -19,3 +19,5 @@ package winfirewall
 //sys fwpmFreeMemory0(p uintptr) = fwpuclnt.FwpmFreeMemory0
 
 //sys fwpmSubLayerAdd0(engineHandle windows.Handle, sublayer *fwpmSublayer0, nilForNow *uintptr) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerAdd0
+
+//sys fwpmSubLayerDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerDeleteByKey0
