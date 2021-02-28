@@ -1,4 +1,4 @@
-package winfirewall
+package wf
 
 //sys fwpmEngineOpen0(mustBeNil *uint16, authnService authnService, authIdentity *uintptr, session *fwpmSession0, engineHandle *windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmEngineOpen0
 

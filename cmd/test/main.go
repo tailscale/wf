@@ -3,11 +3,19 @@ package main
 import (
 	"fmt"
 
-	"inet.af/winfirewall"
+	"golang.org/x/sys/windows"
+	"inet.af/wf"
 )
 
+func name(g windows.GUID) string {
+	if s := wf.GuidNames[g]; s != "" {
+		return s
+	}
+	return g.String()
+}
+
 func main() {
-	sess, err := winfirewall.New()
+	sess, err := wf.New()
 	if err != nil {
 		fmt.Println("fail:", err)
 	}
@@ -19,7 +27,7 @@ func main() {
 	}
 
 	for _, filter := range filters {
-		fmt.Printf("[%s]\n  > %s\n  > %s\n  > %s\n\n", filter.Name, filter.Description, winfirewall.GuidNames[filter.LayerKey], winfirewall.GuidNames[filter.SubLayerKey])
+		fmt.Printf("[%s]\n  > %s\n  > %s\n  > %s\n\n", filter.Name, filter.Description, name(filter.LayerKey), name(filter.SubLayerKey))
 	}
 
 	fmt.Println("got", len(filters), "filters")
