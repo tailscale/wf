@@ -116,3 +116,15 @@ type fwpmSublayer0 struct {
 	ProviderData fwpByteBlob
 	Weight       uint16
 }
+
+type fwpmProviderEnumTemplate0 struct {
+	Reserved uint64
+}
+
+type fwpmProvider0 struct {
+	ProviderKey  windows.GUID
+	DisplayData  fwpmDisplayData0
+	Flags        ProviderFlags
+	ProviderData fwpByteBlob
+	ServiceName  *uint16
+}
