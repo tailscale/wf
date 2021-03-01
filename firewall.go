@@ -309,11 +309,7 @@ func (s *Session) Sublayers(provider *windows.GUID) ([]*Sublayer, error) {
 			return nil, err
 		}
 
-		sublayers, err := toSublayers(sublayersArray, num)
-		if err != nil {
-			return nil, err
-		}
-		ret = append(ret, sublayers...)
+		ret = append(ret, toSublayers(sublayersArray, num)...)
 
 		if num < pageSize {
 			return ret, nil
@@ -323,7 +319,7 @@ func (s *Session) Sublayers(provider *windows.GUID) ([]*Sublayer, error) {
 
 // toSublayers converts a C array of fwpmSublayer0 to a safe-to-use Sublayer
 // slice.
-func toSublayers(sublayersArray **fwpmSublayer0, numSublayers uint32) ([]*Sublayer, error) {
+func toSublayers(sublayersArray **fwpmSublayer0, numSublayers uint32) []*Sublayer {
 	defer fwpmFreeMemory0(uintptr(unsafe.Pointer(&sublayersArray)))
 
 	var ret []*Sublayer
@@ -352,7 +348,7 @@ func toSublayers(sublayersArray **fwpmSublayer0, numSublayers uint32) ([]*Sublay
 		ret = append(ret, s)
 	}
 
-	return ret, nil
+	return ret
 }
 
 // AddSublayer creates a new Sublayer.
@@ -382,6 +378,85 @@ func (s *Session) DeleteSublayer(id windows.GUID) error {
 	}
 
 	return fwpmSubLayerDeleteByKey0(s.handle, &id)
+}
+
+// A Provider is an entity that owns sublayers and filtering rules.
+type Provider struct {
+	// Key is the unique identifier for this provider.
+	Key windows.GUID
+	// Name is a short descriptive name.
+	Name string
+	// Description is a longer description of the provider.
+	Description string
+	// Persistent indicates whether the provider is preserved across
+	// restarts of the filtering engine.
+	Persistent bool
+	// Data is optional opaque data that can be held on behalf of the
+	// Provider.
+	Data []byte
+	// ServiceName is an optional Windows service name. If present,
+	// the rules owned by this Provider are only activated when the
+	// service is active.
+	ServiceName string
+
+	// Disabled indicates whether the rules owned by this Provider are
+	// disabled due to its associated service being
+	// disabled. Read-only, ignored on Provider creation.
+	Disabled bool
+}
+
+func (s *Session) Providers() ([]*Provider, error) {
+	var enum windows.Handle
+	if err := fwpmProviderCreateEnumHandle0(s.handle, nil, &enum); err != nil {
+		return nil, err
+	}
+	defer fwpmProviderDestroyEnumHandle0(s.handle, enum)
+
+	var ret []*Provider
+
+	const pageSize = 100
+	for {
+		var providersArray **fwpmProvider0
+		var num uint32
+		if err := fwpmProviderEnum0(s.handle, enum, pageSize, &providersArray, &num); err != nil {
+			return nil, err
+		}
+
+		ret = append(ret, toProviders(providersArray, num)...)
+
+		if num < pageSize {
+			return ret, nil
+		}
+	}
+}
+
+// toProviders converts a C array of fwpmProvider0 to a safe-to-use Provider
+// slice.
+func toProviders(providersArray **fwpmProvider0, numProviders uint32) []*Provider {
+	defer fwpmFreeMemory0(uintptr(unsafe.Pointer(&providersArray)))
+
+	var ret []*Provider
+
+	var providers []*fwpmProvider0
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&providers))
+	sh.Cap = int(numProviders)
+	sh.Len = int(numProviders)
+	sh.Data = uintptr(unsafe.Pointer(providersArray))
+
+	for _, provider := range providers {
+		p := &Provider{
+			Key:         provider.ProviderKey,
+			Name:        windows.UTF16PtrToString(provider.DisplayData.Name),
+			Description: windows.UTF16PtrToString(provider.DisplayData.Description),
+			Persistent:  (provider.Flags & fwpmProviderFlagsPersistent) != 0,
+			Disabled:    (provider.Flags & fwpmProviderFlagsDisabled) != 0,
+			Data:        fromByteBlob(provider.ProviderData),
+			ServiceName: windows.UTF16PtrToString(provider.ServiceName),
+		}
+		ret = append(ret, p)
+	}
+
+	return ret
 }
 
 // GUIDName returns a human-readable name for standard WFP GUIDs. If g

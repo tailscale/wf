@@ -11,5 +11,5 @@ package wf
 //go:generate stringer -output=zactiontype_strings.go -type=ActionType -trimprefix=ActionType
 //go:generate stringer -output=zmatchtype_strings.go -type=MatchType -trimprefix=MatchType
 //go:generate stringer -output=zfilterflags_strings.go -type=FilterFlags -trimprefix=FilterFlags
-//go:generate stringer -output=zproviderflags_strings.go -type=ProviderFlags -trimprefix=ProviderFlags
+//go:generate stringer -output=zproviderflags_strings.go -type=fwpmProviderFlags -trimprefix=fwpmProviderFlags
 //go:generate stringer -output=zdatatype_strings.go -type=DataType -trimprefix=DataType
