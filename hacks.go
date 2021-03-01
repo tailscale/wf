@@ -1,7 +1,6 @@
 package wf
 
 import (
-	"errors"
 	"fmt"
 	"math/bits"
 	"net"
@@ -183,30 +182,6 @@ func (s *Session) Filters() ([]*Filter, error) {
 			return ret, nil
 		}
 	}
-}
-
-func (s *Session) AddProvider(provider *Provider) error {
-	if provider.Key == (windows.GUID{}) {
-		return errors.New("Provider.Key cannot be zero")
-	}
-
-	p := &fwpmProvider0{
-		ProviderKey: provider.Key,
-		DisplayData: mkDisplayData(provider.Name, provider.Description),
-		//Flags:        provider.Flags,
-		//ProviderData: mkByteBlob(provider.ProviderData),
-		ServiceName: windows.StringToUTF16Ptr(provider.ServiceName),
-	}
-
-	return fwpmProviderAdd0(s.handle, p, nil)
-}
-
-func (s *Session) DeleteProvider(id windows.GUID) error {
-	if id == (windows.GUID{}) {
-		return errors.New("GUID cannot be zero")
-	}
-
-	return fwpmProviderDeleteByKey0(s.handle, &id)
 }
 
 type DataType uint32

@@ -21,6 +21,26 @@ var (
 		Exec:       listProviders,
 	}
 
+	addProviderFS       = flag.NewFlagSet("wfpcli add-provider", flag.ExitOnError)
+	providerName        = addProviderFS.String("name", "", "Provider name")
+	providerDescription = addProviderFS.String("description", "", "Provider description")
+	providerPersistent  = addProviderFS.Bool("persistent", false, "Whether the provider is persistent")
+	providerServiceName = addProviderFS.String("service", "", "Service name")
+	addProviderC        = &ffcli.Command{
+		Name:       "add-provider",
+		ShortUsage: "wfpcli add-provider",
+		ShortHelp:  "Add WFP provider",
+		FlagSet:    addProviderFS,
+		Exec:       addProvider,
+	}
+
+	delProviderC = &ffcli.Command{
+		Name:       "del-provider",
+		ShortUsage: "wfpcli del-provider <guid>",
+		ShortHelp:  "Delete WFP provider.",
+		Exec:       delProvider,
+	}
+
 	listLayersC = &ffcli.Command{
 		Name:       "list-layers",
 		ShortUsage: "wfpcli list-layers",
@@ -39,6 +59,7 @@ var (
 	sublayerName        = addSublayerFS.String("name", "", "Sublayer name")
 	sublayerDescription = addSublayerFS.String("description", "", "Sublayer description")
 	sublayerPersistent  = addSublayerFS.Bool("persistent", false, "Whether the sublayer is persistent")
+	sublayerProvider    = addSublayerFS.String("provider", "", "Owner of the sublayer")
 	sublayerWeight      = addSublayerFS.Int("weight", 1, "Sublayer weight")
 	addSublayerC        = &ffcli.Command{
 		Name:       "add-sublayer",
@@ -60,7 +81,7 @@ var (
 	root    = &ffcli.Command{
 		ShortUsage:  "wfpcli <subcommand>",
 		FlagSet:     rootFS,
-		Subcommands: []*ffcli.Command{listProvidersC, listLayersC, listSublayersC, addSublayerC, delSublayerC},
+		Subcommands: []*ffcli.Command{listProvidersC, addProviderC, delProviderC, listLayersC, listSublayersC, addSublayerC, delSublayerC},
 		Exec: func(context.Context, []string) error {
 			return flag.ErrHelp
 		},
@@ -126,6 +147,56 @@ func listProviders(_ context.Context, _ []string) error {
 		fmt.Printf("  Disabled: %v\n", provider.Disabled)
 		fmt.Printf("\n")
 	}
+
+	return nil
+}
+
+func addProvider(context.Context, []string) error {
+	sess, err := session()
+	if err != nil {
+		return fmt.Errorf("creating WFP session: %w", err)
+	}
+	defer sess.Close()
+
+	p := &wf.Provider{
+		Key:         mustGUID(),
+		Name:        *providerName,
+		Description: *providerDescription,
+		Persistent:  *providerPersistent,
+		ServiceName: *providerServiceName,
+	}
+
+	if err := sess.AddProvider(p); err != nil {
+		return fmt.Errorf("adding provider: %w", err)
+	}
+
+	fmt.Printf("Created provider %s\n", p.Key)
+
+	return nil
+}
+
+func delProvider(_ context.Context, args []string) error {
+	if len(args) != 1 {
+		fmt.Fprintf(os.Stderr, "GUID is required\n")
+		return flag.ErrHelp
+	}
+
+	guid, err := windows.GUIDFromString(args[0])
+	if err != nil {
+		return fmt.Errorf("Parsing GUID: %w", err)
+	}
+
+	sess, err := session()
+	if err != nil {
+		return fmt.Errorf("creating WFP session: %w", err)
+	}
+	defer sess.Close()
+
+	if err := sess.DeleteProvider(guid); err != nil {
+		return fmt.Errorf("deleting provider: %w", err)
+	}
+
+	fmt.Printf("Deleted provider %s\n", guid)
 
 	return nil
 }
@@ -206,6 +277,13 @@ func addSublayer(_ context.Context, _ []string) error {
 		Description: *sublayerDescription,
 		Persistent:  *sublayerPersistent,
 		Weight:      uint16(*sublayerWeight),
+	}
+	if *sublayerProvider != "" {
+		guid, err := windows.GUIDFromString(*sublayerProvider)
+		if err != nil {
+			return fmt.Errorf("Parsing provider GUID: %w", err)
+		}
+		sl.Provider = &guid
 	}
 
 	if err := sess.AddSublayer(sl); err != nil {
