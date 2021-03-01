@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
 	"golang.org/x/sys/windows"
@@ -76,12 +77,19 @@ var (
 		Exec:       delSublayer,
 	}
 
+	listRulesC = &ffcli.Command{
+		Name:       "list-rules",
+		ShortUsage: "wfpcli list-rules",
+		ShortHelp:  "List WFP rules.",
+		Exec:       listRules,
+	}
+
 	rootFS  = flag.NewFlagSet("wfpcli", flag.ExitOnError)
 	dynamic = rootFS.Bool("dynamic", false, "Use a dynamic WFP session")
 	root    = &ffcli.Command{
 		ShortUsage:  "wfpcli <subcommand>",
 		FlagSet:     rootFS,
-		Subcommands: []*ffcli.Command{listProvidersC, addProviderC, delProviderC, listLayersC, listSublayersC, addSublayerC, delSublayerC},
+		Subcommands: []*ffcli.Command{listProvidersC, addProviderC, delProviderC, listLayersC, listSublayersC, addSublayerC, delSublayerC, listRulesC},
 		Exec: func(context.Context, []string) error {
 			return flag.ErrHelp
 		},
@@ -317,5 +325,55 @@ func delSublayer(_ context.Context, args []string) error {
 
 	fmt.Printf("Deleted sublayer %s\n", guid)
 
+	return nil
+}
+
+func listRules(context.Context, []string) error {
+	sess, err := session()
+	if err != nil {
+		return fmt.Errorf("creating WFP session: %w", err)
+	}
+	defer sess.Close()
+
+	rules, err := sess.Rules()
+	if err != nil {
+		return fmt.Errorf("getting rules: %w", err)
+	}
+
+	sort.Slice(rules, func(i, j int) bool {
+		return rules[i].Key.String() < rules[j].Key.String()
+	})
+
+	for _, rule := range rules {
+		fmt.Printf("%s\n", displayName(rule.Key, rule.Name))
+		fmt.Printf("  GUID: %s\n", rule.Key)
+		fmt.Printf("  Name: %q\n", rule.Name)
+		if rule.Description != "" {
+			fmt.Printf("  Description: %q\n", rule.Description)
+		}
+		fmt.Printf("  Layer: %s\n", wf.GUIDName(rule.Layer))
+		fmt.Printf("  Sublayer: %s\n", wf.GUIDName(rule.Sublayer))
+		fmt.Printf("  Weight: 0x%02x\n", rule.Weight)
+		fmt.Printf("  Action: %s\n", rule.Action)
+		if rule.Callout != (windows.GUID{}) {
+			fmt.Printf("  Callout: %s\n", wf.GUIDName(rule.Callout))
+		}
+		if rule.Action == wf.ActionCalloutTerminating || rule.Action == wf.ActionCalloutUnknown {
+			fmt.Printf("  Permit if missing: %v\n", rule.PermitIfMissing)
+		}
+		fmt.Printf("  Persistent: %v\n", rule.Persistent)
+		fmt.Printf("  Boot-time: %v\n", rule.BootTime)
+		if rule.Provider != nil {
+			//fmt.Printf("  Provider: %s\n", wf.GUIDName(*rule.Provider))
+		}
+		if rule.Disabled {
+			fmt.Printf("  Disabled: %v\n", rule.Disabled)
+		}
+		for _, cond := range rule.Conditions {
+			fmt.Printf("  Condition: %s\n", cond)
+		}
+		fmt.Printf("\n")
+	}
+	fmt.Printf("Dumped %d rules\n", len(rules))
 	return nil
 }

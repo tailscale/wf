@@ -3,17 +3,24 @@ package wf
 import (
 	"errors"
 	"fmt"
+	"math/bits"
 	"reflect"
 	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
+	"golang.org/x/text/encoding/unicode"
 	"inet.af/netaddr"
 )
+
+type fieldTypes map[windows.GUID]reflect.Type
+type layerTypes map[windows.GUID]fieldTypes
 
 // Session is a connection to the WFP API.
 type Session struct {
 	handle windows.Handle
+	// layerTypes is a map of layer ID -> field ID -> Go type for that field.
+	layerTypes layerTypes
 }
 
 // SessionOptions configure a Session.
@@ -60,9 +67,26 @@ func New(opts *SessionOptions) (*Session, error) {
 		return nil, err
 	}
 
-	return &Session{
-		handle: handle,
-	}, nil
+	ret := &Session{
+		handle:     handle,
+		layerTypes: layerTypes{},
+	}
+
+	// Populate the layer type cache.
+	layers, err := ret.Layers()
+	if err != nil {
+		ret.Close()
+		return nil, err
+	}
+	for _, layer := range layers {
+		fields := fieldTypes{}
+		for _, field := range layer.Fields {
+			fields[field.Key] = field.Type
+		}
+		ret.layerTypes[layer.Key] = fields
+	}
+
+	return ret, nil
 }
 
 // Close implements io.Closer.
@@ -121,6 +145,10 @@ type Bitmap64 uint64
 // BitmapIndex is an index into a Bitmap64.
 type BitmapIndex uint8 // TODO: this is a guess, the API doesn't document what the underlying type is.
 
+type Range struct {
+	From, To interface{}
+}
+
 // TokenInformation defines a set of security identifiers.
 // For more information see https://docs.microsoft.com/en-us/windows/win32/api/Fwptypes/ns-fwptypes-fwp_token_information.
 type TokenInformation struct {
@@ -129,33 +157,30 @@ type TokenInformation struct {
 }
 
 // fieldTypeMap maps dataType to a Go value of that type.
-var fieldTypeMap = map[dataType]interface{}{
-	dataTypeUint8:                  uint8(0),
-	dataTypeUint16:                 uint16(0),
-	dataTypeUint32:                 uint32(0),
-	dataTypeUint64:                 uint64(0),
-	dataTypeInt8:                   int8(0),
-	dataTypeInt16:                  int16(0),
-	dataTypeInt32:                  int32(0),
-	dataTypeInt64:                  int64(0),
-	dataTypeFloat:                  float32(0),
-	dataTypeDouble:                 float64(0),
-	dataTypeByteArray16:            [16]byte{},
-	dataTypeByteBlob:               []byte(nil),
-	dataTypeSID:                    windows.SID{},
-	dataTypeSecurityDescriptor:     windows.SECURITY_DESCRIPTOR{},
-	dataTypeTokenInformation:       TokenInformation{},
-	dataTypeTokenAccessInformation: TokenAccessInformation(nil),
-	dataTypeUnicodeString:          "",
-	dataTypeArray6:                 [6]byte{},
-	dataTypeBitmapIndex:            BitmapIndex(0),
-	dataTypeBitmapArray64:          Bitmap64(0),
-	dataTypeV4AddrMask:             netaddr.IPPrefix{},
-	dataTypeV6AddrMask:             netaddr.IPPrefix{},
-
-	// TODO: not sure how to represent yet. It's only used when
-	// defining filters, layers don't provide ranges to filters.
-	// dataTypeRange
+var fieldTypeMap = map[dataType]reflect.Type{
+	dataTypeUint8:                  reflect.TypeOf(uint8(0)),
+	dataTypeUint16:                 reflect.TypeOf(uint16(0)),
+	dataTypeUint32:                 reflect.TypeOf(uint32(0)),
+	dataTypeUint64:                 reflect.TypeOf(uint64(0)),
+	dataTypeInt8:                   reflect.TypeOf(int8(0)),
+	dataTypeInt16:                  reflect.TypeOf(int16(0)),
+	dataTypeInt32:                  reflect.TypeOf(int32(0)),
+	dataTypeInt64:                  reflect.TypeOf(int64(0)),
+	dataTypeFloat:                  reflect.TypeOf(float32(0)),
+	dataTypeDouble:                 reflect.TypeOf(float64(0)),
+	dataTypeByteArray16:            reflect.TypeOf([16]byte{}),
+	dataTypeByteBlob:               reflect.TypeOf([]byte(nil)),
+	dataTypeSID:                    reflect.TypeOf(windows.SID{}),
+	dataTypeSecurityDescriptor:     reflect.TypeOf(windows.SECURITY_DESCRIPTOR{}),
+	dataTypeTokenInformation:       reflect.TypeOf(TokenInformation{}),
+	dataTypeTokenAccessInformation: reflect.TypeOf(TokenAccessInformation(nil)),
+	dataTypeUnicodeString:          reflect.TypeOf(""),
+	dataTypeArray6:                 reflect.TypeOf([6]byte{}),
+	dataTypeBitmapIndex:            reflect.TypeOf(BitmapIndex(0)),
+	dataTypeBitmapArray64:          reflect.TypeOf(Bitmap64(0)),
+	dataTypeV4AddrMask:             reflect.TypeOf(netaddr.IPPrefix{}),
+	dataTypeV6AddrMask:             reflect.TypeOf(netaddr.IPPrefix{}),
+	dataTypeRange:                  reflect.TypeOf(Range{}),
 }
 
 // fieldType returns the reflect.Type for a field, or an error if the
@@ -179,8 +204,8 @@ func fieldType(f fwpmField0) (reflect.Type, error) {
 		return reflect.TypeOf(uint32(0)), nil
 	}
 
-	if v, ok := fieldTypeMap[f.DataType]; ok {
-		return reflect.TypeOf(v), nil
+	if t, ok := fieldTypeMap[f.DataType]; ok {
+		return t, nil
 	}
 
 	return nil, fmt.Errorf("unknown data type %s", f.DataType)
@@ -489,6 +514,294 @@ func (s *Session) DeleteProvider(id windows.GUID) error {
 	return fwpmProviderDeleteByKey0(s.handle, &id)
 }
 
+// MatchType is the operator to use when testing a field in a Match.
+type MatchType uint32 // do not change type, used in C calls
+
+const (
+	MatchTypeEqual MatchType = iota
+	MatchTypeGreater
+	MatchTypeLess
+	MatchTypeGreaterOrEqual
+	MatchTypeLessOrEqual
+	MatchTypeRange // true if the field value is within the Range.
+	MatchTypeFlagsAllSet
+	MatchTypeFlagsAnySet
+	MatchTypeFlagsNoneSet
+	MatchTypeEqualCaseInsensitive // only valid on strings, no string fields exist
+	MatchTypeNotEqual
+	MatchTypePrefix    // TODO: not well documented. Is this prefix.Contains(ip) ?
+	MatchTypeNotPrefix // TODO: see above.
+)
+
+var mtStr = map[MatchType]string{
+	MatchTypeEqual:                "==",
+	MatchTypeGreater:              ">",
+	MatchTypeLess:                 "<",
+	MatchTypeGreaterOrEqual:       ">=",
+	MatchTypeLessOrEqual:          "<=",
+	MatchTypeRange:                "in",
+	MatchTypeFlagsAllSet:          "F[all]",
+	MatchTypeFlagsAnySet:          "F[any]",
+	MatchTypeFlagsNoneSet:         "F[none]",
+	MatchTypeEqualCaseInsensitive: "i==",
+	MatchTypeNotEqual:             "!=",
+	MatchTypePrefix:               "pfx",
+	MatchTypeNotPrefix:            "!pfx",
+}
+
+func (m MatchType) String() string {
+	return mtStr[m]
+}
+
+// valid reports whether the MatchType is valid for the given data
+// type. For example, MatchTypeGreater reports valid=false for SIDs,
+// because SIDs are not sortable.
+func (m MatchType) valid(v interface{}) bool {
+	switch m {
+	case MatchTypeEqual:
+		return true
+	case MatchTypeGreater, MatchTypeLess, MatchTypeGreaterOrEqual, MatchTypeLessOrEqual, MatchTypeRange, MatchTypeNotEqual:
+		switch v.(type) {
+		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, float32, float64, [16]byte, []byte, string:
+			return true
+		default:
+			return false
+		}
+	case MatchTypeFlagsAllSet, MatchTypeFlagsAnySet, MatchTypeFlagsNoneSet:
+		switch v.(type) {
+		case uint8, uint16, uint32, uint64:
+			return true
+		default:
+			return false
+		}
+	case MatchTypeEqualCaseInsensitive:
+		_, ok := v.(string)
+		return ok
+	case MatchTypePrefix, MatchTypeNotPrefix:
+		// TODO: don't know what to do with these yet, prevent their use.
+		return false
+	default:
+		panic("unknown match type")
+	}
+}
+
+// Match is a matching test that gets run against a layer's field.
+type Match struct {
+	Key   windows.GUID
+	Op    MatchType
+	Value interface{}
+}
+
+func (m Match) String() string {
+	val := m.Value
+	if m.Key == guidConditionALEAppID {
+		d := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewDecoder()
+		bs, err := d.Bytes(m.Value.([]byte))
+		if err != nil {
+			panic(err)
+		}
+		val = string(bs[:len(bs)-1])
+	}
+	return fmt.Sprintf("%s %s %v (%T)", GUIDName(m.Key), m.Op, val, m.Value)
+}
+
+// valid reports whether the Match is valid. A Match is valid if its
+// Key and Value are of compatible types, and Op can apply to those
+// types.
+func (m Match) valid() bool {
+	return true
+}
+
+// Action is an action the filtering engine can execute.
+type Action uint32
+
+const (
+	// ActionBlock blocks a packet or session.
+	ActionBlock Action = 0x1001
+	// ActionPermit permits a packet or session.
+	ActionPermit Action = 0x1002
+	// ActionCalloutTerminating invokes a callout that must return a
+	// permit or block verdict.
+	ActionCalloutTerminating Action = 0x5003
+	// ActionCalloutInspection invokes a callout that is expected to
+	// not return a verdict (i.e. a read-only callout).
+	ActionCalloutInspection Action = 0x6004
+	// ActionCalloutUnknown invokes a callout that may return a permit
+	// or block verdict.
+	ActionCalloutUnknown Action = 0x4005
+)
+
+// A Rule is an action to take on packets that match a set of
+// conditions.
+type Rule struct {
+	// Key is the unique identifier for this rule.
+	Key windows.GUID
+	// Name is a short descriptive name.
+	Name string
+	// Description is a longer description of the rule.
+	Description string
+	// Layer is the ID of the layer in which the rule runs.
+	Layer windows.GUID
+	// Sublayer is the ID of the sublayer in which the rule runs.
+	Sublayer windows.GUID
+	// Weight is the priority of the rule relative to other rules in
+	// its sublayer.
+	Weight uint64
+	// Conditions are the tests which must pass for this rule to apply
+	// to a packet.
+	Conditions []*Match
+	// Action is the action to take on matching packets.
+	Action Action
+	// Callout is the ID of the callout to invoke. Only valid if
+	// Action is ActionCalloutTerminating, ActionCalloutInspection, or
+	// ActionCalloutUnknown.
+	Callout windows.GUID
+	// PermitIfMissing, if set, indicates that a callout action to a
+	// callout ID that isn't registered should be translated into an
+	// ActionPermit, rather than an ActionBlock. Only relevant if
+	// Action is ActionCalloutTerminating or ActionCalloutUnknown.
+	PermitIfMissing bool
+
+	// Persistent indicates whether the rule is preserved across
+	// restarts of the filtering engine.
+	Persistent bool
+	// BootTime indicates that this rule applies only during early
+	// boot, before the filtering engine fully starts and hands off to
+	// the normal runtime rules.
+	BootTime bool
+
+	// Provider optionally identifies the Provider that manages this
+	// rule.
+	Provider *windows.GUID
+	// ProviderData is optional opaque data that can be held on behalf
+	// of the Provider.
+	ProviderData []byte
+
+	// Disabled indicates whether the rule is currently disabled due
+	// to its provider being associated with an inactive Windows
+	// service. See Provider.ServiceName for details.
+	Disabled bool
+}
+
+// TODO: figure out what currently unexposed flags do: ClearActionRight, Indexed
+// TODO: figure out what ProviderContextKey is about. MSDN doesn't explain what contexts are.
+
+func (s *Session) Rules() ([]*Rule, error) { // TODO: support filter settings
+	var enum windows.Handle
+	if err := fwpmFilterCreateEnumHandle0(s.handle, nil, &enum); err != nil {
+		return nil, err
+	}
+	defer fwpmFilterDestroyEnumHandle0(s.handle, enum)
+
+	var ret []*Rule
+
+	const pageSize = 100
+	for {
+		var rulesArray **fwpmFilter0
+		var num uint32
+		if err := fwpmFilterEnum0(s.handle, enum, pageSize, &rulesArray, &num); err != nil {
+			return nil, err
+		}
+
+		rules, err := toRules(rulesArray, num, s.layerTypes)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, rules...)
+
+		if num < pageSize {
+			return ret, nil
+		}
+	}
+}
+
+func toRules(rulesArray **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rule, error) {
+	defer fwpmFreeMemory0(uintptr(unsafe.Pointer(&rulesArray)))
+
+	var rules []*fwpmFilter0
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&rules))
+	sh.Cap = int(num)
+	sh.Len = int(num)
+	sh.Data = uintptr(unsafe.Pointer(rulesArray))
+
+	var ret []*Rule
+
+	for _, rule := range rules {
+		r := &Rule{
+			Key:          rule.FilterKey,
+			Name:         windows.UTF16PtrToString(rule.DisplayData.Name),
+			Description:  windows.UTF16PtrToString(rule.DisplayData.Description),
+			Layer:        rule.LayerKey,
+			Sublayer:     rule.SublayerKey,
+			Action:       rule.Action.Type,
+			Persistent:   (rule.Flags & fwpmFilterFlagsPersistent) != 0,
+			BootTime:     (rule.Flags & fwpmFilterFlagsBootTime) != 0,
+			Provider:     rule.ProviderKey,
+			ProviderData: fromByteBlob(rule.ProviderData),
+			Disabled:     (rule.Flags & fwpmFilterFlagsDisabled) != 0,
+		}
+		if rule.EffectiveWeight.Type == dataTypeUint64 {
+			r.Weight = *(*uint64)(unsafe.Pointer(rule.EffectiveWeight.Value))
+		}
+		if r.Action == ActionCalloutTerminating || r.Action == ActionCalloutInspection || r.Action == ActionCalloutUnknown {
+			r.Callout = rule.Action.GUID
+		}
+		if r.Action == ActionCalloutTerminating || r.Action == ActionCalloutUnknown {
+			r.PermitIfMissing = (rule.Flags & fwpmFilterFlagsPermitIfCalloutUnregistered) != 0
+		}
+
+		ft := layerTypes[r.Layer]
+		if ft == nil {
+			return nil, fmt.Errorf("unknown layer %s", r.Layer)
+		}
+
+		ms, err := toConditions(rule.FilterConditions, rule.NumFilterConditions, ft)
+		if err != nil {
+			return nil, err
+		}
+
+		r.Conditions = ms
+
+		ret = append(ret, r)
+	}
+
+	return ret, nil
+}
+
+func toConditions(condArray *fwpmFilterCondition0, num uint32, fieldTypes fieldTypes) ([]*Match, error) {
+	var conditions []fwpmFilterCondition0
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&conditions))
+	sh.Cap = int(num)
+	sh.Len = int(num)
+	sh.Data = uintptr(unsafe.Pointer(condArray))
+
+	var ret []*Match
+
+	for _, cond := range conditions {
+		fieldType, ok := fieldTypes[cond.FieldKey]
+		if !ok {
+			return nil, fmt.Errorf("unknown field %s", cond.FieldKey)
+		}
+
+		v, err := fromValue(fwpValue0(cond.Value), fieldType)
+		if err != nil {
+			return nil, fmt.Errorf("getting value for match [%s %s]: %w", GUIDName(cond.FieldKey), cond.MatchType, err)
+		}
+		m := &Match{
+			Key:   cond.FieldKey,
+			Op:    cond.MatchType,
+			Value: v,
+		}
+		if !m.valid() {
+			return nil, fmt.Errorf("match [%s %s %v] is not valid", GUIDName(m.Key), m.Op, m.Value)
+		}
+
+		ret = append(ret, m)
+	}
+
+	return ret, nil
+}
+
 // GUIDName returns a human-readable name for standard WFP GUIDs. If g
 // is not a standard WFP GUID, g.String() is returned.
 func GUIDName(g windows.GUID) string {
@@ -496,6 +809,189 @@ func GUIDName(g windows.GUID) string {
 		return n
 	}
 	return g.String()
+}
+
+// fromValue converts a fwpValue0 to the corresponding Go value.
+func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
+	// For most types, the field type and raw data type match up. But
+	// for some, the raw type can vary from the field type
+	// (e.g. comparing an IP to a prefix). Get the complex matchups
+	// out of the way first.
+	mapErr := func() error {
+		return fmt.Errorf("can't map condition type %s into type %s", v.Type, ftype)
+	}
+	if fieldTypeMap[v.Type] != ftype {
+		switch {
+		case ftype == reflect.TypeOf(netaddr.IP{}) && v.Type != dataTypeRange:
+			switch v.Type {
+			case dataTypeUint32:
+				u32 := *(*uint32)(unsafe.Pointer(&v.Value))
+				return ipv4From32(u32), nil
+			case dataTypeByteArray16:
+				var bs [16]byte
+				copy(bs[:], fromBytes(v.Value, 16))
+				return netaddr.IPFrom16(bs), nil
+			case dataTypeV4AddrMask:
+				return parseV4AddrAndMask(v.Value), nil
+			case dataTypeV6AddrMask:
+				return parseV6AddrAndMask(v.Value), nil
+			default:
+				return nil, mapErr()
+			}
+		case v.Type == dataTypeSecurityDescriptor:
+			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation(nil)) {
+				return nil, mapErr()
+			}
+			return parseSecurityDescriptor(v.Value)
+		case v.Type == dataTypeSID:
+			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation(nil)) {
+				return nil, mapErr()
+			}
+			return parseSID(v.Value)
+		case v.Type == dataTypeRange:
+			r := (*fwpRange0)(unsafe.Pointer(v.Value))
+			from, err := fromValue(r.From, ftype)
+			if err != nil {
+				return nil, fmt.Errorf("getting range.From: %w", err)
+			}
+			to, err := fromValue(r.To, ftype)
+			if err != nil {
+				return nil, fmt.Errorf("getting range.To: %w", err)
+			}
+			if reflect.TypeOf(from) != reflect.TypeOf(to) {
+				panic(fmt.Sprintf("range.From and range.To types don't match: %s / %s", reflect.TypeOf(from), reflect.TypeOf(to)))
+			}
+			if reflect.TypeOf(from) == reflect.TypeOf(netaddr.IP{}) {
+				// TODO: only return IPRange, not IPRange or IPPrefix?
+				// Less work to parse on the receiving end.
+				ret := netaddr.IPRange{from.(netaddr.IP), to.(netaddr.IP)}
+				if pfx, ok := ret.Prefix(); ok {
+					return pfx, nil
+				}
+				return ret, nil
+			}
+			return Range{from, to}, nil
+		default:
+			return nil, mapErr()
+		}
+	}
+
+	// That's all the complicated ones. For everything else we can
+	// parse by looking only at the raw type.
+	//
+	// Note that, depending on the type, we take either the
+	// unsafe.Pointer of v.Value, or &v.Value. The extra & is for
+	// values that get inlined into the Value field, everything else
+	// is when Value is a pointer to the actual value.
+	//
+	// See [TODO docs of FWP_VALUE0 here] for details.
+
+	switch v.Type {
+	case dataTypeEmpty:
+		return nil, errors.New("value is Empty")
+	case dataTypeUint8:
+		return *(*uint8)(unsafe.Pointer(&v.Value)), nil
+	case dataTypeUint16:
+		return *(*uint16)(unsafe.Pointer(&v.Value)), nil
+	case dataTypeUint32:
+		return *(*uint32)(unsafe.Pointer(&v.Value)), nil
+	case dataTypeUint64:
+		return *(*uint64)(unsafe.Pointer(v.Value)), nil
+	case dataTypeInt8:
+		return *(*int8)(unsafe.Pointer(&v.Value)), nil
+	case dataTypeInt16:
+		return *(*int16)(unsafe.Pointer(&v.Value)), nil
+	case dataTypeInt32:
+		return *(*int32)(unsafe.Pointer(&v.Value)), nil
+	case dataTypeInt64:
+		return *(*int64)(unsafe.Pointer(v.Value)), nil
+	case dataTypeFloat:
+		return *(*float32)(unsafe.Pointer(&v.Value)), nil
+	case dataTypeDouble:
+		return *(*float64)(unsafe.Pointer(v.Value)), nil
+	case dataTypeByteArray16:
+		var ret [16]byte
+		copy(ret[:], fromBytes(v.Value, 16))
+		return ret, nil
+	case dataTypeByteBlob:
+		return fromByteBlob(*(*fwpByteBlob)(unsafe.Pointer(v.Value))), nil
+	case dataTypeSID:
+		return parseSID(v.Value)
+	case dataTypeSecurityDescriptor:
+		return parseSecurityDescriptor(v.Value)
+	case dataTypeTokenInformation:
+		return nil, errors.New("TODO TokenInformation")
+	case dataTypeTokenAccessInformation:
+		return nil, errors.New("TODO TokenAccessInformation")
+	case dataTypeUnicodeString:
+		return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(v.Value))), nil
+	case dataTypeArray6:
+		var ret [6]byte
+		copy(ret[:], fromBytes(v.Value, 6))
+		return ret, nil
+	case dataTypeBitmapIndex:
+		return nil, errors.New("TODO BitmapIndex")
+	case dataTypeBitmapArray64:
+		return Bitmap64(*(*uint64)(unsafe.Pointer(v.Value))), nil
+	case dataTypeV4AddrMask:
+		return parseV4AddrAndMask(v.Value), nil
+	case dataTypeV6AddrMask:
+		return parseV6AddrAndMask(v.Value), nil
+	default:
+		return nil, fmt.Errorf("unknown value type %d", v.Type)
+	}
+}
+
+func parseV4AddrAndMask(v uintptr) netaddr.IPPrefix {
+	v4 := *(*fwpV4AddrAndMask)(unsafe.Pointer(v))
+	ip := netaddr.IPv4(uint8(v4.Addr>>24), uint8(v4.Addr>>16), uint8(v4.Addr>>8), uint8(v4.Addr))
+	bits := uint8(32 - bits.TrailingZeros32(v4.Mask))
+	return netaddr.IPPrefix{
+		IP:   ip,
+		Bits: bits,
+	}
+}
+
+func parseV6AddrAndMask(v uintptr) netaddr.IPPrefix {
+	v6 := *(*fwpV6AddrAndMask)(unsafe.Pointer(v))
+	return netaddr.IPPrefix{
+		IP:   netaddr.IPFrom16(v6.Addr),
+		Bits: v6.PrefixLength,
+	}
+}
+
+func parseSID(v uintptr) (*windows.SID, error) {
+	// TODO: export IsValidSid in x/sys/windows so we can vaguely
+	// verify this pointer.
+	sid := (*windows.SID)(unsafe.Pointer(v))
+	// Copy the SID into Go memory.
+	dsid, err := sid.Copy()
+	if err != nil {
+		return nil, err
+	}
+	return dsid, nil
+}
+
+func parseSecurityDescriptor(v uintptr) (*windows.SECURITY_DESCRIPTOR, error) {
+	// The security descriptor is embedded in the API response as
+	// a byte slice.
+	bb := fromByteBlob(*(*fwpByteBlob)(unsafe.Pointer(v)))
+	relSD := (*windows.SECURITY_DESCRIPTOR)(unsafe.Pointer(&bb[0]))
+	return relSD, nil
+}
+
+func ipv4From32(v uint32) netaddr.IP {
+	return netaddr.IPv4(uint8(v>>24), uint8(v>>16), uint8(v>>8), uint8(v))
+}
+
+func fromBytes(bb uintptr, length int) []byte {
+	var bs []byte
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
+	sh.Cap = length
+	sh.Len = length
+	sh.Data = bb
+	return append([]byte(nil), bs...)
+
 }
 
 // fromByteBlob extracts the bytes from bb and returns them as a
