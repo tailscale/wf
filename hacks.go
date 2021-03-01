@@ -61,58 +61,18 @@ const (
 	filterEnumFlagsIncludeDisabled
 )
 
-type actionType uint32
-
-const (
-	actionTypeBlock              actionType = 0x1001
-	actionTypePermit             actionType = 0x1002
-	actionTypeCalloutTerminating actionType = 0x5003
-	actionTypeCalloutInspection  actionType = 0x6004
-	actionTypeCalloutUnknown     actionType = 0x4005
-)
-
-type matchType uint32
-
-const (
-	matchEqual matchType = iota
-	matchGreater
-	matchLess
-	matchGreaterOrEqual
-	matchLessOrEqual
-	matchRange
-	matchFlagsAllSet
-	matchFlagsAnySet
-	matchFlagsNoneSet
-	matchEqualCaseInsensitive
-	matchNotEqual
-	matchPrefix
-	matchNotPrefix
-)
-
-type filterFlags uint32
-
-const (
-	filterFlagsPersistent filterFlags = 1 << iota
-	filterFlagsBootTime
-	filterFlagsHasProviderContext
-	filterFlagsClearActionRight
-	filterFlagsPermitIfCalloutUnregistered
-	filterFlagsDisabled
-	filterFlagsIndexed
-)
-
 type filter struct {
 	Key                windows.GUID
 	Name               string
 	Description        string
-	Flags              filterFlags
+	Flags              fwpmFilterFlags
 	ProviderKey        *windows.GUID
 	ProviderData       []byte
 	LayerKey           windows.GUID
 	SubLayerKey        windows.GUID
 	Weight             value
 	Conditions         []condition
-	Action             action
+	Action             Action
 	ProviderContextKey windows.GUID
 	Reserved           *windows.GUID
 	FilterID           uint64
@@ -121,13 +81,8 @@ type filter struct {
 
 type condition struct {
 	Field windows.GUID
-	Op    matchType
+	Op    MatchType
 	value value
-}
-
-type action struct {
-	Type actionType
-	GUID windows.GUID
 }
 
 func (s *Session) filters() ([]*filter, error) {
@@ -165,10 +120,10 @@ func (s *Session) filters() ([]*filter, error) {
 				ProviderKey:        filterv.ProviderKey,
 				ProviderData:       getByteBlob(filterv.ProviderData),
 				LayerKey:           filterv.LayerKey,
-				SubLayerKey:        filterv.SubLayerKey,
+				SubLayerKey:        filterv.SublayerKey,
 				Weight:             nil, // TODO,
 				Conditions:         nil, // TODO
-				Action:             filterv.Action,
+				Action:             filterv.Action.Type,
 				ProviderContextKey: filterv.ProviderContextKey,
 				FilterID:           filterv.FilterID,
 				EffectiveWeight:    nil, // TODO
@@ -183,35 +138,6 @@ func (s *Session) filters() ([]*filter, error) {
 		}
 	}
 }
-
-type dataType uint32
-
-const (
-	dataTypeEmpty dataType = iota
-	dataTypeUint8
-	dataTypeUint16
-	dataTypeUint32
-	dataTypeUint64
-	dataTypeInt8
-	dataTypeInt16
-	dataTypeInt32
-	dataTypeInt64
-	dataTypeFloat
-	dataTypeDouble
-	dataTypeByteArray16
-	dataTypeByteBlob
-	dataTypeSID
-	dataTypeSecurityDescriptor
-	dataTypeTokenInformation
-	dataTypeTokenAccessInformation
-	dataTypeUnicodeString
-	dataTypeArray6
-	dataTypeBitmapIndex
-	dataTypeBitmapArray64
-	dataTypeV4AddrMask dataType = 0x100 + iota
-	dataTypeV6AddrMask
-	dataTypeRange
-)
 
 type value interface{}
 

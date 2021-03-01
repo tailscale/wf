@@ -62,6 +62,36 @@ const (
 	fwpmFieldTypeFlags                          // data is a flag bitfield
 )
 
+type dataType uint32
+
+const (
+	dataTypeEmpty dataType = iota
+	dataTypeUint8
+	dataTypeUint16
+	dataTypeUint32
+	dataTypeUint64
+	dataTypeInt8
+	dataTypeInt16
+	dataTypeInt32
+	dataTypeInt64
+	dataTypeFloat
+	dataTypeDouble
+	dataTypeByteArray16
+	dataTypeByteBlob
+	dataTypeSID
+	dataTypeSecurityDescriptor
+	dataTypeTokenInformation
+	dataTypeTokenAccessInformation
+	dataTypeUnicodeString
+	dataTypeArray6
+	dataTypeBitmapIndex
+	dataTypeBitmapArray64
+
+	dataTypeV4AddrMask = 256
+	dataTypeV6AddrMask = 257
+	dataTypeRange      = 258
+)
+
 type fwpmField0 struct {
 	FieldKey *windows.GUID
 	Type     fwpmFieldType
@@ -114,18 +144,35 @@ type fwpValue0 struct {
 	Value uintptr // unioned value
 }
 
+type fwpmFilterFlags uint32
+
+const (
+	fwpmFilterFlagsPersistent fwpmFilterFlags = 1 << iota
+	fwpmFilterFlagsBootTime
+	fwpmFilterFlagsHasProviderContext
+	fwpmFilterFlagsClearActionRight
+	fwpmFilterFlagsPermitIfCalloutUnregistered
+	fwpmFilterFlagsDisabled
+	fwpmFilterFlagsIndexed
+)
+
+type fwpmAction0 struct {
+	Type Action
+	GUID windows.GUID
+}
+
 type fwpmFilter0 struct {
 	FilterKey           windows.GUID
 	DisplayData         fwpmDisplayData0
-	Flags               filterFlags
+	Flags               fwpmFilterFlags
 	ProviderKey         *windows.GUID
 	ProviderData        fwpByteBlob
 	LayerKey            windows.GUID
-	SubLayerKey         windows.GUID
+	SublayerKey         windows.GUID
 	Weight              fwpValue0
 	NumFilterConditions uint32
 	FilterConditions    *fwpmFilterCondition0
-	Action              action
+	Action              fwpmAction0
 	ProviderContextKey  windows.GUID
 	Reserved            *windows.GUID
 	FilterID            uint64
@@ -138,9 +185,9 @@ type fwpConditionValue0 struct {
 }
 
 type fwpmFilterCondition0 struct {
-	FieldKey       windows.GUID
-	MatchType      matchType
-	ConditionValue fwpConditionValue0
+	FieldKey  windows.GUID
+	MatchType MatchType
+	Value     fwpConditionValue0
 }
 
 type fwpV4AddrAndMask struct {
@@ -167,4 +214,8 @@ type fwpmFilterEnumTemplate0 struct {
 	Conditions              *fwpmFilterCondition0
 	ActionMask              uint32
 	CalloutKey              *windows.GUID
+}
+
+type fwpRange0 struct {
+	From, To fwpValue0
 }
