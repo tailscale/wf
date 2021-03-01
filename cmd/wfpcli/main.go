@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
+	"golang.org/x/sys/windows"
 	"inet.af/wf"
 )
 
@@ -34,12 +35,32 @@ var (
 		Exec:       listSublayers,
 	}
 
+	addSublayerFS       = flag.NewFlagSet("wfpcli add-sublayer", flag.ExitOnError)
+	sublayerName        = addSublayerFS.String("name", "", "Sublayer name")
+	sublayerDescription = addSublayerFS.String("description", "", "Sublayer description")
+	sublayerPersistent  = addSublayerFS.Bool("persistent", false, "Whether the sublayer is persistent")
+	sublayerWeight      = addSublayerFS.Int("weight", 1, "Sublayer weight")
+	addSublayerC        = &ffcli.Command{
+		Name:       "add-sublayer",
+		ShortUsage: "wfpcli add-sublayer",
+		ShortHelp:  "Add WFP sublayer.",
+		FlagSet:    addSublayerFS,
+		Exec:       addSublayer,
+	}
+
+	delSublayerC = &ffcli.Command{
+		Name:       "del-sublayer",
+		ShortUsage: "wfpcli del-sublayer <guid>",
+		ShortHelp:  "Delete WFP sublayer.",
+		Exec:       delSublayer,
+	}
+
 	rootFS  = flag.NewFlagSet("wfpcli", flag.ExitOnError)
 	dynamic = rootFS.Bool("dynamic", false, "Use a dynamic WFP session")
 	root    = &ffcli.Command{
 		ShortUsage:  "wfpcli <subcommand>",
 		FlagSet:     rootFS,
-		Subcommands: []*ffcli.Command{listProvidersC, listLayersC, listSublayersC},
+		Subcommands: []*ffcli.Command{listProvidersC, listLayersC, listSublayersC, addSublayerC, delSublayerC},
 		Exec: func(context.Context, []string) error {
 			return flag.ErrHelp
 		},
@@ -53,14 +74,31 @@ func main() {
 	}
 }
 
-var sessOpts = &wf.SessionOptions{
-	Name:        "wfpcli",
-	Description: "WFP CLI",
-	Dynamic:     true,
+func session() (*wf.Session, error) {
+	return wf.New(&wf.SessionOptions{
+		Name:        "wfpcli",
+		Description: "WFP CLI",
+		Dynamic:     *dynamic,
+	})
+}
+
+func mustGUID() windows.GUID {
+	ret, err := windows.GenerateGUID()
+	if err != nil {
+		panic(err)
+	}
+	return ret
+}
+
+func displayName(guid windows.GUID, name string) string {
+	if name != "" {
+		return name
+	}
+	return wf.GUIDName(guid)
 }
 
 func listProviders(_ context.Context, _ []string) error {
-	sess, err := wf.New(sessOpts)
+	sess, err := session()
 	if err != nil {
 		return fmt.Errorf("creating WFP session: %w", err)
 	}
@@ -72,7 +110,8 @@ func listProviders(_ context.Context, _ []string) error {
 	}
 
 	for _, provider := range providers {
-		fmt.Printf("%s\n", wf.GUIDName(provider.Key))
+		fmt.Printf("%s\n", displayName(provider.Key, provider.Name))
+		fmt.Printf("  GUID: %s\n", provider.Key)
 		fmt.Printf("  Name: %q\n", provider.Name)
 		if provider.Description != "" {
 			fmt.Printf("  Description: %q\n", provider.Description)
@@ -92,7 +131,7 @@ func listProviders(_ context.Context, _ []string) error {
 }
 
 func listLayers(_ context.Context, _ []string) error {
-	sess, err := wf.New(sessOpts)
+	sess, err := session()
 	if err != nil {
 		return fmt.Errorf("creating WFP session: %w", err)
 	}
@@ -104,13 +143,16 @@ func listLayers(_ context.Context, _ []string) error {
 	}
 
 	for _, layer := range layers {
-		fmt.Printf("%s\n", wf.GUIDName(layer.Key))
+		fmt.Printf("%s\n", displayName(layer.Key, layer.Name))
+		fmt.Printf("  GUID: %s\n", layer.Key)
 		fmt.Printf("  Name: %q\n", layer.Name)
 		if layer.Description != "" {
 			fmt.Printf("  Description: %q\n", layer.Description)
 		}
 		for _, field := range layer.Fields {
-			fmt.Printf("  Field: %s (%s)\n", wf.GUIDName(field.Key), field.Type)
+			fmt.Printf("  Field: %s\n", wf.GUIDName(field.Key))
+			fmt.Printf("    GUID: %s\n", field.Key)
+			fmt.Printf("    Type: %s\n", field.Type)
 		}
 		fmt.Printf("\n")
 	}
@@ -119,7 +161,7 @@ func listLayers(_ context.Context, _ []string) error {
 }
 
 func listSublayers(_ context.Context, _ []string) error {
-	sess, err := wf.New(sessOpts)
+	sess, err := session()
 	if err != nil {
 		return fmt.Errorf("creating WFP session: %w", err)
 	}
@@ -131,7 +173,8 @@ func listSublayers(_ context.Context, _ []string) error {
 	}
 
 	for _, sublayer := range sublayers {
-		fmt.Printf("%s\n", wf.GUIDName(sublayer.Key))
+		fmt.Printf("%s\n", displayName(sublayer.Key, sublayer.Name))
+		fmt.Printf("  GUID: %s\n", sublayer.Key)
 		fmt.Printf("  Name: %q\n", sublayer.Name)
 		if sublayer.Description != "" {
 			fmt.Printf("  Description: %q\n", sublayer.Description)
@@ -146,6 +189,55 @@ func listSublayers(_ context.Context, _ []string) error {
 		fmt.Printf("  Weight: %d\n", sublayer.Weight)
 		fmt.Printf("\n")
 	}
+
+	return nil
+}
+
+func addSublayer(_ context.Context, _ []string) error {
+	sess, err := session()
+	if err != nil {
+		return fmt.Errorf("creating WFP session: %w", err)
+	}
+	defer sess.Close()
+
+	sl := &wf.Sublayer{
+		Key:         mustGUID(),
+		Name:        *sublayerName,
+		Description: *sublayerDescription,
+		Persistent:  *sublayerPersistent,
+		Weight:      uint16(*sublayerWeight),
+	}
+
+	if err := sess.AddSublayer(sl); err != nil {
+		return fmt.Errorf("creating sublayer: %w", err)
+	}
+
+	fmt.Printf("Created sublayer %s\n", sl.Key)
+	return nil
+}
+
+func delSublayer(_ context.Context, args []string) error {
+	if len(args) != 1 {
+		fmt.Fprintf(os.Stderr, "GUID is required\n")
+		return flag.ErrHelp
+	}
+
+	guid, err := windows.GUIDFromString(args[0])
+	if err != nil {
+		return fmt.Errorf("Parsing GUID: %w", err)
+	}
+
+	sess, err := session()
+	if err != nil {
+		return fmt.Errorf("creating WFP session: %w", err)
+	}
+	defer sess.Close()
+
+	if err := sess.DeleteSublayer(guid); err != nil {
+		return fmt.Errorf("deleting sublayer: %w", err)
+	}
+
+	fmt.Printf("Deleted sublayer %s\n", guid)
 
 	return nil
 }
