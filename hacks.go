@@ -15,31 +15,6 @@ import (
 // This file is all the stuff I hacked on late at night, which needs
 // cleaning up before it's up to actual publication standards.
 
-func (s *Session) AddSublayer(sublayer *Sublayer) error {
-	if sublayer.Key == (windows.GUID{}) {
-		return errors.New("Sublayer.Key cannot be zero")
-	}
-
-	sl := fwpmSublayer0{
-		SublayerKey: sublayer.Key,
-		DisplayData: mkDisplayData(sublayer.Name, sublayer.Description),
-		//		Flags:        sublayer.Flags,
-		ProviderKey:  sublayer.Provider,
-		ProviderData: mkByteBlob(sublayer.ProviderData),
-		Weight:       sublayer.Weight,
-	}
-
-	return fwpmSubLayerAdd0(s.handle, &sl, nil)
-}
-
-func (s *Session) DeleteSublayer(id windows.GUID) error {
-	if id == (windows.GUID{}) {
-		return errors.New("GUID cannot be zero")
-	}
-
-	return fwpmSubLayerDeleteByKey0(s.handle, &id)
-}
-
 func mkDisplayData(name, description string) fwpmDisplayData0 {
 	return fwpmDisplayData0{
 		Name:        windows.StringToUTF16Ptr(name),
