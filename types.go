@@ -65,7 +65,7 @@ const (
 type fwpmField0 struct {
 	FieldKey *windows.GUID
 	Type     fwpmFieldType
-	DataType DataType
+	DataType dataType
 }
 
 type fwpmSublayerEnumTemplate0 struct {
@@ -110,14 +110,14 @@ type fwpmProvider0 struct {
 }
 
 type fwpValue0 struct {
-	Type  DataType
+	Type  dataType
 	Value uintptr // unioned value
 }
 
 type fwpmFilter0 struct {
 	FilterKey           windows.GUID
 	DisplayData         fwpmDisplayData0
-	Flags               FilterFlags
+	Flags               filterFlags
 	ProviderKey         *windows.GUID
 	ProviderData        fwpByteBlob
 	LayerKey            windows.GUID
@@ -125,7 +125,7 @@ type fwpmFilter0 struct {
 	Weight              fwpValue0
 	NumFilterConditions uint32
 	FilterConditions    *fwpmFilterCondition0
-	Action              Action
+	Action              action
 	ProviderContextKey  windows.GUID
 	Reserved            *windows.GUID
 	FilterID            uint64
@@ -133,13 +133,13 @@ type fwpmFilter0 struct {
 }
 
 type fwpConditionValue0 struct {
-	Type  DataType
+	Type  dataType
 	Value uintptr
 }
 
 type fwpmFilterCondition0 struct {
 	FieldKey       windows.GUID
-	MatchType      MatchType
+	MatchType      matchType
 	ConditionValue fwpConditionValue0
 }
 
@@ -160,8 +160,8 @@ type fwpmProviderContextEnumTemplate0 struct {
 type fwpmFilterEnumTemplate0 struct {
 	ProviderKey             *windows.GUID
 	LayerKey                windows.GUID
-	EnumType                FilterEnumType
-	Flags                   FilterEnumFlags
+	EnumType                filterEnumType
+	Flags                   filterEnumFlags
 	ProviderContextTemplate *fwpmProviderContextEnumTemplate0 // TODO: wtf?
 	NumConditions           uint32
 	Conditions              *fwpmFilterCondition0

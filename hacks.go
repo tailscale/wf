@@ -44,93 +44,93 @@ func getByteBlob(bb fwpByteBlob) []byte {
 	return append([]byte(nil), blob...)
 }
 
-type FilterEnumType uint32
+type filterEnumType uint32
 
 const (
-	FilterEnumTypeFullyContained FilterEnumType = iota
-	FilterEnumTypeOverlapping
+	filterEnumTypeFullyContained filterEnumType = iota
+	filterEnumTypeOverlapping
 )
 
-type FilterEnumFlags uint32
+type filterEnumFlags uint32
 
 const (
-	FilterEnumFlagsBestTerminatingMatch FilterEnumFlags = iota + 1
-	FilterEnumFlagsSorted
-	FilterEnumFlagsBootTimeOnly
-	FilterEnumFlagsIncludeBootTime
-	FilterEnumFlagsIncludeDisabled
+	filterEnumFlagsBestTerminatingMatch filterEnumFlags = iota + 1
+	filterEnumFlagsSorted
+	filterEnumFlagsBootTimeOnly
+	filterEnumFlagsIncludeBootTime
+	filterEnumFlagsIncludeDisabled
 )
 
-type ActionType uint32
+type actionType uint32
 
 const (
-	ActionTypeBlock              ActionType = 0x1001
-	ActionTypePermit             ActionType = 0x1002
-	ActionTypeCalloutTerminating ActionType = 0x5003
-	ActionTypeCalloutInspection  ActionType = 0x6004
-	ActionTypeCalloutUnknown     ActionType = 0x4005
+	actionTypeBlock              actionType = 0x1001
+	actionTypePermit             actionType = 0x1002
+	actionTypeCalloutTerminating actionType = 0x5003
+	actionTypeCalloutInspection  actionType = 0x6004
+	actionTypeCalloutUnknown     actionType = 0x4005
 )
 
-type MatchType uint32
+type matchType uint32
 
 const (
-	MatchEqual MatchType = iota
-	MatchGreater
-	MatchLess
-	MatchGreaterOrEqual
-	MatchLessOrEqual
-	MatchRange
-	MatchFlagsAllSet
-	MatchFlagsAnySet
-	MatchFlagsNoneSet
-	MatchEqualCaseInsensitive
-	MatchNotEqual
-	MatchPrefix
-	MatchNotPrefix
+	matchEqual matchType = iota
+	matchGreater
+	matchLess
+	matchGreaterOrEqual
+	matchLessOrEqual
+	matchRange
+	matchFlagsAllSet
+	matchFlagsAnySet
+	matchFlagsNoneSet
+	matchEqualCaseInsensitive
+	matchNotEqual
+	matchPrefix
+	matchNotPrefix
 )
 
-type FilterFlags uint32
+type filterFlags uint32
 
 const (
-	FilterFlagsPersistent FilterFlags = 1 << iota
-	FilterFlagsBootTime
-	FilterFlagsHasProviderContext
-	FilterFlagsClearActionRight
-	FilterFlagsPermitIfCalloutUnregistered
-	FilterFlagsDisabled
-	FilterFlagsIndexed
+	filterFlagsPersistent filterFlags = 1 << iota
+	filterFlagsBootTime
+	filterFlagsHasProviderContext
+	filterFlagsClearActionRight
+	filterFlagsPermitIfCalloutUnregistered
+	filterFlagsDisabled
+	filterFlagsIndexed
 )
 
-type Filter struct {
+type filter struct {
 	Key                windows.GUID
 	Name               string
 	Description        string
-	Flags              FilterFlags
+	Flags              filterFlags
 	ProviderKey        *windows.GUID
 	ProviderData       []byte
 	LayerKey           windows.GUID
 	SubLayerKey        windows.GUID
-	Weight             Value
-	Conditions         []Condition
-	Action             Action
+	Weight             value
+	Conditions         []condition
+	Action             action
 	ProviderContextKey windows.GUID
 	Reserved           *windows.GUID
 	FilterID           uint64
-	EffectiveWeight    Value
+	EffectiveWeight    value
 }
 
-type Condition struct {
+type condition struct {
 	Field windows.GUID
-	Op    MatchType
-	Value Value
+	Op    matchType
+	value value
 }
 
-type Action struct {
-	Type ActionType
+type action struct {
+	Type actionType
 	GUID windows.GUID
 }
 
-func (s *Session) Filters() ([]*Filter, error) {
+func (s *Session) filters() ([]*filter, error) {
 	var enum windows.Handle
 	if err := fwpmFilterCreateEnumHandle0(s.handle, nil, &enum); err != nil {
 		fmt.Printf("%T\n", err)
@@ -139,7 +139,7 @@ func (s *Session) Filters() ([]*Filter, error) {
 	}
 	defer fwpmFilterDestroyEnumHandle0(s.handle, enum)
 
-	var ret []*Filter
+	var ret []*filter
 
 	const pageSize = 100
 	for {
@@ -156,21 +156,21 @@ func (s *Session) Filters() ([]*Filter, error) {
 		sh.Len = int(num)
 		sh.Data = uintptr(unsafe.Pointer(filtersArray))
 
-		for _, filter := range filters {
-			f := &Filter{
-				Key:                filter.FilterKey,
-				Name:               windows.UTF16PtrToString(filter.DisplayData.Name),
-				Description:        windows.UTF16PtrToString(filter.DisplayData.Description),
-				Flags:              filter.Flags,
-				ProviderKey:        filter.ProviderKey,
-				ProviderData:       getByteBlob(filter.ProviderData),
-				LayerKey:           filter.LayerKey,
-				SubLayerKey:        filter.SubLayerKey,
+		for _, filterv := range filters {
+			f := &filter{
+				Key:                filterv.FilterKey,
+				Name:               windows.UTF16PtrToString(filterv.DisplayData.Name),
+				Description:        windows.UTF16PtrToString(filterv.DisplayData.Description),
+				Flags:              filterv.Flags,
+				ProviderKey:        filterv.ProviderKey,
+				ProviderData:       getByteBlob(filterv.ProviderData),
+				LayerKey:           filterv.LayerKey,
+				SubLayerKey:        filterv.SubLayerKey,
 				Weight:             nil, // TODO,
 				Conditions:         nil, // TODO
-				Action:             filter.Action,
-				ProviderContextKey: filter.ProviderContextKey,
-				FilterID:           filter.FilterID,
+				Action:             filterv.Action,
+				ProviderContextKey: filterv.ProviderContextKey,
+				FilterID:           filterv.FilterID,
 				EffectiveWeight:    nil, // TODO
 			}
 			ret = append(ret, f)
@@ -184,38 +184,38 @@ func (s *Session) Filters() ([]*Filter, error) {
 	}
 }
 
-type DataType uint32
+type dataType uint32
 
 const (
-	DataTypeEmpty DataType = iota
-	DataTypeUint8
-	DataTypeUint16
-	DataTypeUint32
-	DataTypeUint64
-	DataTypeInt8
-	DataTypeInt16
-	DataTypeInt32
-	DataTypeInt64
-	DataTypeFloat
-	DataTypeDouble
-	DataTypeByteArray16
-	DataTypeByteBlob
-	DataTypeSID
-	DataTypeSecurityDescriptor
-	DataTypeTokenInformation
-	DataTypeTokenAccessInformation
-	DataTypeUnicodeString
-	DataTypeArray6
-	DataTypeBitmapIndex
-	DataTypeBitmapArray64
-	DataTypeV4AddrMask DataType = 0x100 + iota
-	DataTypeV6AddrMask
-	DataTypeRange
+	dataTypeEmpty dataType = iota
+	dataTypeUint8
+	dataTypeUint16
+	dataTypeUint32
+	dataTypeUint64
+	dataTypeInt8
+	dataTypeInt16
+	dataTypeInt32
+	dataTypeInt64
+	dataTypeFloat
+	dataTypeDouble
+	dataTypeByteArray16
+	dataTypeByteBlob
+	dataTypeSID
+	dataTypeSecurityDescriptor
+	dataTypeTokenInformation
+	dataTypeTokenAccessInformation
+	dataTypeUnicodeString
+	dataTypeArray6
+	dataTypeBitmapIndex
+	dataTypeBitmapArray64
+	dataTypeV4AddrMask dataType = 0x100 + iota
+	dataTypeV6AddrMask
+	dataTypeRange
 )
 
-type Value interface{}
+type value interface{}
 
-func ValueValid(v Value) bool {
+func valueValid(v value) bool {
 	switch v.(type) {
 	case uint8, uint16, uint32, uint64, int8, int16, int32, int64, float32, float64, []byte, string, netaddr.IPPrefix:
 		return true
@@ -224,7 +224,7 @@ func ValueValid(v Value) bool {
 	}
 }
 
-func valueToValue0(v Value) (ret fwpValue0, ref interface{}) {
+func valueToValue0(v value) (ret fwpValue0, ref interface{}) {
 	switch v.(type) {
 	case netaddr.IPPrefix:
 		return
@@ -234,60 +234,60 @@ func valueToValue0(v Value) (ret fwpValue0, ref interface{}) {
 	}
 }
 
-func valueToFilterConditionValue0(v Value) (ret fwpConditionValue0, ref interface{}) {
-	if !ValueValid(v) {
+func valueToFilterConditionValue0(v value) (ret fwpConditionValue0, ref interface{}) {
+	if !valueValid(v) {
 		return
 	}
 	switch c := v.(type) {
 	case uint8:
-		ret.Type = DataTypeUint8
+		ret.Type = dataTypeUint8
 		*(*uint8)(unsafe.Pointer(&ret.Value)) = c
 	case uint16:
-		ret.Type = DataTypeUint16
+		ret.Type = dataTypeUint16
 		*(*uint16)(unsafe.Pointer(&ret.Value)) = c
 	case uint32:
-		ret.Type = DataTypeUint32
+		ret.Type = dataTypeUint32
 		*(*uint32)(unsafe.Pointer(&ret.Value)) = c
 	case uint64:
-		ret.Type = DataTypeUint64
+		ret.Type = dataTypeUint64
 		up := &c
 		ref = up
 		ret.Value = uintptr(unsafe.Pointer(up))
 	case int8:
-		ret.Type = DataTypeInt8
+		ret.Type = dataTypeInt8
 		*(*int8)(unsafe.Pointer(&ret.Value)) = c
 	case int16:
-		ret.Type = DataTypeInt16
+		ret.Type = dataTypeInt16
 		*(*int16)(unsafe.Pointer(&ret.Value)) = c
 	case int32:
-		ret.Type = DataTypeInt32
+		ret.Type = dataTypeInt32
 		*(*int32)(unsafe.Pointer(&ret.Value)) = c
 	case int64:
-		ret.Type = DataTypeInt64
+		ret.Type = dataTypeInt64
 		up := &c
 		ref = up
 		ret.Value = uintptr(unsafe.Pointer(up))
 	case float32:
-		ret.Type = DataTypeFloat
+		ret.Type = dataTypeFloat
 		*(*float32)(unsafe.Pointer(&ret.Value)) = c
 	case float64:
-		ret.Type = DataTypeDouble
+		ret.Type = dataTypeDouble
 		dp := &c
 		ref = dp
 		ret.Value = uintptr(unsafe.Pointer(dp))
 	case []byte:
-		ret.Type = DataTypeByteBlob
+		ret.Type = dataTypeByteBlob
 		bb := mkByteBlob(c)
 		ref = &bb
 		ret.Value = uintptr(unsafe.Pointer(&bb))
 	case string:
-		ret.Type = DataTypeUnicodeString
+		ret.Type = dataTypeUnicodeString
 		s := windows.StringToUTF16Ptr(c)
 		ref = s
 		ret.Value = uintptr(unsafe.Pointer(s))
 	case netaddr.IPPrefix:
 		if c.IP.Is4() {
-			ret.Type = DataTypeV4AddrMask
+			ret.Type = dataTypeV4AddrMask
 			ip4 := c.IP.As4()
 			m4 := net.CIDRMask(int(c.Bits), 32)
 			pfx := &fwpV4AddrAndMask{
@@ -297,7 +297,7 @@ func valueToFilterConditionValue0(v Value) (ret fwpConditionValue0, ref interfac
 			ref = pfx
 			ret.Value = uintptr(unsafe.Pointer(pfx))
 		} else {
-			ret.Type = DataTypeV6AddrMask
+			ret.Type = dataTypeV6AddrMask
 			pfx := &fwpV6AddrAndMask{
 				PrefixLength: c.Bits,
 			}
@@ -311,35 +311,35 @@ func valueToFilterConditionValue0(v Value) (ret fwpConditionValue0, ref interfac
 	return ret, ref
 }
 
-func mkValue(typ DataType, v uintptr) Value {
+func mkValue(typ dataType, v uintptr) value {
 	switch typ {
-	case DataTypeUint8:
+	case dataTypeUint8:
 		return *(*uint8)(unsafe.Pointer(&v))
-	case DataTypeUint16:
+	case dataTypeUint16:
 		return *(*uint16)(unsafe.Pointer(&v))
-	case DataTypeUint32:
+	case dataTypeUint32:
 		return *(*uint32)(unsafe.Pointer(&v))
-	case DataTypeUint64:
+	case dataTypeUint64:
 		return *(*uint64)(unsafe.Pointer(v))
-	case DataTypeInt8:
+	case dataTypeInt8:
 		return *(*int8)(unsafe.Pointer(&v))
-	case DataTypeInt16:
+	case dataTypeInt16:
 		return *(*int16)(unsafe.Pointer(&v))
-	case DataTypeInt32:
+	case dataTypeInt32:
 		return *(*int32)(unsafe.Pointer(&v))
-	case DataTypeInt64:
+	case dataTypeInt64:
 		return *(*int64)(unsafe.Pointer(v))
-	case DataTypeFloat:
+	case dataTypeFloat:
 		return *(*float32)(unsafe.Pointer(&v))
-	case DataTypeDouble:
+	case dataTypeDouble:
 		return *(*float64)(unsafe.Pointer(v))
-	case DataTypeByteBlob:
+	case dataTypeByteBlob:
 		bb := (*fwpByteBlob)(unsafe.Pointer(v))
 		return getByteBlob(*bb)
-	case DataTypeUnicodeString:
+	case dataTypeUnicodeString:
 		s := (*uint16)(unsafe.Pointer(v))
 		return windows.UTF16PtrToString(s)
-	case DataTypeV4AddrMask:
+	case dataTypeV4AddrMask:
 		pfx := (*fwpV4AddrAndMask)(unsafe.Pointer(v))
 		bits := 32 - bits.TrailingZeros32(pfx.Mask)
 		var vs []byte
@@ -352,7 +352,7 @@ func mkValue(typ DataType, v uintptr) Value {
 			IP:   ip,
 			Bits: uint8(bits),
 		}
-	case DataTypeV6AddrMask:
+	case dataTypeV6AddrMask:
 		pfx := (*fwpV6AddrAndMask)(unsafe.Pointer(v))
 		return netaddr.IPPrefix{
 			IP:   netaddr.IPFrom16(pfx.Addr),
