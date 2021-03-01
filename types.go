@@ -54,9 +54,17 @@ type fwpmLayer0 struct {
 	LayerID            uint16
 }
 
+type fwpmFieldType uint32
+
+const (
+	fwpmFieldTypeRawData   fwpmFieldType = iota // no special semantics
+	fwpmFieldTypeIPAddress                      // data is an IP address
+	fwpmFieldTypeFlags                          // data is a flag bitfield
+)
+
 type fwpmField0 struct {
 	FieldKey *windows.GUID
-	Type     FieldType
+	Type     fwpmFieldType
 	DataType DataType
 }
 
