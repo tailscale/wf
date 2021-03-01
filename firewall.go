@@ -1,6 +1,7 @@
 package wf
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -354,6 +355,35 @@ func toSublayers(sublayersArray **fwpmSublayer0, numSublayers uint32) ([]*Sublay
 	return ret, nil
 }
 
+// AddSublayer creates a new Sublayer.
+func (s *Session) AddSublayer(sl *Sublayer) error {
+	// the WFP API accepts zero GUIDs and interprets it as "give me a
+	// random GUID". However, we can't get that GUID back out, so it
+	// would be pointless to make such a request. Stop it here.
+	if sl.Key == (windows.GUID{}) {
+		return errors.New("Sublayer.Key cannot be zero")
+	}
+
+	sl0 := fwpmSublayer0{
+		SublayerKey:  sl.Key,
+		DisplayData:  toDisplayData(sl.Name, sl.Description),
+		ProviderKey:  sl.Provider,
+		ProviderData: toByteBlob(sl.ProviderData),
+		Weight:       sl.Weight,
+	}
+
+	return fwpmSubLayerAdd0(s.handle, &sl0, nil) // TODO: security descriptor
+}
+
+// DeleteSublayer deletes the Sublayer whose GUID is id.
+func (s *Session) DeleteSublayer(id windows.GUID) error {
+	if id == (windows.GUID{}) {
+		return errors.New("GUID cannot be zero")
+	}
+
+	return fwpmSubLayerDeleteByKey0(s.handle, &id)
+}
+
 // GUIDName returns a human-readable name for standard WFP GUIDs. If g
 // is not a standard WFP GUID, g.String() is returned.
 func GUIDName(g windows.GUID) string {
@@ -377,4 +407,24 @@ func fromByteBlob(bb fwpByteBlob) []byte {
 	sh.Data = uintptr(unsafe.Pointer(bb.Data))
 
 	return append([]byte(nil), blob...)
+}
+
+// toByteBlob packs bs into fwpByteBlob. The returned fwpByteBlob
+// shares memory with bs.
+func toByteBlob(bs []byte) fwpByteBlob {
+	if len(bs) == 0 {
+		return fwpByteBlob{0, nil}
+	}
+	return fwpByteBlob{
+		Size: uint32(len(bs)),
+		Data: &bs[0],
+	}
+}
+
+// toDisplayData packs name and description into a fwpmDisplayData0.
+func toDisplayData(name, description string) fwpmDisplayData0 {
+	return fwpmDisplayData0{
+		Name:        windows.StringToUTF16Ptr(name),
+		Description: windows.StringToUTF16Ptr(description),
+	}
 }
