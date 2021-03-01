@@ -459,6 +459,36 @@ func toProviders(providersArray **fwpmProvider0, numProviders uint32) []*Provide
 	return ret
 }
 
+// AddProvider creates a new provider.
+func (s *Session) AddProvider(p *Provider) error {
+	if p.Key == (windows.GUID{}) {
+		return errors.New("Provider.Key cannot be zero")
+	}
+
+	p0 := &fwpmProvider0{
+		ProviderKey:  p.Key,
+		DisplayData:  toDisplayData(p.Name, p.Description),
+		ProviderData: toByteBlob(p.Data),
+		ServiceName:  windows.StringToUTF16Ptr(p.ServiceName),
+	}
+	if p.Persistent {
+		p0.Flags = fwpmProviderFlagsPersistent
+	}
+
+	return fwpmProviderAdd0(s.handle, p0, nil)
+}
+
+// DeleteProvider deletes the Provider whose GUID is id. A provider
+// can only be deleted once all the resources it owns have been
+// deleted.
+func (s *Session) DeleteProvider(id windows.GUID) error {
+	if id == (windows.GUID{}) {
+		return errors.New("GUID cannot be zero")
+	}
+
+	return fwpmProviderDeleteByKey0(s.handle, &id)
+}
+
 // GUIDName returns a human-readable name for standard WFP GUIDs. If g
 // is not a standard WFP GUID, g.String() is returned.
 func GUIDName(g windows.GUID) string {
