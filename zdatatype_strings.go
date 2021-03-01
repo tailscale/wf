@@ -26,15 +26,32 @@ func _() {
 	_ = x[DataTypeTokenInformation-15]
 	_ = x[DataTypeTokenAccessInformation-16]
 	_ = x[DataTypeUnicodeString-17]
+	_ = x[DataTypeArray6-18]
+	_ = x[DataTypeBitmapIndex-19]
+	_ = x[DataTypeBitmapArray64-20]
+	_ = x[DataTypeV4AddrMask-277]
+	_ = x[DataTypeV6AddrMask-278]
+	_ = x[DataTypeRange-279]
 }
 
-const _DataType_name = "EmptyUint8Uint16Uint32Uint64Int8Int16Int32Int64FloatDoubleByteArray16ByteBlobSIDSecurityDescriptorTokenInformationTokenAccessInformationUnicodeString"
+const (
+	_DataType_name_0 = "EmptyUint8Uint16Uint32Uint64Int8Int16Int32Int64FloatDoubleByteArray16ByteBlobSIDSecurityDescriptorTokenInformationTokenAccessInformationUnicodeStringArray6BitmapIndexBitmapArray64"
+	_DataType_name_1 = "V4AddrMaskV6AddrMaskRange"
+)
 
-var _DataType_index = [...]uint8{0, 5, 10, 16, 22, 28, 32, 37, 42, 47, 52, 58, 69, 77, 80, 98, 114, 136, 149}
+var (
+	_DataType_index_0 = [...]uint8{0, 5, 10, 16, 22, 28, 32, 37, 42, 47, 52, 58, 69, 77, 80, 98, 114, 136, 149, 155, 166, 179}
+	_DataType_index_1 = [...]uint8{0, 10, 20, 25}
+)
 
 func (i DataType) String() string {
-	if i >= DataType(len(_DataType_index)-1) {
+	switch {
+	case i <= 20:
+		return _DataType_name_0[_DataType_index_0[i]:_DataType_index_0[i+1]]
+	case 277 <= i && i <= 279:
+		i -= 277
+		return _DataType_name_1[_DataType_index_1[i]:_DataType_index_1[i+1]]
+	default:
 		return "DataType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _DataType_name[_DataType_index[i]:_DataType_index[i+1]]
 }

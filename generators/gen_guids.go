@@ -65,7 +65,7 @@ Data4: [8]byte{%s},
 		generated = append(generated, name)
 	}
 
-	out.WriteString("var GuidNames = map[windows.GUID]string{\n")
+	out.WriteString("var guidNames = map[windows.GUID]string{\n")
 	for _, name := range generated {
 		fmt.Fprintf(&out, "%s: %q,\n", varName(name), name)
 	}
