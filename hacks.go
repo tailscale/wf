@@ -15,77 +15,15 @@ import (
 // This file is all the stuff I hacked on late at night, which needs
 // cleaning up before it's up to actual publication standards.
 
-type SublayerFlags uint32
-
-const SublayerFlagsPersistent SublayerFlags = 1
-
-type Sublayer struct {
-	Key          windows.GUID
-	Name         string
-	Description  string
-	Flags        SublayerFlags
-	Provider     *windows.GUID // optional
-	ProviderData []byte
-	Weight       uint16
-}
-
-func (s *Session) Sublayers(provider *windows.GUID) ([]*Sublayer, error) {
-	tpl := fwpmSublayerEnumTemplate0{
-		ProviderKey: provider,
-	}
-
-	var enum windows.Handle
-	if err := fwpmSubLayerCreateEnumHandle0(s.handle, &tpl, &enum); err != nil {
-		return nil, err
-	}
-	defer fwpmSubLayerDestroyEnumHandle0(s.handle, enum)
-
-	var ret []*Sublayer
-
-	const pageSize = 100
-	for {
-		var sublayersArray **fwpmSublayer0
-		var num uint32
-		if err := fwpmSubLayerEnum0(s.handle, enum, pageSize, &sublayersArray, &num); err != nil {
-			return nil, err
-		}
-
-		var sublayers []*fwpmSublayer0
-		sh := (*reflect.SliceHeader)(unsafe.Pointer(&sublayers))
-		sh.Cap = int(num)
-		sh.Len = int(num)
-		sh.Data = uintptr(unsafe.Pointer(sublayersArray))
-
-		for _, sublayer := range sublayers {
-			l := &Sublayer{
-				Key:          sublayer.SublayerKey,
-				Name:         windows.UTF16PtrToString(sublayer.DisplayData.Name),
-				Description:  windows.UTF16PtrToString(sublayer.DisplayData.Description),
-				Flags:        sublayer.Flags,
-				Provider:     sublayer.ProviderKey,
-				ProviderData: getByteBlob(sublayer.ProviderData),
-				Weight:       sublayer.Weight,
-			}
-			ret = append(ret, l)
-		}
-
-		fwpmFreeMemory0(uintptr(unsafe.Pointer(&sublayersArray)))
-
-		if num < pageSize {
-			return ret, nil
-		}
-	}
-}
-
 func (s *Session) AddSublayer(sublayer *Sublayer) error {
 	if sublayer.Key == (windows.GUID{}) {
 		return errors.New("Sublayer.Key cannot be zero")
 	}
 
 	sl := fwpmSublayer0{
-		SublayerKey:  sublayer.Key,
-		DisplayData:  mkDisplayData(sublayer.Name, sublayer.Description),
-		Flags:        sublayer.Flags,
+		SublayerKey: sublayer.Key,
+		DisplayData: mkDisplayData(sublayer.Name, sublayer.Description),
+		//		Flags:        sublayer.Flags,
 		ProviderKey:  sublayer.Provider,
 		ProviderData: mkByteBlob(sublayer.ProviderData),
 		Weight:       sublayer.Weight,

@@ -5,7 +5,7 @@ package wf
 
 //go:generate stringer -output=zlayerflags_strings.go -type=fwpmLayerFlags -trimprefix=fwpmLayerFlags
 //go:generate stringer -output=zfieldtype_strings.go -type=fwpmFieldType -trimprefix=fwpmFieldtype
-//go:generate stringer -output=zsublayerflags_strings.go -type=SublayerFlags -trimprefix=SublayerFlags
+//go:generate stringer -output=zsublayerflags_strings.go -type=fwpmSublayerFlags -trimprefix=fwpmSublayerFlags
 //go:generate stringer -output=zfilterenumtype_strings.go -type=FilterEnumType -trimprefix=FilterEnumType
 //go:generate stringer -output=zfilterenumflags_strings.go -type=FilterEnumFlags -trimprefix=FilterEnumFlags
 //go:generate stringer -output=zactiontype_strings.go -type=ActionType -trimprefix=ActionType
