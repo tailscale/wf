@@ -128,34 +128,34 @@ type TokenInformation struct {
 	RestrictedSIDs []windows.SIDAndAttributes
 }
 
-// fieldTypeMap maps DataType to a Go value of that type.
-var fieldTypeMap = map[DataType]interface{}{
-	DataTypeUint8:                  uint8(0),
-	DataTypeUint16:                 uint16(0),
-	DataTypeUint32:                 uint32(0),
-	DataTypeUint64:                 uint64(0),
-	DataTypeInt8:                   int8(0),
-	DataTypeInt16:                  int16(0),
-	DataTypeInt32:                  int32(0),
-	DataTypeInt64:                  int64(0),
-	DataTypeFloat:                  float32(0),
-	DataTypeDouble:                 float64(0),
-	DataTypeByteArray16:            [16]byte{},
-	DataTypeByteBlob:               []byte(nil),
-	DataTypeSID:                    windows.SID{},
-	DataTypeSecurityDescriptor:     windows.SECURITY_DESCRIPTOR{},
-	DataTypeTokenInformation:       TokenInformation{},
-	DataTypeTokenAccessInformation: TokenAccessInformation(nil),
-	DataTypeUnicodeString:          "",
-	DataTypeArray6:                 [6]byte{},
-	DataTypeBitmapIndex:            BitmapIndex(0),
-	DataTypeBitmapArray64:          Bitmap64(0),
-	DataTypeV4AddrMask:             netaddr.IPPrefix{},
-	DataTypeV6AddrMask:             netaddr.IPPrefix{},
+// fieldTypeMap maps dataType to a Go value of that type.
+var fieldTypeMap = map[dataType]interface{}{
+	dataTypeUint8:                  uint8(0),
+	dataTypeUint16:                 uint16(0),
+	dataTypeUint32:                 uint32(0),
+	dataTypeUint64:                 uint64(0),
+	dataTypeInt8:                   int8(0),
+	dataTypeInt16:                  int16(0),
+	dataTypeInt32:                  int32(0),
+	dataTypeInt64:                  int64(0),
+	dataTypeFloat:                  float32(0),
+	dataTypeDouble:                 float64(0),
+	dataTypeByteArray16:            [16]byte{},
+	dataTypeByteBlob:               []byte(nil),
+	dataTypeSID:                    windows.SID{},
+	dataTypeSecurityDescriptor:     windows.SECURITY_DESCRIPTOR{},
+	dataTypeTokenInformation:       TokenInformation{},
+	dataTypeTokenAccessInformation: TokenAccessInformation(nil),
+	dataTypeUnicodeString:          "",
+	dataTypeArray6:                 [6]byte{},
+	dataTypeBitmapIndex:            BitmapIndex(0),
+	dataTypeBitmapArray64:          Bitmap64(0),
+	dataTypeV4AddrMask:             netaddr.IPPrefix{},
+	dataTypeV6AddrMask:             netaddr.IPPrefix{},
 
 	// TODO: not sure how to represent yet. It's only used when
 	// defining filters, layers don't provide ranges to filters.
-	// DataTypeRange
+	// dataTypeRange
 }
 
 // fieldType returns the reflect.Type for a field, or an error if the
@@ -165,7 +165,7 @@ func fieldType(f fwpmField0) (reflect.Type, error) {
 	// array, with a modifier flag indicating that it's an IP
 	// address. Use plain IPs when exposing in Go.
 	if f.Type == fwpmFieldTypeIPAddress {
-		if f.DataType != DataTypeUint32 && f.DataType != DataTypeByteArray16 {
+		if f.DataType != dataTypeUint32 && f.DataType != dataTypeByteArray16 {
 			return nil, fmt.Errorf("field has IP address type, but underlying datatype is %s (want Uint32 or ByteArray16)", f.DataType)
 		}
 		return reflect.TypeOf(netaddr.IP{}), nil
@@ -173,7 +173,7 @@ func fieldType(f fwpmField0) (reflect.Type, error) {
 	// Flags are a uint32 with a modifier. This just checks that there
 	// are no surprise flag fields of other types.
 	if f.Type == fwpmFieldTypeFlags {
-		if f.DataType != DataTypeUint32 {
+		if f.DataType != dataTypeUint32 {
 			return nil, fmt.Errorf("field has flag type, but underlying datatype is %s (want Uint32)", f.DataType)
 		}
 		return reflect.TypeOf(uint32(0)), nil
