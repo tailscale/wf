@@ -77,10 +77,14 @@ type fwpByteBlob struct {
 	Data *uint8
 }
 
+type fwpmSublayerFlags uint32
+
+const fwpmSublayerFlagsPersistent fwpmSublayerFlags = 1
+
 type fwpmSublayer0 struct {
 	SublayerKey  windows.GUID
 	DisplayData  fwpmDisplayData0
-	Flags        SublayerFlags
+	Flags        fwpmSublayerFlags
 	ProviderKey  *windows.GUID
 	ProviderData fwpByteBlob
 	Weight       uint16
