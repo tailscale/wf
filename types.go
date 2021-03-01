@@ -94,10 +94,17 @@ type fwpmProviderEnumTemplate0 struct {
 	Reserved uint64
 }
 
+type fwpmProviderFlags uint32
+
+const (
+	fwpmProviderFlagsPersistent fwpmProviderFlags = 0x01
+	fwpmProviderFlagsDisabled   fwpmProviderFlags = 0x10
+)
+
 type fwpmProvider0 struct {
 	ProviderKey  windows.GUID
 	DisplayData  fwpmDisplayData0
-	Flags        ProviderFlags
+	Flags        fwpmProviderFlags
 	ProviderData fwpByteBlob
 	ServiceName  *uint16
 }
