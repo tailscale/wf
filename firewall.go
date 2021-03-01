@@ -148,7 +148,7 @@ var fieldTypeMap = map[DataType]interface{}{
 	DataTypeUnicodeString:          "",
 	DataTypeArray6:                 [6]byte{},
 	DataTypeBitmapIndex:            BitmapIndex(0),
-	DataTypeBitmapArray64:          BitmapArray64(0),
+	DataTypeBitmapArray64:          Bitmap64(0),
 	DataTypeV4AddrMask:             netaddr.IPPrefix{},
 	DataTypeV6AddrMask:             netaddr.IPPrefix{},
 
@@ -250,7 +250,7 @@ func toLayers(layersArray **fwpmLayer0, numLayers uint32) ([]*Layer, error) {
 		for _, field := range fields {
 			typ, err := fieldType(field)
 			if err != nil {
-				return nil, fmt.Errorf("finding type of field %s: %w", GUIDName(field.Key), err)
+				return nil, fmt.Errorf("finding type of field %s: %w", GUIDName(*field.FieldKey), err)
 			}
 			l.Fields = append(l.Fields, &Field{
 				Key:  *field.FieldKey,
@@ -263,6 +263,97 @@ func toLayers(layersArray **fwpmLayer0, numLayers uint32) ([]*Layer, error) {
 	return ret, nil
 }
 
+// A Sublayer is a container for filtering rules.
+type Sublayer struct {
+	// Key is the unique identifier for this sublayer.
+	Key windows.GUID
+	// Name is a short descriptive name.
+	Name string
+	// Description is a longer description of the Sublayer.
+	Description string
+	// Persistent indicates whether the sublayer is preserved across
+	// restarts of the filtering engine.
+	Persistent bool
+	// Provider optionally identifies the Provider that manages this
+	// sublayer.
+	Provider *windows.GUID
+	// ProviderData is optional opaque data that can be held on behalf
+	// of the Provider.
+	ProviderData []byte
+	// Weight specifies the priority of this sublayer relative to
+	// other sublayers. Higher-weighted sublayers are invoked first.
+	Weight uint16
+}
+
+// Sublayers returns available Sublayers. If provider is non-nil, only
+// Sublayers registered to that Provider are returned.
+func (s *Session) Sublayers(provider *windows.GUID) ([]*Sublayer, error) {
+	tpl := fwpmSublayerEnumTemplate0{
+		ProviderKey: provider,
+	}
+
+	var enum windows.Handle
+	if err := fwpmSubLayerCreateEnumHandle0(s.handle, &tpl, &enum); err != nil {
+		return nil, err
+	}
+	defer fwpmSubLayerDestroyEnumHandle0(s.handle, enum)
+
+	var ret []*Sublayer
+
+	const pageSize = 100
+	for {
+		var sublayersArray **fwpmSublayer0
+		var num uint32
+		if err := fwpmSubLayerEnum0(s.handle, enum, pageSize, &sublayersArray, &num); err != nil {
+			return nil, err
+		}
+
+		sublayers, err := toSublayers(sublayersArray, num)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, sublayers...)
+
+		if num < pageSize {
+			return ret, nil
+		}
+	}
+}
+
+// toSublayers converts a C array of fwpmSublayer0 to a safe-to-use Sublayer
+// slice.
+func toSublayers(sublayersArray **fwpmSublayer0, numSublayers uint32) ([]*Sublayer, error) {
+	defer fwpmFreeMemory0(uintptr(unsafe.Pointer(&sublayersArray)))
+
+	var ret []*Sublayer
+
+	var sublayers []*fwpmSublayer0
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&sublayers))
+	sh.Cap = int(numSublayers)
+	sh.Len = int(numSublayers)
+	sh.Data = uintptr(unsafe.Pointer(sublayersArray))
+
+	for _, sublayer := range sublayers {
+		s := &Sublayer{
+			Key:          sublayer.SublayerKey,
+			Name:         windows.UTF16PtrToString(sublayer.DisplayData.Name),
+			Description:  windows.UTF16PtrToString(sublayer.DisplayData.Description),
+			Persistent:   (sublayer.Flags & fwpmSublayerFlagsPersistent) != 0,
+			ProviderData: fromByteBlob(sublayer.ProviderData),
+			Weight:       sublayer.Weight,
+		}
+		if sublayer.ProviderKey != nil {
+			// Make a copy of the GUID, to ensure we're not aliasing C
+			// memory.
+			p := *sublayer.ProviderKey
+			s.Provider = &p
+		}
+		ret = append(ret, s)
+	}
+
+	return ret, nil
+}
+
 // GUIDName returns a human-readable name for standard WFP GUIDs. If g
 // is not a standard WFP GUID, g.String() is returned.
 func GUIDName(g windows.GUID) string {
@@ -270,4 +361,20 @@ func GUIDName(g windows.GUID) string {
 		return n
 	}
 	return g.String()
+}
+
+// fromByteBlob extracts the bytes from bb and returns them as a
+// []byte that doesn't alias C memory.
+func fromByteBlob(bb fwpByteBlob) []byte {
+	if bb.Size == 0 {
+		return nil
+	}
+
+	var blob []byte
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&blob))
+	sh.Cap = int(bb.Size)
+	sh.Len = sh.Cap
+	sh.Data = uintptr(unsafe.Pointer(bb.Data))
+
+	return append([]byte(nil), blob...)
 }
