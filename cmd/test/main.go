@@ -21,16 +21,29 @@ func main() {
 	}
 	defer sess.Close()
 
-	filters, err := sess.Filters()
+	layers, err := sess.Layers()
 	if err != nil {
 		panic(err)
 	}
 
-	for _, filter := range filters {
-		fmt.Printf("[%s]\n  > %s\n  > %s\n  > %s\n\n", filter.Name, filter.Description, name(filter.LayerKey), name(filter.SubLayerKey))
+	for _, layer := range layers {
+		fmt.Printf("%s (%s, %s)\n", name(layer.Key), layer.Name, layer.Description)
+		for _, field := range layer.Fields {
+			fmt.Printf("  > %s (%s)\n", name(field.Key), field.Type.String())
+		}
+		fmt.Printf("\n")
 	}
 
-	fmt.Println("got", len(filters), "filters")
+	// filters, err := sess.Filters()
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// for _, filter := range filters {
+	// 	fmt.Printf("[%s]\n  > %s\n  > %s\n  > %s\n\n", filter.Name, filter.Description, name(filter.LayerKey), name(filter.SubLayerKey))
+	// }
+
+	// fmt.Println("got", len(filters), "filters")
 
 	// guid, err := windows.GenerateGUID()
 	// if err != nil {

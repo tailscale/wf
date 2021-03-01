@@ -2116,7 +2116,7 @@ var guidKeyingModuleIKEv2 = windows.GUID{
 	Data4: [8]byte{0xa3, 0x94, 0x71, 0x69, 0x68, 0xcb, 0x16, 0x47},
 }
 
-var GuidNames = map[windows.GUID]string{
+var guidNames = map[windows.GUID]string{
 	guidLayerInboundIPPacketV4:                       "FWPM_LAYER_INBOUND_IPPACKET_V4",
 	guidLayerInboundIPPacketV4Discard:                "FWPM_LAYER_INBOUND_IPPACKET_V4_DISCARD",
 	guidLayerInboundIPPacketV6:                       "FWPM_LAYER_INBOUND_IPPACKET_V6",
