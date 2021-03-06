@@ -142,7 +142,7 @@ type fwpmProvider0 struct {
 
 type fwpValue0 struct {
 	Type  dataType
-	Value uintptr // unioned value
+	Value *uintptr // unioned value
 }
 
 type fwpmFilterFlags uint32
@@ -182,7 +182,7 @@ type fwpmFilter0 struct {
 
 type fwpConditionValue0 struct {
 	Type  dataType
-	Value uintptr
+	Value *uintptr
 }
 
 type fwpmFilterCondition0 struct {

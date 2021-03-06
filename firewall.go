@@ -162,8 +162,8 @@ var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeUint64:                 reflect.TypeOf(uint64(0)),
 	dataTypeByteArray16:            reflect.TypeOf([16]byte{}),
 	dataTypeByteBlob:               reflect.TypeOf([]byte(nil)),
-	dataTypeSID:                    reflect.TypeOf(windows.SID{}),
-	dataTypeSecurityDescriptor:     reflect.TypeOf(windows.SECURITY_DESCRIPTOR{}),
+	dataTypeSID:                    reflect.TypeOf(&windows.SID{}),
+	dataTypeSecurityDescriptor:     reflect.TypeOf(&windows.SECURITY_DESCRIPTOR{}),
 	dataTypeTokenInformation:       reflect.TypeOf(TokenInformation{}),
 	dataTypeTokenAccessInformation: reflect.TypeOf(TokenAccessInformation(nil)),
 	dataTypeArray6:                 reflect.TypeOf([6]byte{}),
@@ -551,38 +551,6 @@ func (m MatchType) String() string {
 	return mtStr[m]
 }
 
-// valid reports whether the MatchType is valid for the given data
-// type. For example, MatchTypeGreater reports valid=false for SIDs,
-// because SIDs are not sortable.
-func (m MatchType) valid(v interface{}) bool {
-	switch m {
-	case MatchTypeEqual:
-		return true
-	case MatchTypeGreater, MatchTypeLess, MatchTypeGreaterOrEqual, MatchTypeLessOrEqual, MatchTypeRange, MatchTypeNotEqual:
-		switch v.(type) {
-		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, float32, float64, [16]byte, []byte, string:
-			return true
-		default:
-			return false
-		}
-	case MatchTypeFlagsAllSet, MatchTypeFlagsAnySet, MatchTypeFlagsNoneSet:
-		switch v.(type) {
-		case uint8, uint16, uint32, uint64:
-			return true
-		default:
-			return false
-		}
-	case MatchTypeEqualCaseInsensitive:
-		_, ok := v.(string)
-		return ok
-	case MatchTypePrefix, MatchTypeNotPrefix:
-		// TODO: don't know what to do with these yet, prevent their use.
-		return false
-	default:
-		panic("unknown match type")
-	}
-}
-
 // Match is a matching test that gets run against a layer's field.
 type Match struct {
 	Key   windows.GUID
@@ -601,13 +569,6 @@ func (m Match) String() string {
 		val = string(bs[:len(bs)-1])
 	}
 	return fmt.Sprintf("%s %s %v (%T)", GUIDName(m.Key), m.Op, val, m.Value)
-}
-
-// valid reports whether the Match is valid. A Match is valid if its
-// Key and Value are of compatible types, and Op can apply to those
-// types.
-func (m Match) valid() bool {
-	return true
 }
 
 // Action is an action the filtering engine can execute.
@@ -743,7 +704,7 @@ func toFilter0(r *Rule, lt layerTypes) (*fwpmFilter0, interface{}, error) {
 		SublayerKey:  r.Sublayer,
 		Weight: fwpValue0{
 			Type:  dataTypeUint64,
-			Value: uintptr(unsafe.Pointer(&r.Weight)),
+			Value: (*uintptr)(unsafe.Pointer(&r.Weight)),
 		},
 		NumFilterConditions: uint32(len(conds)), // TODO: overflow?
 		FilterConditions:    &conds[0],
@@ -816,20 +777,20 @@ func toValue(v interface{}, ftype reflect.Type) (ret fwpConditionValue0, referen
 		}
 		pu := &u
 		reference = pu
-		ret.Value = uintptr(unsafe.Pointer(pu))
+		ret.Value = (*uintptr)(unsafe.Pointer(pu))
 	case dataTypeByteBlob:
 		u, ok := v.([]byte)
 		if !ok {
 			return ret, nil, mapErr()
 		}
 		bb := toByteBlob(u)
-		ret.Value = uintptr(unsafe.Pointer(&bb))
+		ret.Value = (*uintptr)(unsafe.Pointer(&bb))
 	case dataTypeSID:
 		u, ok := v.(*windows.SID)
 		if !ok {
 			return ret, nil, mapErr()
 		}
-		ret.Value = uintptr(unsafe.Pointer(u))
+		ret.Value = (*uintptr)(unsafe.Pointer(u))
 	}
 
 	// TODO: bitmapIndex
@@ -920,9 +881,7 @@ func fromConditions(condArray *fwpmFilterCondition0, num uint32, fieldTypes fiel
 			Op:    cond.MatchType,
 			Value: v,
 		}
-		if !m.valid() {
-			return nil, fmt.Errorf("match [%s %s %v] is not valid", GUIDName(m.Key), m.Op, m.Value)
-		}
+		// TODO: check if the match makes sense?
 
 		ret = append(ret, m)
 	}
@@ -992,7 +951,10 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 			if reflect.TypeOf(from) == reflect.TypeOf(netaddr.IP{}) {
 				// TODO: only return IPRange, not IPRange or IPPrefix?
 				// Less work to parse on the receiving end.
-				ret := netaddr.IPRange{from.(netaddr.IP), to.(netaddr.IP)}
+				ret := netaddr.IPRange{
+					From: from.(netaddr.IP),
+					To:   to.(netaddr.IP),
+				}
 				if pfx, ok := ret.Prefix(); ok {
 					return pfx, nil
 				}
@@ -1031,8 +993,8 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 		return fromByteBlob(*(*fwpByteBlob)(unsafe.Pointer(v.Value))), nil
 	case dataTypeSID:
 		return parseSID(v.Value)
-	// case dataTypeSecurityDescriptor:
-	// 	return parseSecurityDescriptor(v.Value)
+	case dataTypeSecurityDescriptor:
+		return parseSecurityDescriptor(v.Value)
 	case dataTypeTokenInformation:
 		return nil, errors.New("TODO TokenInformation")
 	case dataTypeTokenAccessInformation:
@@ -1052,7 +1014,7 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 	}
 }
 
-func parseV4AddrAndMask(v uintptr) netaddr.IPPrefix {
+func parseV4AddrAndMask(v *uintptr) netaddr.IPPrefix {
 	v4 := *(*fwpV4AddrAndMask)(unsafe.Pointer(v))
 	ip := netaddr.IPv4(uint8(v4.Addr>>24), uint8(v4.Addr>>16), uint8(v4.Addr>>8), uint8(v4.Addr))
 	bits := uint8(32 - bits.TrailingZeros32(v4.Mask))
@@ -1062,7 +1024,7 @@ func parseV4AddrAndMask(v uintptr) netaddr.IPPrefix {
 	}
 }
 
-func parseV6AddrAndMask(v uintptr) netaddr.IPPrefix {
+func parseV6AddrAndMask(v *uintptr) netaddr.IPPrefix {
 	v6 := *(*fwpV6AddrAndMask)(unsafe.Pointer(v))
 	return netaddr.IPPrefix{
 		IP:   netaddr.IPFrom16(v6.Addr),
@@ -1070,7 +1032,7 @@ func parseV6AddrAndMask(v uintptr) netaddr.IPPrefix {
 	}
 }
 
-func parseSID(v uintptr) (*windows.SID, error) {
+func parseSID(v *uintptr) (*windows.SID, error) {
 	// TODO: export IsValidSid in x/sys/windows so we can vaguely
 	// verify this pointer.
 	sid := (*windows.SID)(unsafe.Pointer(v))
@@ -1082,7 +1044,7 @@ func parseSID(v uintptr) (*windows.SID, error) {
 	return dsid, nil
 }
 
-func parseSecurityDescriptor(v uintptr) (*windows.SECURITY_DESCRIPTOR, error) {
+func parseSecurityDescriptor(v *uintptr) (*windows.SECURITY_DESCRIPTOR, error) {
 	// The security descriptor is embedded in the API response as
 	// a byte slice.
 	bb := fromByteBlob(*(*fwpByteBlob)(unsafe.Pointer(v)))
@@ -1094,12 +1056,12 @@ func ipv4From32(v uint32) netaddr.IP {
 	return netaddr.IPv4(uint8(v>>24), uint8(v>>16), uint8(v>>8), uint8(v))
 }
 
-func fromBytes(bb uintptr, length int) []byte {
+func fromBytes(bb *uintptr, length int) []byte {
 	var bs []byte
 	sh := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
 	sh.Cap = length
 	sh.Len = length
-	sh.Data = bb
+	sh.Data = uintptr(unsafe.Pointer(bb))
 	return append([]byte(nil), bs...)
 
 }
