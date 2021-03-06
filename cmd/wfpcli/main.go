@@ -84,12 +84,19 @@ var (
 		Exec:       listRules,
 	}
 
+	testC = &ffcli.Command{
+		Name:       "test",
+		ShortUsage: "wfpcli list-rules",
+		ShortHelp:  "List WFP rules.",
+		Exec:       test,
+	}
+
 	rootFS  = flag.NewFlagSet("wfpcli", flag.ExitOnError)
 	dynamic = rootFS.Bool("dynamic", false, "Use a dynamic WFP session")
 	root    = &ffcli.Command{
 		ShortUsage:  "wfpcli <subcommand>",
 		FlagSet:     rootFS,
-		Subcommands: []*ffcli.Command{listProvidersC, addProviderC, delProviderC, listLayersC, listSublayersC, addSublayerC, delSublayerC, listRulesC},
+		Subcommands: []*ffcli.Command{listProvidersC, addProviderC, delProviderC, listLayersC, listSublayersC, addSublayerC, delSublayerC, listRulesC, testC},
 		Exec: func(context.Context, []string) error {
 			return flag.ErrHelp
 		},
@@ -375,5 +382,68 @@ func listRules(context.Context, []string) error {
 		fmt.Printf("\n")
 	}
 	fmt.Printf("Dumped %d rules\n", len(rules))
+	return nil
+}
+
+var guidLayerALEAuthRecvAcceptV4 = windows.GUID{
+	Data1: 0xe1cd9fe7,
+	Data2: 0xf4b5,
+	Data3: 0x4273,
+	Data4: [8]byte{0x96, 0xc0, 0x59, 0x2e, 0x48, 0x7b, 0x86, 0x50},
+}
+
+var guidSublayerUniversal = windows.GUID{
+	Data1: 0xeebecc03,
+	Data2: 0xced4,
+	Data3: 0x4380,
+	Data4: [8]byte{0x81, 0x9a, 0x27, 0x34, 0x39, 0x7b, 0x2b, 0x74},
+}
+
+var guidConditionIPLocalPort = windows.GUID{
+	Data1: 0x0c1ba1af,
+	Data2: 0x5765,
+	Data3: 0x453f,
+	Data4: [8]byte{0xaf, 0x22, 0xa8, 0xf7, 0x91, 0xac, 0x77, 0x5b},
+}
+
+var guidConditionIPLocalInterface = windows.GUID{
+	Data1: 0x4cd62a49,
+	Data2: 0x59c3,
+	Data3: 0x4969,
+	Data4: [8]byte{0xb7, 0xf3, 0xbd, 0xa5, 0xd3, 0x28, 0x90, 0xa4},
+}
+
+func test(context.Context, []string) error {
+	sess, err := session()
+	if err != nil {
+		return fmt.Errorf("creating WFP session: %w", err)
+	}
+	defer sess.Close()
+
+	guid, err := windows.GenerateGUID()
+	if err != nil {
+		panic(err)
+	}
+
+	r := &wf.Rule{
+		Key:      guid,
+		Name:     "test2",
+		Layer:    guidLayerALEAuthRecvAcceptV4,
+		Sublayer: guidSublayerUniversal,
+		Weight:   10,
+		Conditions: []*wf.Match{
+			&wf.Match{
+				Key:   guidConditionIPLocalInterface,
+				Op:    wf.MatchTypeEqual,
+				Value: uint64(5),
+			},
+		},
+		Action: wf.ActionPermit,
+	}
+
+	if err := sess.AddRule(r); err != nil {
+		return fmt.Errorf("failed to add rule: %w", err)
+	}
+
 	return nil
 }

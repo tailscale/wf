@@ -9,7 +9,6 @@ package wf
 //go:generate stringer -output=zfilterenumtype_strings.go -type=filterEnumType -trimprefix=filterEnumType
 //go:generate stringer -output=zfilterenumflags_strings.go -type=filterEnumFlags -trimprefix=filterEnumFlags
 //go:generate stringer -output=zaction_strings.go -type=Action -trimprefix=Action
-//go:generate stringer -output=zmatchtype_strings.go -type=MatchType -trimprefix=MatchType
 //go:generate stringer -output=zfilterflags_strings.go -type=fwpmFilterFlags -trimprefix=fwpmFilterFlags
 //go:generate stringer -output=zproviderflags_strings.go -type=fwpmProviderFlags -trimprefix=fwpmProviderFlags
 //go:generate stringer -output=zdatatype_strings.go -type=dataType -trimprefix=dataType
