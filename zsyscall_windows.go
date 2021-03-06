@@ -42,6 +42,7 @@ var (
 
 	procFwpmEngineClose0               = modfwpuclnt.NewProc("FwpmEngineClose0")
 	procFwpmEngineOpen0                = modfwpuclnt.NewProc("FwpmEngineOpen0")
+	procFwpmFilterAdd0                 = modfwpuclnt.NewProc("FwpmFilterAdd0")
 	procFwpmFilterCreateEnumHandle0    = modfwpuclnt.NewProc("FwpmFilterCreateEnumHandle0")
 	procFwpmFilterDestroyEnumHandle0   = modfwpuclnt.NewProc("FwpmFilterDestroyEnumHandle0")
 	procFwpmFilterEnum0                = modfwpuclnt.NewProc("FwpmFilterEnum0")
@@ -74,6 +75,14 @@ func fwpmEngineClose0(engineHandle windows.Handle) (err error) {
 
 func fwpmEngineOpen0(mustBeNil *uint16, authnService authnService, authIdentity *uintptr, session *fwpmSession0, engineHandle *windows.Handle) (err error) {
 	r1, _, e1 := syscall.Syscall6(procFwpmEngineOpen0.Addr(), 5, uintptr(unsafe.Pointer(mustBeNil)), uintptr(authnService), uintptr(unsafe.Pointer(authIdentity)), uintptr(unsafe.Pointer(session)), uintptr(unsafe.Pointer(engineHandle)), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmFilterAdd0(engineHandle windows.Handle, rule *fwpmFilter0, sd *windows.SECURITY_DESCRIPTOR, id *uint64) (err error) {
+	r1, _, e1 := syscall.Syscall6(procFwpmFilterAdd0.Addr(), 4, uintptr(engineHandle), uintptr(unsafe.Pointer(rule)), uintptr(unsafe.Pointer(sd)), uintptr(unsafe.Pointer(id)), 0, 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
 	}

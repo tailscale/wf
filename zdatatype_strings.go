@@ -13,31 +13,47 @@ func _() {
 	_ = x[dataTypeUint16-2]
 	_ = x[dataTypeUint32-3]
 	_ = x[dataTypeUint64-4]
-	_ = x[dataTypeInt8-5]
-	_ = x[dataTypeInt16-6]
-	_ = x[dataTypeInt32-7]
-	_ = x[dataTypeInt64-8]
-	_ = x[dataTypeFloat-9]
-	_ = x[dataTypeDouble-10]
 	_ = x[dataTypeByteArray16-11]
 	_ = x[dataTypeByteBlob-12]
 	_ = x[dataTypeSID-13]
 	_ = x[dataTypeSecurityDescriptor-14]
 	_ = x[dataTypeTokenInformation-15]
 	_ = x[dataTypeTokenAccessInformation-16]
-	_ = x[dataTypeUnicodeString-17]
 	_ = x[dataTypeArray6-18]
 	_ = x[dataTypeBitmapIndex-19]
-	_ = x[dataTypeBitmapArray64-20]
+	_ = x[dataTypeV4AddrMask-256]
+	_ = x[dataTypeV6AddrMask-257]
+	_ = x[dataTypeRange-258]
 }
 
-const _dataType_name = "EmptyUint8Uint16Uint32Uint64Int8Int16Int32Int64FloatDoubleByteArray16ByteBlobSIDSecurityDescriptorTokenInformationTokenAccessInformationUnicodeStringArray6BitmapIndexBitmapArray64"
+const (
+	_dataType_name_0 = "EmptyUint8Uint16Uint32Uint64"
+	_dataType_name_1 = "ByteArray16ByteBlobSIDSecurityDescriptorTokenInformationTokenAccessInformation"
+	_dataType_name_2 = "Array6BitmapIndex"
+	_dataType_name_3 = "V4AddrMaskV6AddrMaskRange"
+)
 
-var _dataType_index = [...]uint8{0, 5, 10, 16, 22, 28, 32, 37, 42, 47, 52, 58, 69, 77, 80, 98, 114, 136, 149, 155, 166, 179}
+var (
+	_dataType_index_0 = [...]uint8{0, 5, 10, 16, 22, 28}
+	_dataType_index_1 = [...]uint8{0, 11, 19, 22, 40, 56, 78}
+	_dataType_index_2 = [...]uint8{0, 6, 17}
+	_dataType_index_3 = [...]uint8{0, 10, 20, 25}
+)
 
 func (i dataType) String() string {
-	if i >= dataType(len(_dataType_index)-1) {
+	switch {
+	case i <= 4:
+		return _dataType_name_0[_dataType_index_0[i]:_dataType_index_0[i+1]]
+	case 11 <= i && i <= 16:
+		i -= 11
+		return _dataType_name_1[_dataType_index_1[i]:_dataType_index_1[i+1]]
+	case 18 <= i && i <= 19:
+		i -= 18
+		return _dataType_name_2[_dataType_index_2[i]:_dataType_index_2[i+1]]
+	case 256 <= i && i <= 258:
+		i -= 256
+		return _dataType_name_3[_dataType_index_3[i]:_dataType_index_3[i+1]]
+	default:
 		return "dataType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _dataType_name[_dataType_index[i]:_dataType_index[i+1]]
 }

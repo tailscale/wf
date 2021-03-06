@@ -65,32 +65,33 @@ const (
 type dataType uint32
 
 const (
-	dataTypeEmpty dataType = iota
-	dataTypeUint8
-	dataTypeUint16
-	dataTypeUint32
-	dataTypeUint64
-	dataTypeInt8
-	dataTypeInt16
-	dataTypeInt32
-	dataTypeInt64
-	dataTypeFloat
-	dataTypeDouble
-	dataTypeByteArray16
-	dataTypeByteBlob
-	dataTypeSID
-	dataTypeSecurityDescriptor
-	dataTypeTokenInformation
-	dataTypeTokenAccessInformation
-	dataTypeUnicodeString
-	dataTypeArray6
-	dataTypeBitmapIndex
-	dataTypeBitmapArray64
-
-	dataTypeV4AddrMask = 256
-	dataTypeV6AddrMask = 257
-	dataTypeRange      = 258
+	dataTypeEmpty                  dataType = 0
+	dataTypeUint8                  dataType = 1
+	dataTypeUint16                 dataType = 2
+	dataTypeUint32                 dataType = 3
+	dataTypeUint64                 dataType = 4
+	dataTypeByteArray16            dataType = 11
+	dataTypeByteBlob               dataType = 12
+	dataTypeSID                    dataType = 13
+	dataTypeSecurityDescriptor     dataType = 14
+	dataTypeTokenInformation       dataType = 15
+	dataTypeTokenAccessInformation dataType = 16
+	dataTypeArray6                 dataType = 18
+	dataTypeBitmapIndex            dataType = 19
+	dataTypeV4AddrMask             dataType = 256
+	dataTypeV6AddrMask             dataType = 257
+	dataTypeRange                  dataType = 258
 )
+
+// Types not implemented, because WFP doesn't seem to use them.
+// dataTypeInt8 dataType = 5
+// dataTypeInt16 dataType = 6
+// dataTypeInt32 dataType = 7
+// dataTypeInt64 dataType = 8
+// dataTypeFloat dataType = 9
+// dataTypeDouble dataType = 10
+// dataTypeUnicodeString dataType = 17
+// dataTypeBitmapArray64 dataType = 20
 
 type fwpmField0 struct {
 	FieldKey *windows.GUID
@@ -219,3 +220,20 @@ type fwpmFilterEnumTemplate0 struct {
 type fwpRange0 struct {
 	From, To fwpValue0
 }
+
+type filterEnumType uint32
+
+const (
+	filterEnumTypeFullyContained filterEnumType = iota
+	filterEnumTypeOverlapping
+)
+
+type filterEnumFlags uint32
+
+const (
+	filterEnumFlagsBestTerminatingMatch filterEnumFlags = iota + 1
+	filterEnumFlagsSorted
+	filterEnumFlagsBootTimeOnly
+	filterEnumFlagsIncludeBootTime
+	filterEnumFlagsIncludeDisabled
+)

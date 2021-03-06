@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/bits"
 	"reflect"
+	"runtime"
 	"time"
 	"unsafe"
 
@@ -139,9 +140,6 @@ type Field struct {
 // TODO: expose in x/sys/windows, https://github.com/inetaf/wf/issues/1
 type TokenAccessInformation []byte
 
-// Bitmap64 is a 64-bit wide bit map.
-type Bitmap64 uint64
-
 // BitmapIndex is an index into a Bitmap64.
 type BitmapIndex uint8 // TODO: this is a guess, the API doesn't document what the underlying type is.
 
@@ -162,25 +160,25 @@ var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeUint16:                 reflect.TypeOf(uint16(0)),
 	dataTypeUint32:                 reflect.TypeOf(uint32(0)),
 	dataTypeUint64:                 reflect.TypeOf(uint64(0)),
-	dataTypeInt8:                   reflect.TypeOf(int8(0)),
-	dataTypeInt16:                  reflect.TypeOf(int16(0)),
-	dataTypeInt32:                  reflect.TypeOf(int32(0)),
-	dataTypeInt64:                  reflect.TypeOf(int64(0)),
-	dataTypeFloat:                  reflect.TypeOf(float32(0)),
-	dataTypeDouble:                 reflect.TypeOf(float64(0)),
 	dataTypeByteArray16:            reflect.TypeOf([16]byte{}),
 	dataTypeByteBlob:               reflect.TypeOf([]byte(nil)),
 	dataTypeSID:                    reflect.TypeOf(windows.SID{}),
 	dataTypeSecurityDescriptor:     reflect.TypeOf(windows.SECURITY_DESCRIPTOR{}),
 	dataTypeTokenInformation:       reflect.TypeOf(TokenInformation{}),
 	dataTypeTokenAccessInformation: reflect.TypeOf(TokenAccessInformation(nil)),
-	dataTypeUnicodeString:          reflect.TypeOf(""),
 	dataTypeArray6:                 reflect.TypeOf([6]byte{}),
 	dataTypeBitmapIndex:            reflect.TypeOf(BitmapIndex(0)),
-	dataTypeBitmapArray64:          reflect.TypeOf(Bitmap64(0)),
 	dataTypeV4AddrMask:             reflect.TypeOf(netaddr.IPPrefix{}),
 	dataTypeV6AddrMask:             reflect.TypeOf(netaddr.IPPrefix{}),
 	dataTypeRange:                  reflect.TypeOf(Range{}),
+}
+
+var fieldTypeMapReverse = map[reflect.Type]dataType{}
+
+func init() {
+	for dt, rt := range fieldTypeMap {
+		fieldTypeMapReverse[rt] = dt
+	}
 }
 
 // fieldType returns the reflect.Type for a field, or an error if the
@@ -715,6 +713,136 @@ func (s *Session) Rules() ([]*Rule, error) { // TODO: support filter settings
 	}
 }
 
+func (s *Session) AddRule(r *Rule) error {
+	f, ref, err := toFilter0(r, s.layerTypes)
+	if err != nil {
+		return err
+	}
+
+	if err := fwpmFilterAdd0(s.handle, f, nil, nil); err != nil {
+		return err
+	}
+
+	runtime.KeepAlive(ref)
+
+	return nil
+}
+
+func toFilter0(r *Rule, lt layerTypes) (*fwpmFilter0, interface{}, error) {
+	conds, ref, err := toConditions(r.Conditions, lt[r.Layer])
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ret := &fwpmFilter0{
+		FilterKey:    r.Key,
+		DisplayData:  toDisplayData(r.Name, r.Description),
+		ProviderKey:  r.Provider,
+		ProviderData: toByteBlob(r.ProviderData),
+		LayerKey:     r.Layer,
+		SublayerKey:  r.Sublayer,
+		Weight: fwpValue0{
+			Type:  dataTypeUint64,
+			Value: uintptr(unsafe.Pointer(&r.Weight)),
+		},
+		NumFilterConditions: uint32(len(conds)), // TODO: overflow?
+		FilterConditions:    &conds[0],
+		Action: fwpmAction0{
+			Type: r.Action,
+			GUID: r.Callout,
+		},
+	}
+	if r.PermitIfMissing {
+		ret.Flags |= fwpmFilterFlagsPermitIfCalloutUnregistered
+	}
+	if r.Persistent {
+		ret.Flags |= fwpmFilterFlagsPersistent
+	}
+	if r.BootTime {
+		ret.Flags |= fwpmFilterFlagsBootTime
+	}
+
+	return ret, ref, nil
+}
+
+func toConditions(ms []*Match, ft fieldTypes) ([]fwpmFilterCondition0, interface{}, error) {
+	ret := make([]fwpmFilterCondition0, 0, len(ms))
+	refs := make([]interface{}, 0, len(ms))
+	for _, m := range ms {
+		v, ref, err := toValue(m.Value, ft[m.Key])
+		if err != nil {
+			return nil, nil, err
+		}
+		ret = append(ret, fwpmFilterCondition0{
+			FieldKey:  m.Key,
+			MatchType: m.Op,
+			Value:     v,
+		})
+		refs = append(refs, ref)
+	}
+
+	return ret, refs, nil
+}
+
+func toValue(v interface{}, ftype reflect.Type) (ret fwpConditionValue0, reference interface{}, err error) {
+	mapErr := func() error {
+		return fmt.Errorf("can't map type %T into condition type %v", v, ftype)
+	}
+
+	ret.Type = fieldTypeMapReverse[ftype]
+	switch ret.Type {
+	case dataTypeUint8:
+		u, ok := v.(uint8)
+		if !ok {
+			return ret, nil, mapErr()
+		}
+		*(*uint8)(unsafe.Pointer(&ret.Value)) = u
+	case dataTypeUint16:
+		u, ok := v.(uint16)
+		if !ok {
+			return ret, nil, mapErr()
+		}
+		*(*uint16)(unsafe.Pointer(&ret.Value)) = u
+	case dataTypeUint32:
+		u, ok := v.(uint32)
+		if !ok {
+			return ret, nil, mapErr()
+		}
+		*(*uint32)(unsafe.Pointer(&ret.Value)) = u
+	case dataTypeUint64:
+		u, ok := v.(uint64)
+		if !ok {
+			return ret, nil, mapErr()
+		}
+		pu := &u
+		reference = pu
+		ret.Value = uintptr(unsafe.Pointer(pu))
+	case dataTypeByteBlob:
+		u, ok := v.([]byte)
+		if !ok {
+			return ret, nil, mapErr()
+		}
+		bb := toByteBlob(u)
+		ret.Value = uintptr(unsafe.Pointer(&bb))
+	case dataTypeSID:
+		u, ok := v.(*windows.SID)
+		if !ok {
+			return ret, nil, mapErr()
+		}
+		ret.Value = uintptr(unsafe.Pointer(u))
+	}
+
+	// TODO: bitmapIndex
+	// TODO: dataTypeArray16
+	// TODO: dataTypeArray6
+	// TODO: dataTypeSecurityDescriptor
+	// TODO: dataTypeTokenInformation
+	// TODO: dataTypeTokenAccessInformation
+	// TODO: addr masks
+
+	return ret, reference, nil
+}
+
 func toRules(rulesArray **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rule, error) {
 	defer fwpmFreeMemory0(uintptr(unsafe.Pointer(&rulesArray)))
 
@@ -755,7 +883,7 @@ func toRules(rulesArray **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Ru
 			return nil, fmt.Errorf("unknown layer %s", r.Layer)
 		}
 
-		ms, err := toConditions(rule.FilterConditions, rule.NumFilterConditions, ft)
+		ms, err := fromConditions(rule.FilterConditions, rule.NumFilterConditions, ft)
 		if err != nil {
 			return nil, err
 		}
@@ -768,7 +896,7 @@ func toRules(rulesArray **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Ru
 	return ret, nil
 }
 
-func toConditions(condArray *fwpmFilterCondition0, num uint32, fieldTypes fieldTypes) ([]*Match, error) {
+func fromConditions(condArray *fwpmFilterCondition0, num uint32, fieldTypes fieldTypes) ([]*Match, error) {
 	var conditions []fwpmFilterCondition0
 	sh := (*reflect.SliceHeader)(unsafe.Pointer(&conditions))
 	sh.Cap = int(num)
@@ -887,8 +1015,6 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 	// See [TODO docs of FWP_VALUE0 here] for details.
 
 	switch v.Type {
-	case dataTypeEmpty:
-		return nil, errors.New("value is Empty")
 	case dataTypeUint8:
 		return *(*uint8)(unsafe.Pointer(&v.Value)), nil
 	case dataTypeUint16:
@@ -897,18 +1023,6 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 		return *(*uint32)(unsafe.Pointer(&v.Value)), nil
 	case dataTypeUint64:
 		return *(*uint64)(unsafe.Pointer(v.Value)), nil
-	case dataTypeInt8:
-		return *(*int8)(unsafe.Pointer(&v.Value)), nil
-	case dataTypeInt16:
-		return *(*int16)(unsafe.Pointer(&v.Value)), nil
-	case dataTypeInt32:
-		return *(*int32)(unsafe.Pointer(&v.Value)), nil
-	case dataTypeInt64:
-		return *(*int64)(unsafe.Pointer(v.Value)), nil
-	case dataTypeFloat:
-		return *(*float32)(unsafe.Pointer(&v.Value)), nil
-	case dataTypeDouble:
-		return *(*float64)(unsafe.Pointer(v.Value)), nil
 	case dataTypeByteArray16:
 		var ret [16]byte
 		copy(ret[:], fromBytes(v.Value, 16))
@@ -917,22 +1031,18 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 		return fromByteBlob(*(*fwpByteBlob)(unsafe.Pointer(v.Value))), nil
 	case dataTypeSID:
 		return parseSID(v.Value)
-	case dataTypeSecurityDescriptor:
-		return parseSecurityDescriptor(v.Value)
+	// case dataTypeSecurityDescriptor:
+	// 	return parseSecurityDescriptor(v.Value)
 	case dataTypeTokenInformation:
 		return nil, errors.New("TODO TokenInformation")
 	case dataTypeTokenAccessInformation:
 		return nil, errors.New("TODO TokenAccessInformation")
-	case dataTypeUnicodeString:
-		return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(v.Value))), nil
 	case dataTypeArray6:
 		var ret [6]byte
 		copy(ret[:], fromBytes(v.Value, 6))
 		return ret, nil
 	case dataTypeBitmapIndex:
 		return nil, errors.New("TODO BitmapIndex")
-	case dataTypeBitmapArray64:
-		return Bitmap64(*(*uint64)(unsafe.Pointer(v.Value))), nil
 	case dataTypeV4AddrMask:
 		return parseV4AddrAndMask(v.Value), nil
 	case dataTypeV6AddrMask:
