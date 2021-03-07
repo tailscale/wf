@@ -1,11 +1,13 @@
 package wf
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
+	"inet.af/netaddr"
 )
 
 func toSession0(a *arena, opts *SessionOptions) *fwpmSession0 {
@@ -154,72 +156,151 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		return 0, 0, fmt.Errorf("can't map type %T into condition type %v", v, ftype)
 	}
 
-	// TODO: exceptions go here
-
-	typ = fieldTypeMapReverse[ftype]
-	switch typ {
-	case dataTypeUint8:
+	switch ftype {
+	case reflect.TypeOf(uint8(0)):
+		typ = dataTypeUint8
 		u, ok := v.(uint8)
 		if !ok {
 			return mapErr()
 		}
 		*(*uint8)(unsafe.Pointer(&val)) = u
-	case dataTypeUint16:
+	case reflect.TypeOf(uint16(0)):
+		typ = dataTypeUint16
 		u, ok := v.(uint16)
 		if !ok {
 			return mapErr()
 		}
 		*(*uint16)(unsafe.Pointer(&val)) = u
-	case dataTypeUint32:
+	case reflect.TypeOf(uint32(0)):
+		typ = dataTypeUint32
 		u, ok := v.(uint32)
 		if !ok {
 			return mapErr()
 		}
 		*(*uint32)(unsafe.Pointer(&val)) = u
-	case dataTypeUint64:
-		p := a.alloc(unsafe.Sizeof(uint64(0)))
-
+	case reflect.TypeOf(uint64(0)):
+		typ = dataTypeUint64
 		u, ok := v.(uint64)
 		if !ok {
 			return mapErr()
 		}
+		p := a.alloc(unsafe.Sizeof(u))
 		*(*uint64)(p) = u
 		val = uintptr(p)
-	case dataTypeByteBlob:
-		u, ok := v.([]byte)
+	case reflect.TypeOf([]byte(nil)):
+		typ = dataTypeByteBlob
+		bb, ok := v.([]byte)
 		if !ok {
 			return mapErr()
 		}
 
 		p := a.alloc(unsafe.Sizeof(fwpByteBlob{}))
 		*(*fwpByteBlob)(p) = fwpByteBlob{
-			Size: uint32(len(u)), // todo: overflow
-			Data: toBytes(a, u),
+			Size: uint32(len(bb)),
+			Data: toBytes(a, bb),
 		}
 		val = uintptr(p)
-	case dataTypeSID:
-		u, ok := v.(*windows.SID)
+	case reflect.TypeOf(&windows.SID{}):
+		typ = dataTypeSID
+		s, ok := v.(*windows.SID)
 		if !ok {
 			return mapErr()
 		}
-
-		sidLen := windows.GetLengthSid(u)
+		sidLen := windows.GetLengthSid(s)
 		p := a.alloc(uintptr(sidLen))
-		if err := windows.CopySid(sidLen, (*windows.SID)(p), u); err != nil {
+		if err := windows.CopySid(sidLen, (*windows.SID)(p), s); err != nil {
 			return 0, 0, err
 		}
 		val = uintptr(p)
+	case reflect.TypeOf(BitmapIndex(0)):
+		typ = dataTypeBitmapIndex
+		i, ok := v.(BitmapIndex)
+		if !ok {
+			return mapErr()
+		}
+		*(*uint8)(unsafe.Pointer(&val)) = uint8(i)
+	case reflect.TypeOf([16]byte{}):
+		typ = dataTypeByteArray16
+		bs, ok := v.([16]byte)
+		if !ok {
+			return mapErr()
+		}
+		val = uintptr(unsafe.Pointer(toBytes(a, bs[:])))
+	case reflect.TypeOf([6]byte{}):
+		typ = dataTypeArray6
+		bs, ok := v.([6]byte)
+		if !ok {
+			return mapErr()
+		}
+		val = uintptr(unsafe.Pointer(toBytes(a, bs[:])))
+	case reflect.TypeOf(netaddr.IP{}):
+		switch m := v.(type) {
+		case netaddr.IP:
+			if m.Is4() {
+				typ = dataTypeUint32
+				*(*uint32)(unsafe.Pointer(&val)) = u32FromIPv4(m)
+			} else {
+				typ = dataTypeByteArray16
+				b16 := m.As16()
+				val = uintptr(unsafe.Pointer(toBytes(a, b16[:])))
+			}
+		case netaddr.IPPrefix:
+			if m.IP.Is4() {
+				typ = dataTypeV4AddrMask
+				val = uintptr(unsafe.Pointer(toFwpV4AddrAndMask(a, m)))
+			} else {
+				typ = dataTypeV6AddrMask
+				val = uintptr(unsafe.Pointer(toFwpV6AddrAndMask(a, m)))
+			}
+		case netaddr.IPRange:
+			if !m.Valid() {
+				return 0, 0, fmt.Errorf("invalid IPRange %v", m)
+			}
+			r, err := toRange0(a, m.From, m.To, ftype)
+			if err != nil {
+				return 0, 0, err
+			}
+			typ = dataTypeRange
+			val = uintptr(unsafe.Pointer(r))
+		}
 	}
 
-	// TODO: bitmapIndex
-	// TODO: dataTypeArray16
-	// TODO: dataTypeArray6
 	// TODO: dataTypeSecurityDescriptor
 	// TODO: dataTypeTokenInformation
 	// TODO: dataTypeTokenAccessInformation
-	// TODO: addr masks
 
 	return typ, val, nil
+}
+
+func toRange0(a *arena, from, to interface{}, ftype reflect.Type) (ret *fwpRange0, err error) {
+	if _, ok := from.(Range); ok {
+		return nil, errors.New("can't have a Range of Ranges")
+	}
+	if _, ok := to.(Range); ok {
+		return nil, errors.New("can't have a Range of Ranges")
+	}
+
+	ftyp, fval, err := toValue0(a, from, ftype)
+	if err != nil {
+		return nil, err
+	}
+	ttyp, tval, err := toValue0(a, to, ftype)
+	if err != nil {
+		return nil, err
+	}
+	ret = (*fwpRange0)(a.alloc(unsafe.Sizeof(fwpRange0{})))
+
+	*ret = fwpRange0{
+		From: fwpValue0{
+			Type:  ftyp,
+			Value: fval,
+		},
+		To: fwpValue0{
+			Type:  ttyp,
+			Value: tval,
+		},
+	}
+	return ret, nil
 }
 
 func toUint16(a *arena, s string) *uint16 {
@@ -264,4 +345,23 @@ func toGUID(a *arena, guid *windows.GUID) *windows.GUID {
 	ret := (*windows.GUID)(a.alloc(unsafe.Sizeof(windows.GUID{})))
 	*ret = *guid
 	return ret
+}
+
+func toFwpV4AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV4AddrAndMask {
+	ret := (*fwpV4AddrAndMask)(a.alloc(unsafe.Sizeof(fwpV4AddrAndMask{})))
+	ret.Addr = u32FromIPv4(pfx.Masked().IP)
+	ret.Mask = (^uint32(0)) << (32 - pfx.Bits)
+	return ret
+}
+
+func toFwpV6AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV6AddrAndMask {
+	ret := (*fwpV6AddrAndMask)(a.alloc(unsafe.Sizeof(fwpV6AddrAndMask{})))
+	ret.Addr = pfx.IP.As16()
+	ret.PrefixLength = pfx.Bits
+	return ret
+}
+
+func u32FromIPv4(ip netaddr.IP) uint32 {
+	b4 := ip.As4()
+	return *(*uint32)(unsafe.Pointer(&b4[0]))
 }

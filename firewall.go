@@ -153,14 +153,6 @@ type TokenInformation struct {
 	RestrictedSIDs []windows.SIDAndAttributes
 }
 
-var fieldTypeMapReverse = map[reflect.Type]dataType{}
-
-func init() {
-	for dt, rt := range fieldTypeMap {
-		fieldTypeMapReverse[rt] = dt
-	}
-}
-
 // Layers returns information on available WFP layers.
 func (s *Session) Layers() ([]*Layer, error) {
 	var enum windows.Handle
