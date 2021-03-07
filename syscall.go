@@ -22,7 +22,7 @@ package wf
 
 //sys fwpmSubLayerDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerDeleteByKey0
 
-//sys fwpmProviderCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpmProviderEnumTemplate0, handle *windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmProviderCreateEnumHandle0
+//sys fwpmProviderCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *struct{}, handle *windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmProviderCreateEnumHandle0
 
 //sys fwpmProviderDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmProviderDestroyEnumHandle0
 

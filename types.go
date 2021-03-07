@@ -4,6 +4,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+//go:notinheap
 type fwpmDisplayData0 struct {
 	Name        *uint16
 	Description *uint16
@@ -13,6 +14,7 @@ type fwpmSession0Flags uint32
 
 const fwpmSession0FlagDynamic = 1
 
+//go:notinheap
 type fwpmSession0 struct {
 	SessionKey           windows.GUID
 	DisplayData          fwpmDisplayData0
@@ -31,6 +33,7 @@ const (
 	authnServiceDefault authnService = 0xffffffff
 )
 
+//go:notinheap
 type fwpmLayerEnumTemplate0 struct {
 	reserved uint64
 }
@@ -44,6 +47,7 @@ const (
 	fwpmLayerFlagsBuffered
 )
 
+//go:notinheap
 type fwpmLayer0 struct {
 	LayerKey           windows.GUID
 	DisplayData        fwpmDisplayData0
@@ -93,16 +97,19 @@ const (
 // dataTypeUnicodeString dataType = 17
 // dataTypeBitmapArray64 dataType = 20
 
+//go:notinheap
 type fwpmField0 struct {
 	FieldKey *windows.GUID
 	Type     fwpmFieldType
 	DataType dataType
 }
 
+//go:notinheap
 type fwpmSublayerEnumTemplate0 struct {
 	ProviderKey *windows.GUID
 }
 
+//go:notinheap
 type fwpByteBlob struct {
 	Size uint32
 	Data *uint8
@@ -112,6 +119,7 @@ type fwpmSublayerFlags uint32
 
 const fwpmSublayerFlagsPersistent fwpmSublayerFlags = 1
 
+//go:notinheap
 type fwpmSublayer0 struct {
 	SublayerKey  windows.GUID
 	DisplayData  fwpmDisplayData0
@@ -121,10 +129,6 @@ type fwpmSublayer0 struct {
 	Weight       uint16
 }
 
-type fwpmProviderEnumTemplate0 struct {
-	Reserved uint64
-}
-
 type fwpmProviderFlags uint32
 
 const (
@@ -132,6 +136,7 @@ const (
 	fwpmProviderFlagsDisabled   fwpmProviderFlags = 0x10
 )
 
+//go:notinheap
 type fwpmProvider0 struct {
 	ProviderKey  windows.GUID
 	DisplayData  fwpmDisplayData0
@@ -140,6 +145,7 @@ type fwpmProvider0 struct {
 	ServiceName  *uint16
 }
 
+//go:notinheap
 type fwpValue0 struct {
 	Type  dataType
 	Value uintptr // unioned value
@@ -157,11 +163,13 @@ const (
 	fwpmFilterFlagsIndexed
 )
 
+//go:notinheap
 type fwpmAction0 struct {
 	Type Action
 	GUID windows.GUID
 }
 
+//go:notinheap
 type fwpmFilter0 struct {
 	FilterKey           windows.GUID
 	DisplayData         fwpmDisplayData0
@@ -180,31 +188,37 @@ type fwpmFilter0 struct {
 	EffectiveWeight     fwpValue0
 }
 
+//go:notinheap
 type fwpConditionValue0 struct {
 	Type  dataType
 	Value uintptr
 }
 
+//go:notinheap
 type fwpmFilterCondition0 struct {
 	FieldKey  windows.GUID
 	MatchType MatchType
 	Value     fwpConditionValue0
 }
 
+//go:notinheap
 type fwpV4AddrAndMask struct {
 	Addr, Mask uint32
 }
 
+//go:notinheap
 type fwpV6AddrAndMask struct {
 	Addr         [16]byte
 	PrefixLength uint8
 }
 
+//go:notinheap
 type fwpmProviderContextEnumTemplate0 struct {
 	ProviderKey         *windows.GUID
 	ProviderContextType uint32
 }
 
+//go:notinheap
 type fwpmFilterEnumTemplate0 struct {
 	ProviderKey             *windows.GUID
 	LayerKey                windows.GUID
@@ -217,6 +231,7 @@ type fwpmFilterEnumTemplate0 struct {
 	CalloutKey              *windows.GUID
 }
 
+//go:notinheap
 type fwpRange0 struct {
 	From, To fwpValue0
 }

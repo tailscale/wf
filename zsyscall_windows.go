@@ -150,7 +150,7 @@ func fwpmProviderAdd0(engineHandle windows.Handle, provider *fwpmProvider0, nilF
 	return
 }
 
-func fwpmProviderCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpmProviderEnumTemplate0, handle *windows.Handle) (err error) {
+func fwpmProviderCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *struct{}, handle *windows.Handle) (err error) {
 	r1, _, e1 := syscall.Syscall(procFwpmProviderCreateEnumHandle0.Addr(), 3, uintptr(engineHandle), uintptr(unsafe.Pointer(enumTemplate)), uintptr(unsafe.Pointer(handle)))
 	if r1 != 0 {
 		err = errnoErr(e1)
