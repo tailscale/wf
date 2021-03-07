@@ -113,8 +113,8 @@ func fwpmFilterEnum0(engineHandle windows.Handle, enumHandle windows.Handle, num
 	return
 }
 
-func fwpmFreeMemory0(p uintptr) {
-	syscall.Syscall(procFwpmFreeMemory0.Addr(), 1, uintptr(p), 0, 0)
+func fwpmFreeMemory0(p *struct{}) {
+	syscall.Syscall(procFwpmFreeMemory0.Addr(), 1, uintptr(unsafe.Pointer(p)), 0, 0)
 	return
 }
 

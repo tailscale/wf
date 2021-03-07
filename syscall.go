@@ -16,7 +16,7 @@ package wf
 
 //sys fwpmSubLayerEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmSublayer0, numEntriesReturned *uint32) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerEnum0
 
-//sys fwpmFreeMemory0(p uintptr) = fwpuclnt.FwpmFreeMemory0
+//sys fwpmFreeMemory0(p *struct{}) = fwpuclnt.FwpmFreeMemory0
 
 //sys fwpmSubLayerAdd0(engineHandle windows.Handle, sublayer *fwpmSublayer0, nilForNow *uintptr) (err error) [failretval!=0] = fwpuclnt.FwpmSubLayerAdd0
 
