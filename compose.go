@@ -16,15 +16,12 @@ func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
 			Name:        toUint16(a, sl.Name),
 			Description: toUint16(a, sl.Description),
 		},
+		ProviderKey: toGUID(a, sl.Provider),
 		ProviderData: fwpByteBlob{
 			Size: uint32(len(sl.ProviderData)),
 			Data: toBytes(a, sl.ProviderData),
 		},
 		Weight: sl.Weight,
-	}
-	if sl.Provider != nil {
-		guid := (*windows.GUID)(a.alloc(unsafe.Sizeof(windows.GUID{})))
-		*guid = *sl.Provider
 	}
 
 	return ret
@@ -69,7 +66,7 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 			Name:        toUint16(a, r.Name),
 			Description: toUint16(a, r.Description),
 		},
-		ProviderKey: r.Provider,
+		ProviderKey: toGUID(a, r.Provider),
 		ProviderData: fwpByteBlob{
 			Size: uint32(len(r.ProviderData)), // todo: overflow?
 			Data: toBytes(a, r.ProviderData),
@@ -104,13 +101,20 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 func toCondition0(a *arena, ms []*Match, ft fieldTypes) (array *fwpmFilterCondition0, err error) {
 	array = (*fwpmFilterCondition0)(a.calloc(len(ms), unsafe.Sizeof(fwpmFilterCondition0{})))
 
+	var conds []fwpmFilterCondition0
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&conds))
+	sh.Cap = len(ms)
+	sh.Len = len(ms)
+	sh.Data = uintptr(unsafe.Pointer(array))
+
 	for i, m := range ms {
+		c := &conds[i]
+
 		typ, val, err := toValue0(a, m.Value, ft[m.Key])
 		if err != nil {
 			return nil, err
 		}
 
-		c := (*fwpmFilterCondition0)(unsafe.Pointer(uintptr(unsafe.Pointer(array)) + uintptr(i)*unsafe.Sizeof(fwpmFilterCondition0{})))
 		*c = fwpmFilterCondition0{
 			FieldKey:  m.Key,
 			MatchType: m.Op,
@@ -198,21 +202,45 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 }
 
 func toUint16(a *arena, s string) *uint16 {
-	n := windows.StringToUTF16(s)
-	np := a.calloc(len(n), 2)
-	for i := range n {
-		*(*uint16)(unsafe.Pointer(uintptr(np) + uintptr(i))) = n[i]
+	if len(s) == 0 {
+		return nil
 	}
-	return (*uint16)(np)
+
+	n := windows.StringToUTF16(s)
+	ret := a.calloc(len(n), 2)
+
+	var sl []uint16
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&sl))
+	sh.Cap = len(s)
+	sh.Len = len(s)
+	sh.Data = uintptr(ret)
+
+	copy(sl, n)
+	return (*uint16)(ret)
 }
 
 func toBytes(a *arena, bs []byte) *byte {
 	if len(bs) == 0 {
 		return nil
 	}
-	p := a.calloc(len(bs), 1)
-	for i := range bs {
-		*(*byte)(unsafe.Pointer(uintptr(p) + uintptr(i))) = bs[i]
+
+	ret := a.calloc(len(bs), 1)
+
+	var sl []byte
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&sl))
+	sh.Cap = len(bs)
+	sh.Len = len(bs)
+	sh.Data = uintptr(ret)
+
+	copy(sl, bs)
+	return (*byte)(ret)
+}
+
+func toGUID(a *arena, guid *windows.GUID) *windows.GUID {
+	if guid == nil {
+		return nil
 	}
-	return (*byte)(p)
+	ret := (*windows.GUID)(a.alloc(unsafe.Sizeof(windows.GUID{})))
+	*ret = *guid
+	return ret
 }
