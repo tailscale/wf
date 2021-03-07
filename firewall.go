@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/bits"
 	"reflect"
-	"runtime"
 	"time"
 	"unsafe"
 
@@ -714,44 +713,68 @@ func (s *Session) Rules() ([]*Rule, error) { // TODO: support filter settings
 }
 
 func (s *Session) AddRule(r *Rule) error {
-	f, ref, err := toFilter0(r, s.layerTypes)
+	f, cmems, err := toFilter0(r, s.layerTypes)
 	if err != nil {
 		return err
 	}
+	defer func() {
+		for _, cmem := range cmems {
+			if _, err := windows.LocalFree(windows.Handle(cmem)); err != nil {
+				panic(err)
+			}
+		}
+	}()
 
 	if err := fwpmFilterAdd0(s.handle, f, nil, nil); err != nil {
 		return err
 	}
 
-	runtime.KeepAlive(ref)
-
 	return nil
 }
 
-func toFilter0(r *Rule, lt layerTypes) (*fwpmFilter0, interface{}, error) {
-	conds, ref, err := toConditions(r.Conditions, lt[r.Layer])
+func toFilter0(r *Rule, lt layerTypes) (*fwpmFilter0, []uintptr, error) {
+	conds, condsLen, cmems, err := toConditions(r.Conditions, lt[r.Layer])
 	if err != nil {
 		return nil, nil, err
 	}
 
-	ret := &fwpmFilter0{
-		FilterKey:    r.Key,
-		DisplayData:  toDisplayData(r.Name, r.Description),
-		ProviderKey:  r.Provider,
-		ProviderData: toByteBlob(r.ProviderData),
-		LayerKey:     r.Layer,
-		SublayerKey:  r.Sublayer,
-		Weight: fwpValue0{
-			Type:  dataTypeUint64,
-			Value: uintptr(unsafe.Pointer(&r.Weight)),
-		},
-		NumFilterConditions: uint32(len(conds)), // TODO: overflow?
-		FilterConditions:    &conds[0],
+	mem, err := windows.LocalAlloc(windows.LPTR, uint32(unsafe.Sizeof(fwpmFilter0{})))
+	if err != nil {
+		return nil, nil, err
+	}
+	cmems = append(cmems, mem)
+	ret := (*fwpmFilter0)(unsafe.Pointer(mem))
+	*ret = fwpmFilter0{
+		FilterKey:           r.Key,
+		ProviderKey:         r.Provider,
+		LayerKey:            r.Layer,
+		SublayerKey:         r.Sublayer,
+		NumFilterConditions: uint32(condsLen), // TODO: overflow?
+		FilterConditions:    conds,
 		Action: fwpmAction0{
 			Type: r.Action,
 			GUID: r.Callout,
 		},
 	}
+
+	ddMem, err := toDisplayData2(r.Name, r.Description, &ret.DisplayData)
+	if err != nil {
+		return nil, cmems, err
+	}
+	cmems = append(cmems, ddMem)
+
+	blobMem, err := toByteBlob2(r.ProviderData, &ret.ProviderData)
+	if err != nil {
+		return nil, cmems, err
+	}
+	cmems = append(cmems, blobMem)
+
+	valueMems, err := toValue(r.Weight, reflect.TypeOf(r.Weight), (*fwpConditionValue0)(unsafe.Pointer(&ret.Weight)))
+	if err != nil {
+		return nil, cmems, err
+	}
+	cmems = append(cmems, valueMems...)
+
 	if r.PermitIfMissing {
 		ret.Flags |= fwpmFilterFlagsPermitIfCalloutUnregistered
 	}
@@ -762,74 +785,112 @@ func toFilter0(r *Rule, lt layerTypes) (*fwpmFilter0, interface{}, error) {
 		ret.Flags |= fwpmFilterFlagsBootTime
 	}
 
-	return ret, ref, nil
+	return ret, cmems, nil
 }
 
-func toConditions(ms []*Match, ft fieldTypes) ([]fwpmFilterCondition0, interface{}, error) {
-	ret := make([]fwpmFilterCondition0, 0, len(ms))
-	refs := make([]interface{}, 0, len(ms))
-	for _, m := range ms {
-		v, ref, err := toValue(m.Value, ft[m.Key])
-		if err != nil {
-			return nil, nil, err
-		}
-		ret = append(ret, fwpmFilterCondition0{
+func toConditions(ms []*Match, ft fieldTypes) (*fwpmFilterCondition0, int, []uintptr, error) {
+	mem, err := windows.LocalAlloc(windows.LPTR, uint32(len(ms))*uint32(unsafe.Sizeof(fwpmFilterCondition0{})))
+	if err != nil {
+		return nil, 0, nil, err
+	}
+	ret := (*fwpmFilterCondition0)(unsafe.Pointer(mem))
+	cmems := []uintptr{mem}
+
+	for i, m := range ms {
+		c := (*fwpmFilterCondition0)(unsafe.Pointer(uintptr(unsafe.Pointer(ret)) + uintptr(i)*unsafe.Sizeof(fwpmFilterCondition0{})))
+
+		*c = fwpmFilterCondition0{
 			FieldKey:  m.Key,
 			MatchType: m.Op,
-			Value:     v,
-		})
-		refs = append(refs, ref)
+		}
+
+		valueMems, err := toValue(m.Value, ft[m.Key], &c.Value)
+		if err != nil {
+			return nil, 0, nil, err
+		}
+		cmems = append(cmems, valueMems...)
 	}
 
-	return ret, refs, nil
+	return ret, len(ms), cmems, nil
 }
 
-func toValue(v interface{}, ftype reflect.Type) (ret fwpConditionValue0, reference interface{}, err error) {
+func toValue(v interface{}, ftype reflect.Type, out *fwpConditionValue0) ([]uintptr, error) {
 	mapErr := func() error {
 		return fmt.Errorf("can't map type %T into condition type %v", v, ftype)
 	}
 
-	ret.Type = fieldTypeMapReverse[ftype]
-	switch ret.Type {
+	// TODO: exceptions go here
+
+	out.Type = fieldTypeMapReverse[ftype]
+	var mems []uintptr
+	switch out.Type {
 	case dataTypeUint8:
 		u, ok := v.(uint8)
 		if !ok {
-			return ret, nil, mapErr()
+			return mems, mapErr()
 		}
-		*(*uint8)(unsafe.Pointer(&ret.Value)) = u
+		*(*uint8)(unsafe.Pointer(&out.Value)) = u
 	case dataTypeUint16:
 		u, ok := v.(uint16)
 		if !ok {
-			return ret, nil, mapErr()
+			return mems, mapErr()
 		}
-		*(*uint16)(unsafe.Pointer(&ret.Value)) = u
+		*(*uint16)(unsafe.Pointer(&out.Value)) = u
 	case dataTypeUint32:
 		u, ok := v.(uint32)
 		if !ok {
-			return ret, nil, mapErr()
+			return mems, mapErr()
 		}
-		*(*uint32)(unsafe.Pointer(&ret.Value)) = u
+		*(*uint32)(unsafe.Pointer(&out.Value)) = u
 	case dataTypeUint64:
+		mem, err := windows.LocalAlloc(windows.LPTR, uint32(unsafe.Sizeof(uint64(0))))
+		if err != nil {
+			return mems, err
+		}
+		mems = append(mems, mem)
+		u64Ptr := (*uint64)(unsafe.Pointer(mem))
+
 		u, ok := v.(uint64)
 		if !ok {
-			return ret, nil, mapErr()
+			return mems, mapErr()
 		}
-		pu := &u
-		reference = pu
-		ret.Value = uintptr(unsafe.Pointer(pu))
+		*u64Ptr = u
+		out.Value = mem
 	case dataTypeByteBlob:
 		u, ok := v.([]byte)
 		if !ok {
-			return ret, nil, mapErr()
+			return mems, mapErr()
 		}
-		bb := toByteBlob(u)
-		ret.Value = uintptr(unsafe.Pointer(&bb))
+
+		mem, err := windows.LocalAlloc(windows.LPTR, uint32(unsafe.Sizeof(fwpByteBlob{})))
+		if err != nil {
+			return mems, err
+		}
+		mems = append(mems, mem)
+		out.Value = mem
+
+		bb := (*fwpByteBlob)(unsafe.Pointer(mem))
+		mem, err = toByteBlob2(u, bb)
+		if err != nil {
+			return mems, err
+		}
+		mems = append(mems, mem)
 	case dataTypeSID:
 		u, ok := v.(*windows.SID)
 		if !ok {
-			return ret, nil, mapErr()
+			return mems, mapErr()
 		}
-		ret.Value = uintptr(unsafe.Pointer(u))
+
+		sidLen := windows.GetLengthSid(u)
+		mem, err := windows.LocalAlloc(windows.LPTR, sidLen)
+		if err != nil {
+			return mems, err
+		}
+		mems = append(mems, mem)
+		if err := windows.CopySid(sidLen, (*windows.SID)(unsafe.Pointer(mem)), u); err != nil {
+			return mems, err
+		}
+		out.Value = mem
 	}
 
 	// TODO: bitmapIndex
@@ -840,7 +901,7 @@ func toValue(v interface{}, ftype reflect.Type) (ret fwpConditionValue0, referen
 	// TODO: dataTypeTokenAccessInformation
 	// TODO: addr masks
 
-	return ret, reference, nil
+	return mems, nil
 }
 
 func toRules(rulesArray **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rule, error) {
@@ -1132,10 +1193,51 @@ func toByteBlob(bs []byte) fwpByteBlob {
 	}
 }
 
+func toByteBlob2(bs []byte, out *fwpByteBlob) (uintptr, error) {
+	if len(bs) == 0 {
+		out.Size = 0
+		out.Data = nil
+	}
+	mem, err := windows.LocalAlloc(windows.LPTR, uint32(len(bs)))
+	if err != nil {
+		return 0, err
+	}
+	for i := range bs {
+		*(*byte)(unsafe.Pointer(mem + uintptr(i)*unsafe.Sizeof(byte(0)))) = bs[i]
+	}
+	out.Size = uint32(len(bs))
+	out.Data = (*uint8)(unsafe.Pointer(mem))
+	return mem, nil
+}
+
 // toDisplayData packs name and description into a fwpmDisplayData0.
 func toDisplayData(name, description string) fwpmDisplayData0 {
 	return fwpmDisplayData0{
 		Name:        windows.StringToUTF16Ptr(name),
 		Description: windows.StringToUTF16Ptr(description),
 	}
+}
+
+func toDisplayData2(name, description string, out *fwpmDisplayData0) (uintptr, error) {
+	n := windows.StringToUTF16(name)
+	d := windows.StringToUTF16(description)
+
+	mem, err := windows.LocalAlloc(windows.LPTR, uint32(2*(len(n)+len(d))))
+	if err != nil {
+		return 0, err
+	}
+	for i := range n {
+		*(*uint16)(unsafe.Pointer(mem + uintptr(i))) = n[i]
+	}
+	dstart := mem + uintptr(len(n))
+	for i := range d {
+		*(*uint16)(unsafe.Pointer(dstart + uintptr(i))) = d[i]
+	}
+
+	*out = fwpmDisplayData0{
+		Name:        (*uint16)(unsafe.Pointer(mem)),
+		Description: (*uint16)(unsafe.Pointer(dstart)),
+	}
+
+	return mem, nil
 }
