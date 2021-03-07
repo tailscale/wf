@@ -91,8 +91,9 @@ func fromLayer0(array **fwpmLayer0, num uint32) ([]*Layer, error) {
 		sh.Len = int(layer.NumFields)
 		sh.Data = uintptr(unsafe.Pointer(layer.Fields))
 
-		for _, field := range fields {
-			typ, err := fieldType(&field)
+		for i := range fields {
+			field := &fields[i]
+			typ, err := fieldType(field)
 			if err != nil {
 				return nil, fmt.Errorf("finding type of field %s: %w", GUIDName(*field.FieldKey), err)
 			}
@@ -124,7 +125,7 @@ func fromSublayer0(array **fwpmSublayer0, num uint32) []*Sublayer {
 			Name:         windows.UTF16PtrToString(sublayer.DisplayData.Name),
 			Description:  windows.UTF16PtrToString(sublayer.DisplayData.Description),
 			Persistent:   (sublayer.Flags & fwpmSublayerFlagsPersistent) != 0,
-			ProviderData: fromByteBlob(sublayer.ProviderData),
+			ProviderData: fromByteBlob(&sublayer.ProviderData),
 			Weight:       sublayer.Weight,
 		}
 		if sublayer.ProviderKey != nil {
@@ -157,7 +158,7 @@ func fromProvider0(array **fwpmProvider0, num uint32) []*Provider {
 			Description: windows.UTF16PtrToString(provider.DisplayData.Description),
 			Persistent:  (provider.Flags & fwpmProviderFlagsPersistent) != 0,
 			Disabled:    (provider.Flags & fwpmProviderFlagsDisabled) != 0,
-			Data:        fromByteBlob(provider.ProviderData),
+			Data:        fromByteBlob(&provider.ProviderData),
 			ServiceName: windows.UTF16PtrToString(provider.ServiceName),
 		}
 		ret = append(ret, p)
@@ -186,7 +187,7 @@ func fromFilter0(array **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rul
 			Persistent:   (rule.Flags & fwpmFilterFlagsPersistent) != 0,
 			BootTime:     (rule.Flags & fwpmFilterFlagsBootTime) != 0,
 			Provider:     rule.ProviderKey,
-			ProviderData: fromByteBlob(rule.ProviderData),
+			ProviderData: fromByteBlob(&rule.ProviderData),
 			Disabled:     (rule.Flags & fwpmFilterFlagsDisabled) != 0,
 		}
 		if rule.EffectiveWeight.Type == dataTypeUint64 {
@@ -226,13 +227,14 @@ func fromCondition0(condArray *fwpmFilterCondition0, num uint32, fieldTypes fiel
 
 	var ret []*Match
 
-	for _, cond := range conditions {
+	for i := range conditions {
+		cond := &conditions[i]
 		fieldType, ok := fieldTypes[cond.FieldKey]
 		if !ok {
 			return nil, fmt.Errorf("unknown field %s", cond.FieldKey)
 		}
 
-		v, err := fromValue0(fwpValue0(cond.Value), fieldType)
+		v, err := fromValue0((*fwpValue0)(unsafe.Pointer(&cond.Value)), fieldType)
 		if err != nil {
 			return nil, fmt.Errorf("getting value for match [%s %s]: %w", GUIDName(cond.FieldKey), cond.MatchType, err)
 		}
@@ -249,7 +251,7 @@ func fromCondition0(condArray *fwpmFilterCondition0, num uint32, fieldTypes fiel
 }
 
 // fromValue converts a fwpValue0 to the corresponding Go value.
-func fromValue0(v fwpValue0, ftype reflect.Type) (interface{}, error) {
+func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 	// For most types, the field type and raw data type match up. But
 	// for some, the raw type can vary from the field type
 	// (e.g. comparing an IP to a prefix). Get the complex matchups
@@ -316,7 +318,7 @@ func fromValue0(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 		copy(ret[:], fromBytes(v.Value, 16))
 		return ret, nil
 	case dataTypeByteBlob:
-		return fromByteBlob(**(**fwpByteBlob)(unsafe.Pointer(&v.Value))), nil
+		return fromByteBlob(*(**fwpByteBlob)(unsafe.Pointer(&v.Value))), nil
 	case dataTypeSID:
 		return parseSID(&v.Value)
 	// case dataTypeSecurityDescriptor:
@@ -373,18 +375,18 @@ func parseSID(v *uintptr) (*windows.SID, error) {
 func parseSecurityDescriptor(v *uintptr) (*windows.SECURITY_DESCRIPTOR, error) {
 	// The security descriptor is embedded in the API response as
 	// a byte slice.
-	bb := fromByteBlob(**(**fwpByteBlob)(unsafe.Pointer(v)))
+	bb := fromByteBlob(*(**fwpByteBlob)(unsafe.Pointer(v)))
 	relSD := (*windows.SECURITY_DESCRIPTOR)(unsafe.Pointer(&bb[0]))
 	return relSD, nil
 }
 
 func parseRange0(v *uintptr, ftype reflect.Type) (interface{}, error) {
 	r := *(**fwpRange0)(unsafe.Pointer(v))
-	from, err := fromValue0(r.From, ftype)
+	from, err := fromValue0(&r.From, ftype)
 	if err != nil {
 		return nil, err
 	}
-	to, err := fromValue0(r.To, ftype)
+	to, err := fromValue0(&r.To, ftype)
 	if err != nil {
 		return nil, err
 	}
@@ -421,8 +423,8 @@ func fromBytes(bb uintptr, length int) []byte {
 
 // fromByteBlob extracts the bytes from bb and returns them as a
 // []byte that doesn't alias C memory.
-func fromByteBlob(bb fwpByteBlob) []byte {
-	if bb.Size == 0 {
+func fromByteBlob(bb *fwpByteBlob) []byte {
+	if bb == nil || bb.Size == 0 {
 		return nil
 	}
 

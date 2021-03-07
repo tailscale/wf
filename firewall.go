@@ -56,20 +56,13 @@ func New(opts *SessionOptions) (*Session, error) {
 		opts = &SessionOptions{}
 	}
 
-	session := fwpmSession0{
-		DisplayData: fwpmDisplayData0{
-			Name:        windows.StringToUTF16Ptr(opts.Name),
-			Description: windows.StringToUTF16Ptr(opts.Description),
-		},
-		TxnWaitTimeoutMillis: uint32(opts.TransactionStartTimeout.Milliseconds()),
-	}
-	if opts.Dynamic {
-		session.Flags = fwpmSession0FlagDynamic
-	}
+	var a arena
+	defer a.dispose()
+
+	s0 := toSession0(&a, opts)
 
 	var handle windows.Handle
-
-	err := fwpmEngineOpen0(nil, authnServiceWinNT, nil, &session, &handle)
+	err := fwpmEngineOpen0(nil, authnServiceWinNT, nil, s0, &handle)
 	if err != nil {
 		return nil, err
 	}
@@ -232,12 +225,13 @@ type Sublayer struct {
 // Sublayers returns available Sublayers. If provider is non-nil, only
 // Sublayers registered to that Provider are returned.
 func (s *Session) Sublayers(provider *windows.GUID) ([]*Sublayer, error) {
-	tpl := fwpmSublayerEnumTemplate0{
-		ProviderKey: provider,
-	}
+	var a arena
+	defer a.dispose()
+
+	tpl := toSublayerEnumTemplate0(&a, provider)
 
 	var enum windows.Handle
-	if err := fwpmSubLayerCreateEnumHandle0(s.handle, &tpl, &enum); err != nil {
+	if err := fwpmSubLayerCreateEnumHandle0(s.handle, tpl, &enum); err != nil {
 		return nil, err
 	}
 	defer fwpmSubLayerDestroyEnumHandle0(s.handle, enum)

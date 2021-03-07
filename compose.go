@@ -8,6 +8,27 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+func toSession0(a *arena, opts *SessionOptions) *fwpmSession0 {
+	ret := (*fwpmSession0)(a.alloc(unsafe.Sizeof(fwpmSession0{})))
+	*ret = fwpmSession0{
+		DisplayData: fwpmDisplayData0{
+			Name:        toUint16(a, opts.Name),
+			Description: toUint16(a, opts.Description),
+		},
+		TxnWaitTimeoutMillis: uint32(opts.TransactionStartTimeout.Milliseconds()),
+	}
+	if opts.Dynamic {
+		ret.Flags = fwpmSession0FlagDynamic
+	}
+	return ret
+}
+
+func toSublayerEnumTemplate0(a *arena, provider *windows.GUID) *fwpmSublayerEnumTemplate0 {
+	ret := (*fwpmSublayerEnumTemplate0)(a.alloc(unsafe.Sizeof(fwpmSublayerEnumTemplate0{})))
+	ret.ProviderKey = toGUID(a, provider)
+	return ret
+}
+
 func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
 	ret := (*fwpmSublayer0)(a.alloc(unsafe.Sizeof(fwpmSublayer0{})))
 	*ret = fwpmSublayer0{
