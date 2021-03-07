@@ -241,7 +241,7 @@ func (s *Session) Layers() ([]*Layer, error) {
 // toLayers converts a C array of fwpmLayer0 to a safe-to-use Layer
 // slice.
 func toLayers(layersArray **fwpmLayer0, numLayers uint32) ([]*Layer, error) {
-	defer fwpmFreeMemory0(uintptr(unsafe.Pointer(&layersArray)))
+	defer fwpmFreeMemory0((*struct{})(unsafe.Pointer(&layersArray)))
 
 	var ret []*Layer
 
@@ -342,7 +342,7 @@ func (s *Session) Sublayers(provider *windows.GUID) ([]*Sublayer, error) {
 // toSublayers converts a C array of fwpmSublayer0 to a safe-to-use Sublayer
 // slice.
 func toSublayers(sublayersArray **fwpmSublayer0, numSublayers uint32) []*Sublayer {
-	defer fwpmFreeMemory0(uintptr(unsafe.Pointer(&sublayersArray)))
+	defer fwpmFreeMemory0((*struct{})(unsafe.Pointer(&sublayersArray)))
 
 	var ret []*Sublayer
 
@@ -382,12 +382,21 @@ func (s *Session) AddSublayer(sl *Sublayer) error {
 		return errors.New("Sublayer.Key cannot be zero")
 	}
 
+	var a arena
+	defer a.dispose()
+
 	sl0 := fwpmSublayer0{
-		SublayerKey:  sl.Key,
-		DisplayData:  toDisplayData(sl.Name, sl.Description),
-		ProviderKey:  sl.Provider,
-		ProviderData: toByteBlob(sl.ProviderData),
-		Weight:       sl.Weight,
+		SublayerKey: sl.Key,
+		DisplayData: fwpmDisplayData0{
+			Name:        toUint16(&a, sl.Name),
+			Description: toUint16(&a, sl.Description),
+		},
+		ProviderKey: sl.Provider,
+		ProviderData: fwpByteBlob{
+			Size: uint32(len(sl.ProviderData)),
+			Data: toBytes(&a, sl.ProviderData),
+		},
+		Weight: sl.Weight,
 	}
 
 	return fwpmSubLayerAdd0(s.handle, &sl0, nil) // TODO: security descriptor
@@ -455,7 +464,7 @@ func (s *Session) Providers() ([]*Provider, error) {
 // toProviders converts a C array of fwpmProvider0 to a safe-to-use Provider
 // slice.
 func toProviders(providersArray **fwpmProvider0, numProviders uint32) []*Provider {
-	defer fwpmFreeMemory0(uintptr(unsafe.Pointer(&providersArray)))
+	defer fwpmFreeMemory0((*struct{})(unsafe.Pointer(&providersArray)))
 
 	var ret []*Provider
 
@@ -487,11 +496,20 @@ func (s *Session) AddProvider(p *Provider) error {
 		return errors.New("Provider.Key cannot be zero")
 	}
 
+	var a arena
+	defer a.dispose()
+
 	p0 := &fwpmProvider0{
-		ProviderKey:  p.Key,
-		DisplayData:  toDisplayData(p.Name, p.Description),
-		ProviderData: toByteBlob(p.Data),
-		ServiceName:  windows.StringToUTF16Ptr(p.ServiceName),
+		ProviderKey: p.Key,
+		DisplayData: fwpmDisplayData0{
+			Name:        toUint16(&a, p.Name),
+			Description: toUint16(&a, p.Description),
+		},
+		ProviderData: fwpByteBlob{
+			Size: uint32(len(p.Data)),
+			Data: toBytes(&a, p.Data),
+		},
+		ServiceName: windows.StringToUTF16Ptr(p.ServiceName),
 	}
 	if p.Persistent {
 		p0.Flags = fwpmProviderFlagsPersistent
@@ -550,38 +568,6 @@ func (m MatchType) String() string {
 	return mtStr[m]
 }
 
-// valid reports whether the MatchType is valid for the given data
-// type. For example, MatchTypeGreater reports valid=false for SIDs,
-// because SIDs are not sortable.
-func (m MatchType) valid(v interface{}) bool {
-	switch m {
-	case MatchTypeEqual:
-		return true
-	case MatchTypeGreater, MatchTypeLess, MatchTypeGreaterOrEqual, MatchTypeLessOrEqual, MatchTypeRange, MatchTypeNotEqual:
-		switch v.(type) {
-		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, float32, float64, [16]byte, []byte, string:
-			return true
-		default:
-			return false
-		}
-	case MatchTypeFlagsAllSet, MatchTypeFlagsAnySet, MatchTypeFlagsNoneSet:
-		switch v.(type) {
-		case uint8, uint16, uint32, uint64:
-			return true
-		default:
-			return false
-		}
-	case MatchTypeEqualCaseInsensitive:
-		_, ok := v.(string)
-		return ok
-	case MatchTypePrefix, MatchTypeNotPrefix:
-		// TODO: don't know what to do with these yet, prevent their use.
-		return false
-	default:
-		panic("unknown match type")
-	}
-}
-
 // Match is a matching test that gets run against a layer's field.
 type Match struct {
 	Key   windows.GUID
@@ -600,13 +586,6 @@ func (m Match) String() string {
 		val = string(bs[:len(bs)-1])
 	}
 	return fmt.Sprintf("%s %s %v (%T)", GUIDName(m.Key), m.Op, val, m.Value)
-}
-
-// valid reports whether the Match is valid. A Match is valid if its
-// Key and Value are of compatible types, and Op can apply to those
-// types.
-func (m Match) valid() bool {
-	return true
 }
 
 // Action is an action the filtering engine can execute.
@@ -713,17 +692,13 @@ func (s *Session) Rules() ([]*Rule, error) { // TODO: support filter settings
 }
 
 func (s *Session) AddRule(r *Rule) error {
-	f, cmems, err := toFilter0(r, s.layerTypes)
+	var a arena
+	defer a.dispose()
+
+	f, err := toFilter0(&a, r, s.layerTypes)
 	if err != nil {
 		return err
 	}
-	defer func() {
-		for _, cmem := range cmems {
-			if _, err := windows.LocalFree(windows.Handle(cmem)); err != nil {
-				panic(err)
-			}
-		}
-	}()
 
 	if err := fwpmFilterAdd0(s.handle, f, nil, nil); err != nil {
 		return err
@@ -732,48 +707,42 @@ func (s *Session) AddRule(r *Rule) error {
 	return nil
 }
 
-func toFilter0(r *Rule, lt layerTypes) (*fwpmFilter0, []uintptr, error) {
-	conds, condsLen, cmems, err := toConditions(r.Conditions, lt[r.Layer])
+func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
+	conds, err := toConditions(a, r.Conditions, lt[r.Layer])
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	mem, err := windows.LocalAlloc(windows.LPTR, uint32(unsafe.Sizeof(fwpmFilter0{})))
+	typ, val, err := toValue(a, r.Weight, reflect.TypeOf(uint64(0)))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	cmems = append(cmems, mem)
-	ret := (*fwpmFilter0)(unsafe.Pointer(mem))
+
+	ret := (*fwpmFilter0)(a.alloc(unsafe.Sizeof(fwpmFilter0{})))
 	*ret = fwpmFilter0{
-		FilterKey:           r.Key,
-		ProviderKey:         r.Provider,
-		LayerKey:            r.Layer,
-		SublayerKey:         r.Sublayer,
-		NumFilterConditions: uint32(condsLen), // TODO: overflow?
+		FilterKey: r.Key,
+		DisplayData: fwpmDisplayData0{
+			Name:        toUint16(a, r.Name),
+			Description: toUint16(a, r.Description),
+		},
+		ProviderKey: r.Provider,
+		ProviderData: fwpByteBlob{
+			Size: uint32(len(r.ProviderData)), // todo: overflow?
+			Data: toBytes(a, r.ProviderData),
+		},
+		LayerKey:    r.Layer,
+		SublayerKey: r.Sublayer,
+		Weight: fwpValue0{
+			Type:  typ,
+			Value: val,
+		},
+		NumFilterConditions: uint32(len(r.Conditions)), // TODO: overflow?
 		FilterConditions:    conds,
 		Action: fwpmAction0{
 			Type: r.Action,
 			GUID: r.Callout,
 		},
 	}
-
-	ddMem, err := toDisplayData2(r.Name, r.Description, &ret.DisplayData)
-	if err != nil {
-		return nil, cmems, err
-	}
-	cmems = append(cmems, ddMem)
-
-	blobMem, err := toByteBlob2(r.ProviderData, &ret.ProviderData)
-	if err != nil {
-		return nil, cmems, err
-	}
-	cmems = append(cmems, blobMem)
-
-	valueMems, err := toValue(r.Weight, reflect.TypeOf(r.Weight), (*fwpConditionValue0)(unsafe.Pointer(&ret.Weight)))
-	if err != nil {
-		return nil, cmems, err
-	}
-	cmems = append(cmems, valueMems...)
 
 	if r.PermitIfMissing {
 		ret.Flags |= fwpmFilterFlagsPermitIfCalloutUnregistered
@@ -785,112 +754,92 @@ func toFilter0(r *Rule, lt layerTypes) (*fwpmFilter0, []uintptr, error) {
 		ret.Flags |= fwpmFilterFlagsBootTime
 	}
 
-	return ret, cmems, nil
+	return ret, nil
 }
 
-func toConditions(ms []*Match, ft fieldTypes) (*fwpmFilterCondition0, int, []uintptr, error) {
-	mem, err := windows.LocalAlloc(windows.LPTR, uint32(len(ms))*uint32(unsafe.Sizeof(fwpmFilterCondition0{})))
-	if err != nil {
-		return nil, 0, nil, err
-	}
-	ret := (*fwpmFilterCondition0)(unsafe.Pointer(mem))
-	cmems := []uintptr{mem}
+func toConditions(a *arena, ms []*Match, ft fieldTypes) (array *fwpmFilterCondition0, err error) {
+	array = (*fwpmFilterCondition0)(a.calloc(len(ms), unsafe.Sizeof(fwpmFilterCondition0{})))
 
 	for i, m := range ms {
-		c := (*fwpmFilterCondition0)(unsafe.Pointer(uintptr(unsafe.Pointer(ret)) + uintptr(i)*unsafe.Sizeof(fwpmFilterCondition0{})))
+		typ, val, err := toValue(a, m.Value, ft[m.Key])
+		if err != nil {
+			return nil, err
+		}
 
+		c := (*fwpmFilterCondition0)(unsafe.Pointer(uintptr(unsafe.Pointer(array)) + uintptr(i)*unsafe.Sizeof(fwpmFilterCondition0{})))
 		*c = fwpmFilterCondition0{
 			FieldKey:  m.Key,
 			MatchType: m.Op,
+			Value: fwpConditionValue0{
+				Type:  typ,
+				Value: val,
+			},
 		}
-
-		valueMems, err := toValue(m.Value, ft[m.Key], &c.Value)
-		if err != nil {
-			return nil, 0, nil, err
-		}
-		cmems = append(cmems, valueMems...)
 	}
 
-	return ret, len(ms), cmems, nil
+	return array, nil
 }
 
-func toValue(v interface{}, ftype reflect.Type, out *fwpConditionValue0) ([]uintptr, error) {
-	mapErr := func() error {
-		return fmt.Errorf("can't map type %T into condition type %v", v, ftype)
+func toValue(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val uintptr, err error) {
+	mapErr := func() (dataType, uintptr, error) {
+		return 0, 0, fmt.Errorf("can't map type %T into condition type %v", v, ftype)
 	}
 
 	// TODO: exceptions go here
 
-	out.Type = fieldTypeMapReverse[ftype]
-	var mems []uintptr
-	switch out.Type {
+	typ = fieldTypeMapReverse[ftype]
+	switch typ {
 	case dataTypeUint8:
 		u, ok := v.(uint8)
 		if !ok {
-			return mems, mapErr()
+			return mapErr()
 		}
-		*(*uint8)(unsafe.Pointer(&out.Value)) = u
+		*(*uint8)(unsafe.Pointer(&val)) = u
 	case dataTypeUint16:
 		u, ok := v.(uint16)
 		if !ok {
-			return mems, mapErr()
+			return mapErr()
 		}
-		*(*uint16)(unsafe.Pointer(&out.Value)) = u
+		*(*uint16)(unsafe.Pointer(&val)) = u
 	case dataTypeUint32:
 		u, ok := v.(uint32)
 		if !ok {
-			return mems, mapErr()
+			return mapErr()
 		}
-		*(*uint32)(unsafe.Pointer(&out.Value)) = u
+		*(*uint32)(unsafe.Pointer(&val)) = u
 	case dataTypeUint64:
-		mem, err := windows.LocalAlloc(windows.LPTR, uint32(unsafe.Sizeof(uint64(0))))
-		if err != nil {
-			return mems, err
-		}
-		mems = append(mems, mem)
-		u64Ptr := (*uint64)(unsafe.Pointer(mem))
+		p := a.alloc(unsafe.Sizeof(uint64(0)))
 
 		u, ok := v.(uint64)
 		if !ok {
-			return mems, mapErr()
+			return mapErr()
 		}
-		*u64Ptr = u
-		out.Value = mem
+		*(*uint64)(p) = u
+		val = uintptr(p)
 	case dataTypeByteBlob:
 		u, ok := v.([]byte)
 		if !ok {
-			return mems, mapErr()
+			return mapErr()
 		}
 
-		mem, err := windows.LocalAlloc(windows.LPTR, uint32(unsafe.Sizeof(fwpByteBlob{})))
-		if err != nil {
-			return mems, err
+		p := a.alloc(unsafe.Sizeof(fwpByteBlob{}))
+		*(*fwpByteBlob)(p) = fwpByteBlob{
+			Size: uint32(len(u)), // todo: overflow
+			Data: toBytes(a, u),
 		}
-		mems = append(mems, mem)
-		out.Value = mem
-
-		bb := (*fwpByteBlob)(unsafe.Pointer(mem))
-		mem, err = toByteBlob2(u, bb)
-		if err != nil {
-			return mems, err
-		}
-		mems = append(mems, mem)
+		val = uintptr(p)
 	case dataTypeSID:
 		u, ok := v.(*windows.SID)
 		if !ok {
-			return mems, mapErr()
+			return mapErr()
 		}
 
 		sidLen := windows.GetLengthSid(u)
-		mem, err := windows.LocalAlloc(windows.LPTR, sidLen)
-		if err != nil {
-			return mems, err
+		p := a.alloc(uintptr(sidLen))
+		if err := windows.CopySid(sidLen, (*windows.SID)(p), u); err != nil {
+			return 0, 0, err
 		}
-		mems = append(mems, mem)
-		if err := windows.CopySid(sidLen, (*windows.SID)(unsafe.Pointer(mem)), u); err != nil {
-			return mems, err
-		}
-		out.Value = mem
+		val = uintptr(p)
 	}
 
 	// TODO: bitmapIndex
@@ -901,11 +850,11 @@ func toValue(v interface{}, ftype reflect.Type, out *fwpConditionValue0) ([]uint
 	// TODO: dataTypeTokenAccessInformation
 	// TODO: addr masks
 
-	return mems, nil
+	return typ, val, nil
 }
 
 func toRules(rulesArray **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rule, error) {
-	defer fwpmFreeMemory0(uintptr(unsafe.Pointer(&rulesArray)))
+	defer fwpmFreeMemory0((*struct{})(unsafe.Pointer(&rulesArray)))
 
 	var rules []*fwpmFilter0
 	sh := (*reflect.SliceHeader)(unsafe.Pointer(&rules))
@@ -930,7 +879,7 @@ func toRules(rulesArray **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Ru
 			Disabled:     (rule.Flags & fwpmFilterFlagsDisabled) != 0,
 		}
 		if rule.EffectiveWeight.Type == dataTypeUint64 {
-			r.Weight = *(*uint64)(unsafe.Pointer(rule.EffectiveWeight.Value))
+			r.Weight = **(**uint64)(unsafe.Pointer(&rule.EffectiveWeight.Value))
 		}
 		if r.Action == ActionCalloutTerminating || r.Action == ActionCalloutInspection || r.Action == ActionCalloutUnknown {
 			r.Callout = rule.Action.GUID
@@ -981,9 +930,6 @@ func fromConditions(condArray *fwpmFilterCondition0, num uint32, fieldTypes fiel
 			Op:    cond.MatchType,
 			Value: v,
 		}
-		if !m.valid() {
-			return nil, fmt.Errorf("match [%s %s %v] is not valid", GUIDName(m.Key), m.Op, m.Value)
-		}
 
 		ret = append(ret, m)
 	}
@@ -1021,9 +967,9 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 				copy(bs[:], fromBytes(v.Value, 16))
 				return netaddr.IPFrom16(bs), nil
 			case dataTypeV4AddrMask:
-				return parseV4AddrAndMask(v.Value), nil
+				return parseV4AddrAndMask(&v.Value), nil
 			case dataTypeV6AddrMask:
-				return parseV6AddrAndMask(v.Value), nil
+				return parseV6AddrAndMask(&v.Value), nil
 			default:
 				return nil, mapErr()
 			}
@@ -1031,35 +977,14 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation(nil)) {
 				return nil, mapErr()
 			}
-			return parseSecurityDescriptor(v.Value)
+			return parseSecurityDescriptor(&v.Value)
 		case v.Type == dataTypeSID:
 			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation(nil)) {
 				return nil, mapErr()
 			}
-			return parseSID(v.Value)
+			return parseSID(&v.Value)
 		case v.Type == dataTypeRange:
-			r := (*fwpRange0)(unsafe.Pointer(v.Value))
-			from, err := fromValue(r.From, ftype)
-			if err != nil {
-				return nil, fmt.Errorf("getting range.From: %w", err)
-			}
-			to, err := fromValue(r.To, ftype)
-			if err != nil {
-				return nil, fmt.Errorf("getting range.To: %w", err)
-			}
-			if reflect.TypeOf(from) != reflect.TypeOf(to) {
-				panic(fmt.Sprintf("range.From and range.To types don't match: %s / %s", reflect.TypeOf(from), reflect.TypeOf(to)))
-			}
-			if reflect.TypeOf(from) == reflect.TypeOf(netaddr.IP{}) {
-				// TODO: only return IPRange, not IPRange or IPPrefix?
-				// Less work to parse on the receiving end.
-				ret := netaddr.IPRange{from.(netaddr.IP), to.(netaddr.IP)}
-				if pfx, ok := ret.Prefix(); ok {
-					return pfx, nil
-				}
-				return ret, nil
-			}
-			return Range{from, to}, nil
+			return parseRange(&v.Value, ftype)
 		default:
 			return nil, mapErr()
 		}
@@ -1083,15 +1008,15 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 	case dataTypeUint32:
 		return *(*uint32)(unsafe.Pointer(&v.Value)), nil
 	case dataTypeUint64:
-		return *(*uint64)(unsafe.Pointer(v.Value)), nil
+		return **(**uint64)(unsafe.Pointer(&v.Value)), nil
 	case dataTypeByteArray16:
 		var ret [16]byte
 		copy(ret[:], fromBytes(v.Value, 16))
 		return ret, nil
 	case dataTypeByteBlob:
-		return fromByteBlob(*(*fwpByteBlob)(unsafe.Pointer(v.Value))), nil
+		return fromByteBlob(**(**fwpByteBlob)(unsafe.Pointer(&v.Value))), nil
 	case dataTypeSID:
-		return parseSID(v.Value)
+		return parseSID(&v.Value)
 	// case dataTypeSecurityDescriptor:
 	// 	return parseSecurityDescriptor(v.Value)
 	case dataTypeTokenInformation:
@@ -1105,16 +1030,16 @@ func fromValue(v fwpValue0, ftype reflect.Type) (interface{}, error) {
 	case dataTypeBitmapIndex:
 		return nil, errors.New("TODO BitmapIndex")
 	case dataTypeV4AddrMask:
-		return parseV4AddrAndMask(v.Value), nil
+		return parseV4AddrAndMask(&v.Value), nil
 	case dataTypeV6AddrMask:
-		return parseV6AddrAndMask(v.Value), nil
+		return parseV6AddrAndMask(&v.Value), nil
 	default:
 		return nil, fmt.Errorf("unknown value type %d", v.Type)
 	}
 }
 
-func parseV4AddrAndMask(v uintptr) netaddr.IPPrefix {
-	v4 := *(*fwpV4AddrAndMask)(unsafe.Pointer(v))
+func parseV4AddrAndMask(v *uintptr) netaddr.IPPrefix {
+	v4 := *(**fwpV4AddrAndMask)(unsafe.Pointer(v))
 	ip := netaddr.IPv4(uint8(v4.Addr>>24), uint8(v4.Addr>>16), uint8(v4.Addr>>8), uint8(v4.Addr))
 	bits := uint8(32 - bits.TrailingZeros32(v4.Mask))
 	return netaddr.IPPrefix{
@@ -1123,18 +1048,18 @@ func parseV4AddrAndMask(v uintptr) netaddr.IPPrefix {
 	}
 }
 
-func parseV6AddrAndMask(v uintptr) netaddr.IPPrefix {
-	v6 := *(*fwpV6AddrAndMask)(unsafe.Pointer(v))
+func parseV6AddrAndMask(v *uintptr) netaddr.IPPrefix {
+	v6 := *(**fwpV6AddrAndMask)(unsafe.Pointer(v))
 	return netaddr.IPPrefix{
 		IP:   netaddr.IPFrom16(v6.Addr),
 		Bits: v6.PrefixLength,
 	}
 }
 
-func parseSID(v uintptr) (*windows.SID, error) {
+func parseSID(v *uintptr) (*windows.SID, error) {
 	// TODO: export IsValidSid in x/sys/windows so we can vaguely
 	// verify this pointer.
-	sid := (*windows.SID)(unsafe.Pointer(v))
+	sid := *(**windows.SID)(unsafe.Pointer(v))
 	// Copy the SID into Go memory.
 	dsid, err := sid.Copy()
 	if err != nil {
@@ -1143,12 +1068,40 @@ func parseSID(v uintptr) (*windows.SID, error) {
 	return dsid, nil
 }
 
-func parseSecurityDescriptor(v uintptr) (*windows.SECURITY_DESCRIPTOR, error) {
+func parseSecurityDescriptor(v *uintptr) (*windows.SECURITY_DESCRIPTOR, error) {
 	// The security descriptor is embedded in the API response as
 	// a byte slice.
-	bb := fromByteBlob(*(*fwpByteBlob)(unsafe.Pointer(v)))
+	bb := fromByteBlob(**(**fwpByteBlob)(unsafe.Pointer(v)))
 	relSD := (*windows.SECURITY_DESCRIPTOR)(unsafe.Pointer(&bb[0]))
 	return relSD, nil
+}
+
+func parseRange(v *uintptr, ftype reflect.Type) (interface{}, error) {
+	r := *(**fwpRange0)(unsafe.Pointer(v))
+	from, err := fromValue(r.From, ftype)
+	if err != nil {
+		return nil, err
+	}
+	to, err := fromValue(r.To, ftype)
+	if err != nil {
+		return nil, err
+	}
+	if reflect.TypeOf(from) != reflect.TypeOf(to) {
+		return nil, fmt.Errorf("range.From and range.To types don't match: %s / %s", reflect.TypeOf(from), reflect.TypeOf(to))
+	}
+	if reflect.TypeOf(from) == reflect.TypeOf(netaddr.IP{}) {
+		// TODO: only return IPRange, not IPRange or IPPrefix?
+		// Less work to parse on the receiving end.
+		ret := netaddr.IPRange{
+			From: from.(netaddr.IP),
+			To:   to.(netaddr.IP),
+		}
+		if pfx, ok := ret.Prefix(); ok {
+			return pfx, nil
+		}
+		return ret, nil
+	}
+	return Range{from, to}, nil
 }
 
 func ipv4From32(v uint32) netaddr.IP {
@@ -1162,7 +1115,6 @@ func fromBytes(bb uintptr, length int) []byte {
 	sh.Len = length
 	sh.Data = bb
 	return append([]byte(nil), bs...)
-
 }
 
 // fromByteBlob extracts the bytes from bb and returns them as a
@@ -1181,63 +1133,22 @@ func fromByteBlob(bb fwpByteBlob) []byte {
 	return append([]byte(nil), blob...)
 }
 
-// toByteBlob packs bs into fwpByteBlob. The returned fwpByteBlob
-// shares memory with bs.
-func toByteBlob(bs []byte) fwpByteBlob {
-	if len(bs) == 0 {
-		return fwpByteBlob{0, nil}
-	}
-	return fwpByteBlob{
-		Size: uint32(len(bs)),
-		Data: &bs[0],
-	}
-}
-
-func toByteBlob2(bs []byte, out *fwpByteBlob) (uintptr, error) {
-	if len(bs) == 0 {
-		out.Size = 0
-		out.Data = nil
-	}
-	mem, err := windows.LocalAlloc(windows.LPTR, uint32(len(bs)))
-	if err != nil {
-		return 0, err
-	}
-	for i := range bs {
-		*(*byte)(unsafe.Pointer(mem + uintptr(i)*unsafe.Sizeof(byte(0)))) = bs[i]
-	}
-	out.Size = uint32(len(bs))
-	out.Data = (*uint8)(unsafe.Pointer(mem))
-	return mem, nil
-}
-
-// toDisplayData packs name and description into a fwpmDisplayData0.
-func toDisplayData(name, description string) fwpmDisplayData0 {
-	return fwpmDisplayData0{
-		Name:        windows.StringToUTF16Ptr(name),
-		Description: windows.StringToUTF16Ptr(description),
-	}
-}
-
-func toDisplayData2(name, description string, out *fwpmDisplayData0) (uintptr, error) {
-	n := windows.StringToUTF16(name)
-	d := windows.StringToUTF16(description)
-
-	mem, err := windows.LocalAlloc(windows.LPTR, uint32(2*(len(n)+len(d))))
-	if err != nil {
-		return 0, err
-	}
+func toUint16(a *arena, s string) *uint16 {
+	n := windows.StringToUTF16(s)
+	np := a.calloc(len(n), 2)
 	for i := range n {
-		*(*uint16)(unsafe.Pointer(mem + uintptr(i))) = n[i]
+		*(*uint16)(unsafe.Pointer(uintptr(np) + uintptr(i))) = n[i]
 	}
-	dstart := mem + uintptr(len(n))
-	for i := range d {
-		*(*uint16)(unsafe.Pointer(dstart + uintptr(i))) = d[i]
-	}
+	return (*uint16)(np)
+}
 
-	*out = fwpmDisplayData0{
-		Name:        (*uint16)(unsafe.Pointer(mem)),
-		Description: (*uint16)(unsafe.Pointer(dstart)),
+func toBytes(a *arena, bs []byte) *byte {
+	if len(bs) == 0 {
+		return nil
 	}
-
-	return mem, nil
+	p := a.calloc(len(bs), 1)
+	for i := range bs {
+		*(*byte)(unsafe.Pointer(uintptr(p) + uintptr(i))) = bs[i]
+	}
+	return (*byte)(p)
 }
