@@ -561,3 +561,11 @@ func (s *Session) AddRule(r *Rule) error {
 
 	return nil
 }
+
+func (s *Session) DeleteRule(id windows.GUID) error {
+	if id == (windows.GUID{}) {
+		return errors.New("GUID cannot be zero")
+	}
+
+	return fwpmFilterDeleteByKey0(s.handle, &id)
+}
