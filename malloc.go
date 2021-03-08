@@ -35,6 +35,10 @@ func (a *arena) alloc(length uintptr) unsafe.Pointer {
 	if length > a.remaining {
 		a.grow()
 	}
+
+	// Cast from *uintptr rather than plain uintptr to avoid the go
+	// vet unsafe.Pointer safety check. This pattern is safe because
+	// a.next never points into the Go heap.
 	ret := *(**struct{})(unsafe.Pointer(&a.next))
 	a.next += length
 	a.remaining -= length
@@ -51,7 +55,7 @@ func (a *arena) dispose() {
 			panic(fmt.Sprintf("free failed: %v", err))
 		}
 	}
-	a.slabs = nil
+	a.slabs = a.slabs[:0]
 	a.next = 0
 	a.remaining = 0
 }
