@@ -3,6 +3,7 @@ package wf
 import (
 	"errors"
 	"fmt"
+	"net"
 	"reflect"
 	"unsafe"
 
@@ -226,13 +227,16 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			return mapErr()
 		}
 		val = uintptr(unsafe.Pointer(toBytes(a, bs[:])))
-	case reflect.TypeOf([6]byte{}):
+	case reflect.TypeOf(net.HardwareAddr{}):
 		typ = dataTypeArray6
-		bs, ok := v.([6]byte)
+		mac, ok := v.(net.HardwareAddr)
 		if !ok {
 			return mapErr()
 		}
-		val = uintptr(unsafe.Pointer(toBytes(a, bs[:])))
+		if len(mac) != 6 {
+			return mapErr() // TODO: better error
+		}
+		val = uintptr(unsafe.Pointer(toBytes(a, mac[:])))
 	case reflect.TypeOf(netaddr.IP{}):
 		switch m := v.(type) {
 		case netaddr.IP:
