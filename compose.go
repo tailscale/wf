@@ -263,9 +263,19 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			typ = dataTypeRange
 			val = uintptr(unsafe.Pointer(r))
 		}
+	case reflect.TypeOf((*windows.SECURITY_DESCRIPTOR)(nil)):
+		sd, ok := v.(*windows.SECURITY_DESCRIPTOR)
+		if !ok {
+			return mapErr()
+		}
+		csd, err := toSecurityDescriptor(a, sd)
+		if err != nil {
+			return 0, 0, err
+		}
+		typ = dataTypeSecurityDescriptor
+		val = uintptr(unsafe.Pointer(csd))
 	}
 
-	// TODO: dataTypeSecurityDescriptor
 	// TODO: dataTypeTokenInformation
 	// TODO: dataTypeTokenAccessInformation
 
@@ -359,6 +369,31 @@ func toFwpV6AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV6AddrAndMask {
 	ret.Addr = pfx.IP.As16()
 	ret.PrefixLength = pfx.Bits
 	return ret
+}
+
+func toSecurityDescriptor(a *arena, s *windows.SECURITY_DESCRIPTOR) (*windows.SECURITY_DESCRIPTOR, error) {
+	s, err := s.ToSelfRelative()
+	if err != nil {
+		return nil, err
+	}
+
+	sl := s.Length()
+	var from []byte
+	sf := (*reflect.SliceHeader)(unsafe.Pointer(&from))
+	sf.Cap = int(sl)
+	sf.Len = int(sl)
+	sf.Data = uintptr(unsafe.Pointer(s))
+
+	p := a.alloc(uintptr(s.Length()))
+	var to []byte
+	st := (*reflect.SliceHeader)(unsafe.Pointer(&to))
+	st.Cap = int(sl)
+	st.Len = int(sl)
+	st.Data = uintptr(p)
+
+	copy(to, from)
+
+	return (*windows.SECURITY_DESCRIPTOR)(p), nil
 }
 
 func u32FromIPv4(ip netaddr.IP) uint32 {
