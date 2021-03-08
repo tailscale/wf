@@ -8,7 +8,6 @@ import (
 	"unsafe"
 
 	"golang.org/x/sys/windows"
-	"golang.org/x/text/encoding/unicode"
 )
 
 // GUIDName returns a human-readable name for standard WFP GUIDs. If g
@@ -57,7 +56,7 @@ func New(opts *SessionOptions) (*Session, error) {
 	}
 
 	var a arena
-	defer a.dispose()
+	defer a.Dispose()
 
 	s0 := toSession0(&a, opts)
 
@@ -216,7 +215,7 @@ type Sublayer struct {
 // Sublayers registered to that Provider are returned.
 func (s *Session) Sublayers(provider *windows.GUID) ([]*Sublayer, error) {
 	var a arena
-	defer a.dispose()
+	defer a.Dispose()
 
 	tpl := toSublayerEnumTemplate0(&a, provider)
 
@@ -267,7 +266,7 @@ func (s *Session) AddSublayer(sl *Sublayer) error {
 	}
 
 	var a arena
-	defer a.dispose()
+	defer a.Dispose()
 
 	sl0 := toSublayer0(&a, sl)
 	return fwpmSubLayerAdd0(s.handle, sl0, nil) // TODO: security descriptor
@@ -352,7 +351,7 @@ func (s *Session) AddProvider(p *Provider) error {
 	}
 
 	var a arena
-	defer a.dispose()
+	defer a.Dispose()
 
 	p0 := toProvider0(&a, p)
 
@@ -417,16 +416,7 @@ type Match struct {
 }
 
 func (m Match) String() string {
-	val := m.Value
-	if m.Key == guidConditionALEAppID {
-		d := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewDecoder()
-		bs, err := d.Bytes(m.Value.([]byte))
-		if err != nil {
-			panic(err)
-		}
-		val = string(bs[:len(bs)-1])
-	}
-	return fmt.Sprintf("%s %s %v (%T)", GUIDName(m.Key), m.Op, val, m.Value)
+	return fmt.Sprintf("%s %s %v (%T)", GUIDName(m.Key), m.Op, m.Value, m.Value)
 }
 
 // Action is an action the filtering engine can execute.
@@ -548,7 +538,7 @@ func (s *Session) AddRule(r *Rule) error {
 	}
 
 	var a arena
-	defer a.dispose()
+	defer a.Dispose()
 
 	f, err := toFilter0(&a, r, s.layerTypes)
 	if err != nil {

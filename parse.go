@@ -1,6 +1,7 @@
 package wf
 
 import (
+	"errors"
 	"fmt"
 	"math/bits"
 	"net"
@@ -17,7 +18,8 @@ import (
 // structs (which require unsafe pointers to traverse) into safe Go
 // types.
 
-// fieldTypeMap maps dataType to a Go value of that type.
+// fieldTypeMap maps a layer field's dataType to a Go value of that
+// type.
 var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeUint8:                  reflect.TypeOf(uint8(0)),
 	dataTypeUint16:                 reflect.TypeOf(uint16(0)),
@@ -36,8 +38,8 @@ var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeRange:                  reflect.TypeOf(Range{}),
 }
 
-// fieldType returns the reflect.Type for a field, or an error if the
-// field has an unknown or infeasible type.
+// fieldType returns the reflect.Type for a layer field, or an error
+// if the field has an unknown type.
 func fieldType(f *fwpmField0) (reflect.Type, error) {
 	// IP addresses are represented as either a uint32 or a 16-byte
 	// array, with a modifier flag indicating that it's an IP
@@ -57,6 +59,16 @@ func fieldType(f *fwpmField0) (reflect.Type, error) {
 		return reflect.TypeOf(uint32(0)), nil
 	}
 
+	// FWPM_CONDITION_ALE_APP_ID is provided by WFP as a byte blob
+	// (aka []byte), but those bytes are actually a null-terminated,
+	// UTF-16 encoded string. Since WFP doesn't use its own "unicode
+	// string" datatype for anything, we use Go strings as a special
+	// case for thtat one field.
+	if f.DataType == dataTypeByteBlob && *f.FieldKey == guidConditionALEAppID {
+		return reflect.TypeOf(""), nil
+	}
+
+	// For everything else, there's a simple mapping.
 	if t, ok := fieldTypeMap[f.DataType]; ok {
 		return t, nil
 	}
@@ -273,7 +285,11 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 		}
 		return ret, nil
 	case dataTypeByteBlob:
-		return fromByteBlob(*(**fwpByteBlob)(unsafe.Pointer(&v.Value))), nil
+		if ftype == reflect.TypeOf("") {
+			return fromByteBlobToString(*(**fwpByteBlob)(unsafe.Pointer(&v.Value)))
+		} else {
+			return fromByteBlob(*(**fwpByteBlob)(unsafe.Pointer(&v.Value))), nil
+		}
 	case dataTypeSID:
 		return parseSID(&v.Value)
 	case dataTypeSecurityDescriptor:
@@ -383,4 +399,21 @@ func fromByteBlob(bb *fwpByteBlob) []byte {
 	sh.Data = uintptr(unsafe.Pointer(bb.Data))
 
 	return append([]byte(nil), blob...)
+}
+
+func fromByteBlobToString(bb *fwpByteBlob) (string, error) {
+	if bb == nil || bb.Size == 0 {
+		return "", nil
+	}
+	if bb.Size%2 != 0 {
+		return "", errors.New("byte blob should be string, but has odd number of bytes")
+	}
+
+	var blob []uint16
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&blob))
+	sh.Cap = int(bb.Size) / 2
+	sh.Len = sh.Cap
+	sh.Data = uintptr(unsafe.Pointer(bb.Data))
+
+	return windows.UTF16ToString(blob), nil
 }
