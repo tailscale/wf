@@ -3,6 +3,7 @@ package wf
 import (
 	"fmt"
 	"math/bits"
+	"net"
 	"reflect"
 	"unsafe"
 
@@ -28,7 +29,7 @@ var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeSecurityDescriptor:     reflect.TypeOf(windows.SECURITY_DESCRIPTOR{}),
 	dataTypeTokenInformation:       reflect.TypeOf(TokenInformation{}),
 	dataTypeTokenAccessInformation: reflect.TypeOf(TokenAccessInformation{}),
-	dataTypeArray6:                 reflect.TypeOf([6]byte{}),
+	dataTypeArray6:                 reflect.TypeOf(net.HardwareAddr{}),
 	dataTypeBitmapIndex:            reflect.TypeOf(BitmapIndex(0)),
 	dataTypeV4AddrMask:             reflect.TypeOf(netaddr.IPPrefix{}),
 	dataTypeV6AddrMask:             reflect.TypeOf(netaddr.IPPrefix{}),
@@ -278,7 +279,7 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 	case dataTypeSecurityDescriptor:
 		return parseSecurityDescriptor(&v.Value)
 	case dataTypeArray6:
-		var ret [6]byte
+		ret := make(net.HardwareAddr, 6)
 		copy(ret[:], fromBytes(v.Value, 6))
 		return ret, nil
 	case dataTypeV4AddrMask:
