@@ -11,8 +11,9 @@ import (
 	"inet.af/netaddr"
 )
 
+// toSession0 converts opts into an arena-allocated fwpmSession0.
 func toSession0(a *arena, opts *SessionOptions) *fwpmSession0 {
-	ret := (*fwpmSession0)(a.alloc(unsafe.Sizeof(fwpmSession0{})))
+	ret := (*fwpmSession0)(a.Alloc(unsafe.Sizeof(fwpmSession0{})))
 	*ret = fwpmSession0{
 		DisplayData: fwpmDisplayData0{
 			Name:        toUint16(a, opts.Name),
@@ -26,14 +27,18 @@ func toSession0(a *arena, opts *SessionOptions) *fwpmSession0 {
 	return ret
 }
 
+// toSublayerEnumTemplate0 returns an arena-allocated
+// fwpmSublayerEnumTemplate0 that filters on the given provider, or
+// all if provider is nil.
 func toSublayerEnumTemplate0(a *arena, provider *windows.GUID) *fwpmSublayerEnumTemplate0 {
-	ret := (*fwpmSublayerEnumTemplate0)(a.alloc(unsafe.Sizeof(fwpmSublayerEnumTemplate0{})))
+	ret := (*fwpmSublayerEnumTemplate0)(a.Alloc(unsafe.Sizeof(fwpmSublayerEnumTemplate0{})))
 	ret.ProviderKey = toGUID(a, provider)
 	return ret
 }
 
+// toSublayer0 converts sl into an arena-allocated fwpmSublayer0.
 func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
-	ret := (*fwpmSublayer0)(a.alloc(unsafe.Sizeof(fwpmSublayer0{})))
+	ret := (*fwpmSublayer0)(a.Alloc(unsafe.Sizeof(fwpmSublayer0{})))
 	*ret = fwpmSublayer0{
 		SublayerKey: sl.Key,
 		DisplayData: fwpmDisplayData0{
@@ -51,8 +56,9 @@ func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
 	return ret
 }
 
+// toProvider0 converts p into an arena-allocated fwpmProvider0.
 func toProvider0(a *arena, p *Provider) *fwpmProvider0 {
-	ret := (*fwpmProvider0)(a.alloc(unsafe.Sizeof(fwpmProvider0{})))
+	ret := (*fwpmProvider0)(a.Alloc(unsafe.Sizeof(fwpmProvider0{})))
 	*ret = fwpmProvider0{
 		ProviderKey: p.Key,
 		DisplayData: fwpmDisplayData0{
@@ -72,6 +78,8 @@ func toProvider0(a *arena, p *Provider) *fwpmProvider0 {
 	return ret
 }
 
+// toFilter0 converts r into an arena-allocated fwpmFilter0, using lt
+// as necessary to correctly cast values.
 func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 	conds, err := toCondition0(a, r.Conditions, lt[r.Layer])
 	if err != nil {
@@ -83,7 +91,7 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 		return nil, err
 	}
 
-	ret := (*fwpmFilter0)(a.alloc(unsafe.Sizeof(fwpmFilter0{})))
+	ret := (*fwpmFilter0)(a.Alloc(unsafe.Sizeof(fwpmFilter0{})))
 	*ret = fwpmFilter0{
 		FilterKey: r.Key,
 		DisplayData: fwpmDisplayData0{
@@ -122,8 +130,11 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 	return ret, nil
 }
 
+// toCondition0 converts ms into an arena-allocated
+// fwpmFilterCondition0 array, using lt as necessary to correctly cast
+// values.
 func toCondition0(a *arena, ms []*Match, ft fieldTypes) (array *fwpmFilterCondition0, err error) {
-	array = (*fwpmFilterCondition0)(a.calloc(len(ms), unsafe.Sizeof(fwpmFilterCondition0{})))
+	array = (*fwpmFilterCondition0)(a.Alloc(uintptr(len(ms)) * unsafe.Sizeof(fwpmFilterCondition0{})))
 
 	var conds []fwpmFilterCondition0
 	sh := (*reflect.SliceHeader)(unsafe.Pointer(&conds))
@@ -152,6 +163,8 @@ func toCondition0(a *arena, ms []*Match, ft fieldTypes) (array *fwpmFilterCondit
 	return array, nil
 }
 
+// toValue0 converts v into the component parts of an fwpValue0 or
+// fwpConditionValue0.
 func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val uintptr, err error) {
 	mapErr := func() (dataType, uintptr, error) {
 		return 0, 0, fmt.Errorf("can't map type %T into condition type %v", v, ftype)
@@ -185,7 +198,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		if !ok {
 			return mapErr()
 		}
-		p := a.alloc(unsafe.Sizeof(u))
+		p := a.Alloc(unsafe.Sizeof(u))
 		*(*uint64)(p) = u
 		val = uintptr(p)
 	case reflect.TypeOf([]byte(nil)):
@@ -195,12 +208,25 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			return mapErr()
 		}
 
-		p := a.alloc(unsafe.Sizeof(fwpByteBlob{}))
+		p := a.Alloc(unsafe.Sizeof(fwpByteBlob{}))
 		*(*fwpByteBlob)(p) = fwpByteBlob{
 			Size: uint32(len(bb)),
 			Data: toBytes(a, bb),
 		}
 		val = uintptr(p)
+	case reflect.TypeOf(""):
+		s, ok := v.(string)
+		if !ok {
+			return mapErr()
+		}
+		bb, l := toBytesFromString(a, s)
+
+		p := a.Alloc(unsafe.Sizeof(fwpByteBlob{}))
+		*(*fwpByteBlob)(p) = fwpByteBlob{
+			Size: uint32(l),
+			Data: bb,
+		}
+		typ = dataTypeByteBlob
 	case reflect.TypeOf(&windows.SID{}):
 		typ = dataTypeSID
 		s, ok := v.(*windows.SID)
@@ -208,7 +234,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			return mapErr()
 		}
 		sidLen := windows.GetLengthSid(s)
-		p := a.alloc(uintptr(sidLen))
+		p := a.Alloc(uintptr(sidLen))
 		if err := windows.CopySid(sidLen, (*windows.SID)(p), s); err != nil {
 			return 0, 0, err
 		}
@@ -260,7 +286,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			if !m.Valid() {
 				return 0, 0, fmt.Errorf("invalid IPRange %v", m)
 			}
-			r, err := toRange0(a, m.From, m.To, ftype)
+			r, err := toRange0(a, Range{m.From, m.To}, ftype)
 			if err != nil {
 				return 0, 0, err
 			}
@@ -278,6 +304,19 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		}
 		typ = dataTypeSecurityDescriptor
 		val = uintptr(unsafe.Pointer(csd))
+	case reflect.TypeOf(Range{}):
+		r, ok := v.(Range)
+		if !ok {
+			return mapErr()
+		}
+		r0, err := toRange0(a, r, ftype)
+		if err != nil {
+			return 0, 0, err
+		}
+		typ = dataTypeRange
+		val = uintptr(unsafe.Pointer(r0))
+	default:
+		return mapErr()
 	}
 
 	// TODO: dataTypeTokenInformation
@@ -286,23 +325,27 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 	return typ, val, nil
 }
 
-func toRange0(a *arena, from, to interface{}, ftype reflect.Type) (ret *fwpRange0, err error) {
-	if _, ok := from.(Range); ok {
+// toRange0 converts r into an arena-allocated fwpRange0.
+func toRange0(a *arena, r Range, ftype reflect.Type) (ret *fwpRange0, err error) {
+	if _, ok := r.From.(Range); ok {
 		return nil, errors.New("can't have a Range of Ranges")
 	}
-	if _, ok := to.(Range); ok {
+	if _, ok := r.To.(Range); ok {
 		return nil, errors.New("can't have a Range of Ranges")
 	}
 
-	ftyp, fval, err := toValue0(a, from, ftype)
+	ftyp, fval, err := toValue0(a, r.From, ftype)
 	if err != nil {
 		return nil, err
 	}
-	ttyp, tval, err := toValue0(a, to, ftype)
+	ttyp, tval, err := toValue0(a, r.To, ftype)
 	if err != nil {
 		return nil, err
 	}
-	ret = (*fwpRange0)(a.alloc(unsafe.Sizeof(fwpRange0{})))
+	if ftyp != ttyp {
+		return nil, fmt.Errorf("range type mismatch: %T vs. %T", r.From, r.To)
+	}
+	ret = (*fwpRange0)(a.Alloc(unsafe.Sizeof(fwpRange0{})))
 
 	*ret = fwpRange0{
 		From: fwpValue0{
@@ -317,13 +360,15 @@ func toRange0(a *arena, from, to interface{}, ftype reflect.Type) (ret *fwpRange
 	return ret, nil
 }
 
+// toUint16 converts s into an arena-allocated, null-terminated UTF-16
+// array pointer.
 func toUint16(a *arena, s string) *uint16 {
 	if len(s) == 0 {
 		return nil
 	}
 
 	n := windows.StringToUTF16(s)
-	ret := a.calloc(len(n), 2)
+	ret := a.Alloc(2 * uintptr(len(n)))
 
 	var sl []uint16
 	sh := (*reflect.SliceHeader)(unsafe.Pointer(&sl))
@@ -335,12 +380,13 @@ func toUint16(a *arena, s string) *uint16 {
 	return (*uint16)(ret)
 }
 
+// toBytes converts bs into an arena-allocated byte array pointer.
 func toBytes(a *arena, bs []byte) *byte {
 	if len(bs) == 0 {
 		return nil
 	}
 
-	ret := a.calloc(len(bs), 1)
+	ret := a.Alloc(uintptr(len(bs)))
 
 	var sl []byte
 	sh := (*reflect.SliceHeader)(unsafe.Pointer(&sl))
@@ -352,29 +398,53 @@ func toBytes(a *arena, bs []byte) *byte {
 	return (*byte)(ret)
 }
 
+// toBytes converts s into an arena-allocated byte array pointer,
+// containing a utf-16 encoded, null-terminated string.
+func toBytesFromString(a *arena, s string) (*byte, int) {
+	bs := windows.StringToUTF16(s)
+
+	l := 2 * len(bs)
+	ret := a.Alloc(uintptr(l))
+
+	var retSlice []uint16
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&retSlice))
+	sh.Cap = len(bs)
+	sh.Len = len(bs)
+	sh.Data = uintptr(ret)
+	copy(retSlice, bs)
+
+	return (*byte)(ret), l
+}
+
+// toGUID returns an arena-allocated copy of guid.
 func toGUID(a *arena, guid *windows.GUID) *windows.GUID {
 	if guid == nil {
 		return nil
 	}
-	ret := (*windows.GUID)(a.alloc(unsafe.Sizeof(windows.GUID{})))
+	ret := (*windows.GUID)(a.Alloc(unsafe.Sizeof(windows.GUID{})))
 	*ret = *guid
 	return ret
 }
 
+// toFwpV4AddrAndMask converts pfx into an arena-allocated
+// fwpV4AddrAndMask.
 func toFwpV4AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV4AddrAndMask {
-	ret := (*fwpV4AddrAndMask)(a.alloc(unsafe.Sizeof(fwpV4AddrAndMask{})))
+	ret := (*fwpV4AddrAndMask)(a.Alloc(unsafe.Sizeof(fwpV4AddrAndMask{})))
 	ret.Addr = u32FromIPv4(pfx.Masked().IP)
 	ret.Mask = (^uint32(0)) << (32 - pfx.Bits)
 	return ret
 }
 
+// toFwpV6AddrAndMask converts pfx into an arena-allocated
+// fwpV6AddrAndMask.
 func toFwpV6AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV6AddrAndMask {
-	ret := (*fwpV6AddrAndMask)(a.alloc(unsafe.Sizeof(fwpV6AddrAndMask{})))
+	ret := (*fwpV6AddrAndMask)(a.Alloc(unsafe.Sizeof(fwpV6AddrAndMask{})))
 	ret.Addr = pfx.IP.As16()
 	ret.PrefixLength = pfx.Bits
 	return ret
 }
 
+// toSecurityDescriptor returns an arena-allocated copy of s.
 func toSecurityDescriptor(a *arena, s *windows.SECURITY_DESCRIPTOR) (*windows.SECURITY_DESCRIPTOR, error) {
 	s, err := s.ToSelfRelative()
 	if err != nil {
@@ -388,7 +458,7 @@ func toSecurityDescriptor(a *arena, s *windows.SECURITY_DESCRIPTOR) (*windows.SE
 	sf.Len = int(sl)
 	sf.Data = uintptr(unsafe.Pointer(s))
 
-	p := a.alloc(uintptr(s.Length()))
+	p := a.Alloc(uintptr(s.Length()))
 	var to []byte
 	st := (*reflect.SliceHeader)(unsafe.Pointer(&to))
 	st.Cap = int(sl)
@@ -400,6 +470,7 @@ func toSecurityDescriptor(a *arena, s *windows.SECURITY_DESCRIPTOR) (*windows.SE
 	return (*windows.SECURITY_DESCRIPTOR)(p), nil
 }
 
+// u32FromIPv4 returns ip as a native-endian uint32.
 func u32FromIPv4(ip netaddr.IP) uint32 {
 	b4 := ip.As4()
 	return *(*uint32)(unsafe.Pointer(&b4[0]))
