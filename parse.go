@@ -251,70 +251,25 @@ func fromCondition0(condArray *fwpmFilterCondition0, num uint32, fieldTypes fiel
 
 // fromValue converts a fwpValue0 to the corresponding Go value.
 func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
-	// For most types, the field type and raw data type match up. But
-	// for some, the raw type can vary from the field type
-	// (e.g. comparing an IP to a prefix). Get the complex matchups
-	// out of the way first.
-	mapErr := func() error {
-		return fmt.Errorf("can't map condition type %s into type %s", v.Type, ftype)
-	}
-	if fieldTypeMap[v.Type] != ftype {
-		switch {
-		case ftype == reflect.TypeOf(netaddr.IP{}) && v.Type != dataTypeRange:
-			switch v.Type {
-			case dataTypeUint32:
-				u32 := *(*uint32)(unsafe.Pointer(&v.Value))
-				return ipv4From32(u32), nil
-			case dataTypeByteArray16:
-				var bs [16]byte
-				copy(bs[:], fromBytes(v.Value, 16))
-				return netaddr.IPFrom16(bs), nil
-			case dataTypeV4AddrMask:
-				return parseV4AddrAndMask(&v.Value), nil
-			case dataTypeV6AddrMask:
-				return parseV6AddrAndMask(&v.Value), nil
-			default:
-				return nil, mapErr()
-			}
-		case v.Type == dataTypeSecurityDescriptor:
-			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation{}) {
-				return nil, mapErr()
-			}
-			return parseSecurityDescriptor(&v.Value)
-		case v.Type == dataTypeSID:
-			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation{}) {
-				return nil, mapErr()
-			}
-			return parseSID(&v.Value)
-		case v.Type == dataTypeRange:
-			return parseRange0(&v.Value, ftype)
-		default:
-			return nil, mapErr()
-		}
-	}
-
-	// That's all the complicated ones. For everything else we can
-	// parse by looking only at the raw type.
-	//
-	// Note that, depending on the type, we take either the
-	// unsafe.Pointer of v.Value, or &v.Value. The extra & is for
-	// values that get inlined into the Value field, everything else
-	// is when Value is a pointer to the actual value.
-	//
-	// See [TODO docs of FWP_VALUE0 here] for details.
-
 	switch v.Type {
 	case dataTypeUint8:
 		return *(*uint8)(unsafe.Pointer(&v.Value)), nil
 	case dataTypeUint16:
 		return *(*uint16)(unsafe.Pointer(&v.Value)), nil
 	case dataTypeUint32:
-		return *(*uint32)(unsafe.Pointer(&v.Value)), nil
+		u := *(*uint32)(unsafe.Pointer(&v.Value))
+		if ftype == reflect.TypeOf(netaddr.IP{}) {
+			return ipv4From32(u), nil
+		}
+		return u, nil
 	case dataTypeUint64:
 		return **(**uint64)(unsafe.Pointer(&v.Value)), nil
 	case dataTypeByteArray16:
 		var ret [16]byte
 		copy(ret[:], fromBytes(v.Value, 16))
+		if ftype == reflect.TypeOf(netaddr.IP{}) {
+			return netaddr.IPFrom16(ret), nil
+		}
 		return ret, nil
 	case dataTypeByteBlob:
 		return fromByteBlob(*(**fwpByteBlob)(unsafe.Pointer(&v.Value))), nil
@@ -330,9 +285,14 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 		return parseV4AddrAndMask(&v.Value), nil
 	case dataTypeV6AddrMask:
 		return parseV6AddrAndMask(&v.Value), nil
-	default:
-		return nil, fmt.Errorf("unknown/unhandled value type %d", v.Type)
+	case dataTypeRange:
+		return parseRange0(&v.Value, ftype)
 	}
+	// Deliberately omitted: TokenInformation, TokenAccessInformation
+	// and BitmapIndex seem to only be used as field types, but match
+	// against other types only.
+
+	return nil, fmt.Errorf("don't know how to map API type %s into Go", v.Type)
 }
 
 func parseV4AddrAndMask(v *uintptr) netaddr.IPPrefix {
@@ -387,16 +347,10 @@ func parseRange0(v *uintptr, ftype reflect.Type) (interface{}, error) {
 		return nil, fmt.Errorf("range.From and range.To types don't match: %s / %s", reflect.TypeOf(from), reflect.TypeOf(to))
 	}
 	if reflect.TypeOf(from) == reflect.TypeOf(netaddr.IP{}) {
-		// TODO: only return IPRange, not IPRange or IPPrefix?
-		// Less work to parse on the receiving end.
-		ret := netaddr.IPRange{
+		return netaddr.IPRange{
 			From: from.(netaddr.IP),
 			To:   to.(netaddr.IP),
-		}
-		if pfx, ok := ret.Prefix(); ok {
-			return pfx, nil
-		}
-		return ret, nil
+		}, nil
 	}
 	return Range{from, to}, nil
 }
