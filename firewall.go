@@ -133,11 +133,11 @@ type Field struct {
 	Type reflect.Type
 }
 
-// TokenAccessInformation is a temporary type representing a Windows
-// TOKEN_ACCESS_INFORMATION struct.
-//
-// TODO: expose in x/sys/windows, https://github.com/inetaf/wf/issues/1
-type TokenAccessInformation []byte
+// TokenAccessInformation represents all the information in a token
+// that is necessary to perform an access check.
+// This type is only present in Layer fields, and cannot be used
+// directly as a value in firewall rules.
+type TokenAccessInformation struct{}
 
 // BitmapIndex is an index into a Bitmap64.
 type BitmapIndex uint8 // TODO: this is a guess, the API doesn't document what the underlying type is.
@@ -147,11 +147,9 @@ type Range struct {
 }
 
 // TokenInformation defines a set of security identifiers.
-// For more information see https://docs.microsoft.com/en-us/windows/win32/api/Fwptypes/ns-fwptypes-fwp_token_information.
-type TokenInformation struct {
-	SIDS           []windows.SIDAndAttributes
-	RestrictedSIDs []windows.SIDAndAttributes
-}
+// This type is only present in Layer fields, and cannot be used
+// directly as a value in firewall rules.
+type TokenInformation struct{}
 
 // Layers returns information on available WFP layers.
 func (s *Session) Layers() ([]*Layer, error) {
