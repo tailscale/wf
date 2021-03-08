@@ -1,7 +1,6 @@
 package wf
 
 import (
-	"errors"
 	"fmt"
 	"math/bits"
 	"reflect"
@@ -28,7 +27,7 @@ var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeSID:                    reflect.TypeOf(windows.SID{}),
 	dataTypeSecurityDescriptor:     reflect.TypeOf(windows.SECURITY_DESCRIPTOR{}),
 	dataTypeTokenInformation:       reflect.TypeOf(TokenInformation{}),
-	dataTypeTokenAccessInformation: reflect.TypeOf(TokenAccessInformation(nil)),
+	dataTypeTokenAccessInformation: reflect.TypeOf(TokenAccessInformation{}),
 	dataTypeArray6:                 reflect.TypeOf([6]byte{}),
 	dataTypeBitmapIndex:            reflect.TypeOf(BitmapIndex(0)),
 	dataTypeV4AddrMask:             reflect.TypeOf(netaddr.IPPrefix{}),
@@ -278,12 +277,12 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 				return nil, mapErr()
 			}
 		case v.Type == dataTypeSecurityDescriptor:
-			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation(nil)) {
+			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation{}) {
 				return nil, mapErr()
 			}
 			return parseSecurityDescriptor(&v.Value)
 		case v.Type == dataTypeSID:
-			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation(nil)) {
+			if ftype != reflect.TypeOf(TokenInformation{}) && ftype != reflect.TypeOf(TokenAccessInformation{}) {
 				return nil, mapErr()
 			}
 			return parseSID(&v.Value)
@@ -323,22 +322,16 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 		return parseSID(&v.Value)
 	case dataTypeSecurityDescriptor:
 		return parseSecurityDescriptor(&v.Value)
-	case dataTypeTokenInformation:
-		return nil, errors.New("TODO TokenInformation")
-	case dataTypeTokenAccessInformation:
-		return nil, errors.New("TODO TokenAccessInformation")
 	case dataTypeArray6:
 		var ret [6]byte
 		copy(ret[:], fromBytes(v.Value, 6))
 		return ret, nil
-	case dataTypeBitmapIndex:
-		return nil, errors.New("TODO BitmapIndex")
 	case dataTypeV4AddrMask:
 		return parseV4AddrAndMask(&v.Value), nil
 	case dataTypeV6AddrMask:
 		return parseV6AddrAndMask(&v.Value), nil
 	default:
-		return nil, fmt.Errorf("unknown value type %d", v.Type)
+		return nil, fmt.Errorf("unknown/unhandled value type %d", v.Type)
 	}
 }
 
