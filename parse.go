@@ -321,8 +321,8 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 		return fromByteBlob(*(**fwpByteBlob)(unsafe.Pointer(&v.Value))), nil
 	case dataTypeSID:
 		return parseSID(&v.Value)
-	// case dataTypeSecurityDescriptor:
-	// 	return parseSecurityDescriptor(v.Value)
+	case dataTypeSecurityDescriptor:
+		return parseSecurityDescriptor(&v.Value)
 	case dataTypeTokenInformation:
 		return nil, errors.New("TODO TokenInformation")
 	case dataTypeTokenAccessInformation:
