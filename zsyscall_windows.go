@@ -44,6 +44,7 @@ var (
 	procFwpmEngineOpen0                = modfwpuclnt.NewProc("FwpmEngineOpen0")
 	procFwpmFilterAdd0                 = modfwpuclnt.NewProc("FwpmFilterAdd0")
 	procFwpmFilterCreateEnumHandle0    = modfwpuclnt.NewProc("FwpmFilterCreateEnumHandle0")
+	procFwpmFilterDeleteByKey0         = modfwpuclnt.NewProc("FwpmFilterDeleteByKey0")
 	procFwpmFilterDestroyEnumHandle0   = modfwpuclnt.NewProc("FwpmFilterDestroyEnumHandle0")
 	procFwpmFilterEnum0                = modfwpuclnt.NewProc("FwpmFilterEnum0")
 	procFwpmFreeMemory0                = modfwpuclnt.NewProc("FwpmFreeMemory0")
@@ -91,6 +92,14 @@ func fwpmFilterAdd0(engineHandle windows.Handle, rule *fwpmFilter0, sd *windows.
 
 func fwpmFilterCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpmFilterEnumTemplate0, handle *windows.Handle) (err error) {
 	r1, _, e1 := syscall.Syscall(procFwpmFilterCreateEnumHandle0.Addr(), 3, uintptr(engineHandle), uintptr(unsafe.Pointer(enumTemplate)), uintptr(unsafe.Pointer(handle)))
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmFilterDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmFilterDeleteByKey0.Addr(), 2, uintptr(engineHandle), uintptr(unsafe.Pointer(guid)), 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
 	}

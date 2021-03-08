@@ -40,6 +40,8 @@ package wf
 
 //sys fwpmFilterAdd0(engineHandle windows.Handle, rule *fwpmFilter0, sd *windows.SECURITY_DESCRIPTOR, id *uint64) (err error) [failretval!=0] = fwpuclnt.FwpmFilterAdd0
 
+//sys fwpmFilterDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) [failretval!=0] = fwpuclnt.FwpmFilterDeleteByKey0
+
 //sys fwpmTransactionBegin0(engineHandle windows.Handle, flags uint32) (err error) [failretval!=0] = fwpuclnt.FwpmTransactionBegin0
 //sys fwpmTransactionCommit0(engineHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmTransactionCommit0
 //sys fwpmTransactionAbort0(engineHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmTransactionAbort0
