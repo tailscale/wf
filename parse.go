@@ -27,7 +27,7 @@ var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeUint64:                 reflect.TypeOf(uint64(0)),
 	dataTypeByteArray16:            reflect.TypeOf([16]byte{}),
 	dataTypeByteBlob:               reflect.TypeOf([]byte(nil)),
-	dataTypeSID:                    reflect.TypeOf(windows.SID{}),
+	dataTypeSID:                    reflect.TypeOf(&windows.SID{}),
 	dataTypeSecurityDescriptor:     reflect.TypeOf(windows.SECURITY_DESCRIPTOR{}),
 	dataTypeTokenInformation:       reflect.TypeOf(TokenInformation{}),
 	dataTypeTokenAccessInformation: reflect.TypeOf(TokenAccessInformation{}),
