@@ -51,6 +51,9 @@ var (
 	procFwpmLayerCreateEnumHandle0     = modfwpuclnt.NewProc("FwpmLayerCreateEnumHandle0")
 	procFwpmLayerDestroyEnumHandle0    = modfwpuclnt.NewProc("FwpmLayerDestroyEnumHandle0")
 	procFwpmLayerEnum0                 = modfwpuclnt.NewProc("FwpmLayerEnum0")
+	procFwpmNetEventCreateEnumHandle0  = modfwpuclnt.NewProc("FwpmNetEventCreateEnumHandle0")
+	procFwpmNetEventDestroyEnumHandle0 = modfwpuclnt.NewProc("FwpmNetEventDestroyEnumHandle0")
+	procFwpmNetEventEnum0              = modfwpuclnt.NewProc("FwpmNetEventEnum0")
 	procFwpmProviderAdd0               = modfwpuclnt.NewProc("FwpmProviderAdd0")
 	procFwpmProviderCreateEnumHandle0  = modfwpuclnt.NewProc("FwpmProviderCreateEnumHandle0")
 	procFwpmProviderDeleteByKey0       = modfwpuclnt.NewProc("FwpmProviderDeleteByKey0")
@@ -145,6 +148,30 @@ func fwpmLayerDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows
 
 func fwpmLayerEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmLayer0, numEntriesReturned *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procFwpmLayerEnum0.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmNetEventCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *struct{}, handle *windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmNetEventCreateEnumHandle0.Addr(), 3, uintptr(engineHandle), uintptr(unsafe.Pointer(enumTemplate)), uintptr(unsafe.Pointer(handle)))
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmNetEventDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFwpmNetEventDestroyEnumHandle0.Addr(), 2, uintptr(engineHandle), uintptr(enumHandle), 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func fwpmNetEventEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmNetEvent0, numEntriesReturned *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procFwpmNetEventEnum0.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
 	}

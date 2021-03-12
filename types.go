@@ -252,3 +252,32 @@ const (
 	filterEnumFlagsIncludeBootTime
 	filterEnumFlagsIncludeDisabled
 )
+
+//go:notinheap
+type fwpmNetEventHeader0 struct {
+	Timestamp  windows.Filetime
+	Flags      uint32 // enum
+	IPVersion  uint32 // enum
+	IPProtocol uint8
+	pad        [3]byte
+	LocalAddr  [16]byte
+	RemoteAddr [16]byte
+	LocalPort  uint16
+	RemotePort uint16
+	ScopeID    uint32
+	AppID      fwpByteBlob
+	UserID     *windows.SID
+}
+
+//go:notinheap
+type fwpmNetEventClassifyDrop0 struct {
+	FilterID uint64
+	LayerID  uint64
+}
+
+//go:notinheap
+type fwpmNetEvent0 struct {
+	Header fwpmNetEventHeader0
+	Type   uint32 // enum
+	Drop   fwpmNetEventClassifyDrop0
+}

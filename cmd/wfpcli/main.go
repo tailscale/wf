@@ -420,30 +420,32 @@ func test(context.Context, []string) error {
 	}
 	defer sess.Close()
 
-	guid, err := windows.GenerateGUID()
-	if err != nil {
-		panic(err)
-	}
+	sess.Dump()
 
-	r := &wf.Rule{
-		Key:      guid,
-		Name:     "test2",
-		Layer:    guidLayerALEAuthRecvAcceptV4,
-		Sublayer: guidSublayerUniversal,
-		Weight:   10,
-		Conditions: []*wf.Match{
-			&wf.Match{
-				Key:   guidConditionIPLocalInterface,
-				Op:    wf.MatchTypeEqual,
-				Value: uint64(5),
-			},
-		},
-		Action: wf.ActionPermit,
-	}
+	// guid, err := windows.GenerateGUID()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	if err := sess.AddRule(r); err != nil {
-		return fmt.Errorf("failed to add rule: %w", err)
-	}
+	// r := &wf.Rule{
+	// 	Key:      guid,
+	// 	Name:     "test2",
+	// 	Layer:    guidLayerALEAuthRecvAcceptV4,
+	// 	Sublayer: guidSublayerUniversal,
+	// 	Weight:   10,
+	// 	Conditions: []*wf.Match{
+	// 		&wf.Match{
+	// 			Key:   guidConditionIPLocalInterface,
+	// 			Op:    wf.MatchTypeEqual,
+	// 			Value: uint64(5),
+	// 		},
+	// 	},
+	// 	Action: wf.ActionPermit,
+	// }
+
+	// if err := sess.AddRule(r); err != nil {
+	// 	return fmt.Errorf("failed to add rule: %w", err)
+	// }
 
 	return nil
 }
