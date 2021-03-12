@@ -122,6 +122,8 @@ type Layer struct {
 	// Fields describes the fields that are available in this layer to
 	// be matched against.
 	Fields []*Field
+
+	KernelID uint16
 }
 
 // Field is a piece of information that a layer makes available to
@@ -570,18 +572,15 @@ type DropEvent struct {
 	RemoteAddr netaddr.IPPort
 	Scope      uint32
 	AppID      string
+
+	Type    uint32
+	Layer   string
+	LayerID uint16
+	Filter  uint64
 }
 
 func (e DropEvent) String() string {
-	return fmt.Sprintf(`@%s
-  Flags: %s
-  IPVersion: %d
-  IPProto: %d
-  Local: %s
-  Remote: %s
-  Scope: %d
-  App: %s
-`, e.Timestamp, e.Flags, e.IPVersion, e.IPProtocol, e.LocalAddr, e.RemoteAddr, e.Scope, e.AppID)
+	return fmt.Sprintf(`@%s F=%d V=%d P=%d L=%s R=%s App=%s Type=%d Layer=%s ID=%d Filter=%d`, e.Timestamp, e.Flags, e.IPVersion, e.IPProtocol, e.LocalAddr, e.RemoteAddr, e.AppID, e.Type, e.Layer, e.LayerID, e.Filter)
 }
 
 func (s *Session) Dump() error {
@@ -591,7 +590,17 @@ func (s *Session) Dump() error {
 	}
 	defer fwpmNetEventDestroyEnumHandle0(s.handle, enum)
 
-	const pageSize = 100
+	layers, err := s.Layers()
+	if err != nil {
+		return err
+	}
+
+	luidToGUID := map[uint16]string{}
+	for _, layer := range layers {
+		luidToGUID[layer.KernelID] = GUIDName(layer.Key)
+	}
+
+	const pageSize = 1
 	for {
 		var (
 			array **fwpmNetEvent0
@@ -621,7 +630,9 @@ func (s *Session) Dump() error {
 					IP:   netaddr.IPFrom16(event.Header.RemoteAddr),
 					Port: event.Header.RemotePort,
 				},
-				Scope: event.Header.ScopeID,
+				Scope:   event.Header.ScopeID,
+				Type:    event.Type,
+				LayerID: event.Drop.LayerID,
 			}
 			if v.IPVersion == 0 {
 				u := *(*uint32)(unsafe.Pointer(&event.Header.LocalAddr[0]))
@@ -629,6 +640,9 @@ func (s *Session) Dump() error {
 				u = *(*uint32)(unsafe.Pointer(&event.Header.RemoteAddr[0]))
 				v.RemoteAddr.IP = ipv4From32(u)
 			}
+			guid, _ := luidToGUID[event.Drop.LayerID]
+			v.Layer = guid
+			v.Filter = event.Drop.FilterID
 			id, err := fromByteBlobToString(&event.Header.AppID)
 			if err != nil {
 				panic(err)

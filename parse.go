@@ -95,6 +95,7 @@ func fromLayer0(array **fwpmLayer0, num uint32) ([]*Layer, error) {
 			ClassifyMostly:     (layer.Flags & fwpmLayerFlagsClassifyMostly) != 0,
 			Buffered:           (layer.Flags & fwpmLayerFlagsBuffered) != 0,
 			DefaultSublayerKey: layer.DefaultSublayerKey,
+			KernelID:           layer.LayerID,
 		}
 
 		var fields []fwpmField0

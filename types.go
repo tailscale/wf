@@ -272,7 +272,7 @@ type fwpmNetEventHeader0 struct {
 //go:notinheap
 type fwpmNetEventClassifyDrop0 struct {
 	FilterID uint64
-	LayerID  uint64
+	LayerID  uint16
 }
 
 //go:notinheap
