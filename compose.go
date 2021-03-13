@@ -292,6 +292,8 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			}
 			typ = dataTypeRange
 			val = uintptr(unsafe.Pointer(r))
+		default:
+			return mapErr()
 		}
 	case reflect.TypeOf((*windows.SECURITY_DESCRIPTOR)(nil)):
 		sd, ok := v.(*windows.SECURITY_DESCRIPTOR)
