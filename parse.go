@@ -240,6 +240,7 @@ func fromFilter0(array **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rul
 	for _, rule := range rules {
 		r := &Rule{
 			Key:          rule.FilterKey,
+			KernelID:     rule.FilterID,
 			Name:         windows.UTF16PtrToString(rule.DisplayData.Name),
 			Description:  windows.UTF16PtrToString(rule.DisplayData.Description),
 			Layer:        rule.LayerKey,
