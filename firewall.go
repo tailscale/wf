@@ -102,6 +102,8 @@ func (s *Session) Close() error {
 type Layer struct {
 	// Key is the unique identifier for this layer.
 	Key windows.GUID
+	// KernelID is the kernel ID for this layer.
+	KernelID uint16
 	// Name is a short descriptive name.
 	Name string
 	// Description is a longer description of the layer's function.
@@ -122,8 +124,6 @@ type Layer struct {
 	// Fields describes the fields that are available in this layer to
 	// be matched against.
 	Fields []*Field
-
-	KernelID uint16
 }
 
 // Field is a piece of information that a layer makes available to
@@ -446,6 +446,8 @@ const (
 type Rule struct {
 	// Key is the unique identifier for this rule.
 	Key windows.GUID
+	// KernelID is the kernel ID for this rule.
+	KernelID uint64
 	// Name is a short descriptive name.
 	Name string
 	// Description is a longer description of the rule.

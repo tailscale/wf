@@ -238,6 +238,7 @@ func listLayers(_ context.Context, _ []string) error {
 	for _, layer := range layers {
 		fmt.Printf("%s\n", displayName(layer.Key, layer.Name))
 		fmt.Printf("  GUID: %s\n", layer.Key)
+		fmt.Printf("  LUID: %d\n", layer.KernelID)
 		fmt.Printf("  Name: %q\n", layer.Name)
 		if layer.Description != "" {
 			fmt.Printf("  Description: %q\n", layer.Description)
