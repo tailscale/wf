@@ -200,3 +200,126 @@ func TestLayers(t *testing.T) {
 		}
 	}
 }
+
+func TestSublayers(t *testing.T) {
+	skipIfUnprivileged(t)
+
+	s, err := New(&SessionOptions{
+		Dynamic: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+
+	guid, err := windows.GenerateGUID()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sl := &Sublayer{
+		Key:          guid,
+		Name:         "test sublayer",
+		Description:  "a test sublayer",
+		ProviderData: []byte("byte blob"),
+		Weight:       0x4242,
+	}
+	if err := s.AddSublayer(sl); err != nil {
+		t.Fatalf("add sublayer failed: %v", err)
+	}
+
+	sublayers, err := s.Sublayers(nil)
+	if err != nil {
+		t.Fatalf("get sublayers failed: %v", err)
+	}
+
+	found := false
+	for _, got := range sublayers {
+		if got.Key != sl.Key {
+			continue
+		}
+		found = true
+		if diff := cmp.Diff(got, sl); diff != "" {
+			t.Fatalf("sublayer is wrong (-got+want):\n%s", diff)
+		}
+		break
+	}
+	if !found {
+		t.Fatal("sublayer added but not found")
+	}
+
+	if err := s.DeleteSublayer(sl.Key); err != nil {
+		t.Fatalf("delete sublayer failed: %v", err)
+	}
+
+	sublayers, err = s.Sublayers(nil)
+	if err != nil {
+		t.Fatalf("get sublayers failed: %v", err)
+	}
+	for _, got := range sublayers {
+		if got.Key == sl.Key {
+			t.Fatalf("deleted sublayer but it's still there: %#v", got)
+		}
+	}
+}
+
+func TestProviders(t *testing.T) {
+	skipIfUnprivileged(t)
+
+	s, err := New(&SessionOptions{
+		Dynamic: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+
+	guid, err := windows.GenerateGUID()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := &Provider{
+		Key:         guid,
+		Name:        "test provider",
+		Description: "a test provider",
+		Data:        []byte("byte blob"),
+	}
+	if err := s.AddProvider(p); err != nil {
+		t.Fatalf("add provider failed: %v", err)
+	}
+
+	providers, err := s.Providers()
+	if err != nil {
+		t.Fatalf("get providers failed: %v", err)
+	}
+
+	found := false
+	for _, got := range providers {
+		if got.Key != p.Key {
+			continue
+		}
+		found = true
+		if diff := cmp.Diff(got, p); diff != "" {
+			t.Fatalf("provider is wrong (-got+want):\n%s", diff)
+		}
+		break
+	}
+	if !found {
+		t.Fatal("provider added but not found")
+	}
+
+	if err := s.DeleteProvider(p.Key); err != nil {
+		t.Fatalf("delete provider failed: %v", err)
+	}
+
+	providers, err = s.Providers()
+	if err != nil {
+		t.Fatalf("get providers failed: %v", err)
+	}
+	for _, got := range providers {
+		if got.Key == p.Key {
+			t.Fatalf("deleted provider but it's still there: %#v", got)
+		}
+	}
+}
