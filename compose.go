@@ -147,7 +147,7 @@ func toCondition0(a *arena, ms []*Match, ft fieldTypes) (array *fwpmFilterCondit
 
 		typ, val, err := toValue0(a, m.Value, ft[m.Key])
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid match %v: %w", m, err)
 		}
 
 		*c = fwpmFilterCondition0{
@@ -167,7 +167,7 @@ func toCondition0(a *arena, ms []*Match, ft fieldTypes) (array *fwpmFilterCondit
 // fwpConditionValue0.
 func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val uintptr, err error) {
 	mapErr := func() (dataType, uintptr, error) {
-		return 0, 0, fmt.Errorf("can't map type %T into condition type %v", v, ftype)
+		return 0, 0, fmt.Errorf("cannot map Go type %T to field type %s", v, ftype)
 	}
 
 	switch ftype {
