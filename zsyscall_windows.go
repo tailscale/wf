@@ -53,7 +53,7 @@ var (
 	procFwpmLayerEnum0                 = modfwpuclnt.NewProc("FwpmLayerEnum0")
 	procFwpmNetEventCreateEnumHandle0  = modfwpuclnt.NewProc("FwpmNetEventCreateEnumHandle0")
 	procFwpmNetEventDestroyEnumHandle0 = modfwpuclnt.NewProc("FwpmNetEventDestroyEnumHandle0")
-	procFwpmNetEventEnum0              = modfwpuclnt.NewProc("FwpmNetEventEnum0")
+	procFwpmNetEventEnum1              = modfwpuclnt.NewProc("FwpmNetEventEnum1")
 	procFwpmProviderAdd0               = modfwpuclnt.NewProc("FwpmProviderAdd0")
 	procFwpmProviderCreateEnumHandle0  = modfwpuclnt.NewProc("FwpmProviderCreateEnumHandle0")
 	procFwpmProviderDeleteByKey0       = modfwpuclnt.NewProc("FwpmProviderDeleteByKey0")
@@ -170,8 +170,8 @@ func fwpmNetEventDestroyEnumHandle0(engineHandle windows.Handle, enumHandle wind
 	return
 }
 
-func fwpmNetEventEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmNetEvent0, numEntriesReturned *uint32) (err error) {
-	r1, _, e1 := syscall.Syscall6(procFwpmNetEventEnum0.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
+func fwpmNetEventEnum1(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmNetEvent1, numEntriesReturned *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procFwpmNetEventEnum1.Addr(), 5, uintptr(engineHandle), uintptr(enumHandle), uintptr(numEntriesRequested), uintptr(unsafe.Pointer(entries)), uintptr(unsafe.Pointer(numEntriesReturned)), 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
 	}

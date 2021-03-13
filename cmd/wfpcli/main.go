@@ -84,6 +84,13 @@ var (
 		Exec:       listRules,
 	}
 
+	listEventsC = &ffcli.Command{
+		Name:       "list-events",
+		ShortUsage: "wfpcli list-events",
+		ShortHelp:  "List WFP drop events.",
+		Exec:       listEvents,
+	}
+
 	testC = &ffcli.Command{
 		Name:       "test",
 		ShortUsage: "wfpcli list-rules",
@@ -96,7 +103,7 @@ var (
 	root    = &ffcli.Command{
 		ShortUsage:  "wfpcli <subcommand>",
 		FlagSet:     rootFS,
-		Subcommands: []*ffcli.Command{listProvidersC, addProviderC, delProviderC, listLayersC, listSublayersC, addSublayerC, delSublayerC, listRulesC, testC},
+		Subcommands: []*ffcli.Command{listProvidersC, addProviderC, delProviderC, listLayersC, listSublayersC, addSublayerC, delSublayerC, listRulesC, listEventsC, testC},
 		Exec: func(context.Context, []string) error {
 			return flag.ErrHelp
 		},
@@ -385,6 +392,34 @@ func listRules(context.Context, []string) error {
 	return nil
 }
 
+func listEvents(context.Context, []string) error {
+	sess, err := session()
+	if err != nil {
+		return fmt.Errorf("creating WFP session: %w", err)
+	}
+	defer sess.Close()
+
+	events, err := sess.DropEvents()
+	if err != nil {
+		return fmt.Errorf("getting events: %w", err)
+	}
+
+	for _, event := range events {
+		fmt.Printf("%s\n", event.Timestamp)
+		fmt.Printf("  Protocol: %d\n", event.IPProtocol)
+		fmt.Printf("  Local addr: %s\n", event.LocalAddr)
+		fmt.Printf("  Remote addr: %s\n", event.RemoteAddr)
+		if event.AppID != "" {
+			fmt.Printf("  App ID: %s\n", event.AppID)
+		}
+		fmt.Printf("  Layer ID: %d\n", event.LayerID)
+		fmt.Printf("  Filter ID: %d\n", event.FilterID)
+		fmt.Printf("\n")
+	}
+	fmt.Printf("Dumped %d events\n", len(events))
+	return nil
+}
+
 var guidLayerALEAuthRecvAcceptV4 = windows.GUID{
 	Data1: 0xe1cd9fe7,
 	Data2: 0xf4b5,
@@ -420,7 +455,7 @@ func test(context.Context, []string) error {
 	}
 	defer sess.Close()
 
-	sess.Dump()
+	//sess.Dump()
 
 	// guid, err := windows.GenerateGUID()
 	// if err != nil {

@@ -565,92 +565,49 @@ func (s *Session) DeleteRule(id windows.GUID) error {
 
 type DropEvent struct {
 	Timestamp  time.Time
-	Flags      uint32
-	IPVersion  uint32
 	IPProtocol uint8
 	LocalAddr  netaddr.IPPort
 	RemoteAddr netaddr.IPPort
-	Scope      uint32
 	AppID      string
 
-	Type    uint32
-	Layer   string
-	LayerID uint16
-	Filter  uint64
+	LayerID  uint16
+	FilterID uint64
 }
 
-func (e DropEvent) String() string {
-	return fmt.Sprintf(`@%s F=%d V=%d P=%d L=%s R=%s App=%s Type=%d Layer=%s ID=%d Filter=%d`, e.Timestamp, e.Flags, e.IPVersion, e.IPProtocol, e.LocalAddr, e.RemoteAddr, e.AppID, e.Type, e.Layer, e.LayerID, e.Filter)
-}
-
-func (s *Session) Dump() error {
+func (s *Session) DropEvents() ([]*DropEvent, error) {
 	var enum windows.Handle
 	if err := fwpmNetEventCreateEnumHandle0(s.handle, nil, &enum); err != nil {
-		return err
+		return nil, err
 	}
 	defer fwpmNetEventDestroyEnumHandle0(s.handle, enum)
 
-	layers, err := s.Layers()
-	if err != nil {
-		return err
-	}
+	var ret []*DropEvent
 
-	luidToGUID := map[uint16]string{}
-	for _, layer := range layers {
-		luidToGUID[layer.KernelID] = GUIDName(layer.Key)
-	}
-
-	const pageSize = 1
 	for {
-		var (
-			array **fwpmNetEvent0
-			num   uint32
-		)
-		if err := fwpmNetEventEnum0(s.handle, enum, pageSize, &array, &num); err != nil {
-			return err
+		events, err := s.getEventPage(enum)
+		if err != nil {
+			return nil, err
 		}
-
-		var events []*fwpmNetEvent0
-		sh := (*reflect.SliceHeader)(unsafe.Pointer(&events))
-		sh.Cap = int(num)
-		sh.Len = int(num)
-		sh.Data = uintptr(unsafe.Pointer(array))
-
-		for _, event := range events {
-			v := &DropEvent{
-				Timestamp:  time.Unix(0, event.Header.Timestamp.Nanoseconds()),
-				Flags:      event.Header.Flags,
-				IPVersion:  event.Header.IPVersion,
-				IPProtocol: event.Header.IPProtocol,
-				LocalAddr: netaddr.IPPort{
-					IP:   netaddr.IPFrom16(event.Header.LocalAddr),
-					Port: event.Header.LocalPort,
-				},
-				RemoteAddr: netaddr.IPPort{
-					IP:   netaddr.IPFrom16(event.Header.RemoteAddr),
-					Port: event.Header.RemotePort,
-				},
-				Scope:   event.Header.ScopeID,
-				Type:    event.Type,
-				LayerID: event.Drop.LayerID,
-			}
-			if v.IPVersion == 0 {
-				u := *(*uint32)(unsafe.Pointer(&event.Header.LocalAddr[0]))
-				v.LocalAddr.IP = ipv4From32(u)
-				u = *(*uint32)(unsafe.Pointer(&event.Header.RemoteAddr[0]))
-				v.RemoteAddr.IP = ipv4From32(u)
-			}
-			guid, _ := luidToGUID[event.Drop.LayerID]
-			v.Layer = guid
-			v.Filter = event.Drop.FilterID
-			id, err := fromByteBlobToString(&event.Header.AppID)
-			if err != nil {
-				panic(err)
-			}
-			v.AppID = id
-			fmt.Printf("%s\n", v)
+		if len(events) == 0 {
+			return ret, nil
 		}
-
-		fwpmFreeMemory0((*struct{})(unsafe.Pointer(&array)))
+		ret = append(ret, events...)
 	}
+}
+
+func (s *Session) getEventPage(enum windows.Handle) ([]*DropEvent, error) {
+	const pageSize = 100
+	var (
+		array **fwpmNetEvent1
+		num   uint32
+	)
+	if err := fwpmNetEventEnum1(s.handle, enum, pageSize, &array, &num); err != nil {
+		return nil, err
+	}
+	if num == 0 {
+		return nil, nil
+	}
+	defer fwpmFreeMemory0((*struct{})(unsafe.Pointer(&array)))
+
+	return fromNetEvent1(array, num)
 }

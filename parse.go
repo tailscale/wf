@@ -6,6 +6,7 @@ import (
 	"math/bits"
 	"net"
 	"reflect"
+	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -178,6 +179,53 @@ func fromProvider0(array **fwpmProvider0, num uint32) []*Provider {
 	}
 
 	return ret
+}
+
+// fromNetEvent1 converts a C array of fwpmNetEvent1 to a safe-to-use
+// DropEvent slice.
+func fromNetEvent1(array **fwpmNetEvent1, num uint32) ([]*DropEvent, error) {
+	var ret []*DropEvent
+
+	var events []*fwpmNetEvent1
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&events))
+	sh.Cap = int(num)
+	sh.Len = int(num)
+	sh.Data = uintptr(unsafe.Pointer(array))
+
+	for _, event := range events {
+		if event.Type != fwpmNetEventClassifyDrop {
+			continue
+		}
+
+		e := &DropEvent{
+			Timestamp:  time.Unix(0, event.Header.Timestamp.Nanoseconds()),
+			IPProtocol: event.Header.IPProtocol,
+			LocalAddr: netaddr.IPPort{
+				Port: event.Header.LocalPort,
+			},
+			RemoteAddr: netaddr.IPPort{
+				Port: event.Header.RemotePort,
+			},
+			LayerID:  event.Drop.LayerID,
+			FilterID: event.Drop.FilterID,
+		}
+		switch event.Header.IPVersion {
+		case fwpIPVersion4:
+			e.LocalAddr.IP = ipv4From32(*(*uint32)(unsafe.Pointer(&event.Header.LocalAddr[0])))
+			e.RemoteAddr.IP = ipv4From32(*(*uint32)(unsafe.Pointer(&event.Header.RemoteAddr[0])))
+		case fwpIPVersion6:
+			e.LocalAddr.IP = netaddr.IPFrom16(event.Header.LocalAddr)
+			e.RemoteAddr.IP = netaddr.IPFrom16(event.Header.RemoteAddr)
+		}
+		appID, err := fromByteBlobToString(&event.Header.AppID)
+		if err != nil {
+			return nil, err
+		}
+		e.AppID = appID
+		ret = append(ret, e)
+	}
+
+	return ret, nil
 }
 
 func fromFilter0(array **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rule, error) {
