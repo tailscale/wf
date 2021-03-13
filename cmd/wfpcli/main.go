@@ -93,8 +93,8 @@ var (
 
 	testC = &ffcli.Command{
 		Name:       "test",
-		ShortUsage: "wfpcli list-rules",
-		ShortHelp:  "List WFP rules.",
+		ShortUsage: "wfpcli list-events",
+		ShortHelp:  "List WFP drop events.",
 		Exec:       test,
 	}
 
@@ -435,18 +435,11 @@ var guidSublayerUniversal = windows.GUID{
 	Data4: [8]byte{0x81, 0x9a, 0x27, 0x34, 0x39, 0x7b, 0x2b, 0x74},
 }
 
-var guidConditionIPLocalPort = windows.GUID{
-	Data1: 0x0c1ba1af,
-	Data2: 0x5765,
-	Data3: 0x453f,
-	Data4: [8]byte{0xaf, 0x22, 0xa8, 0xf7, 0x91, 0xac, 0x77, 0x5b},
-}
-
-var guidConditionIPLocalInterface = windows.GUID{
-	Data1: 0x4cd62a49,
-	Data2: 0x59c3,
-	Data3: 0x4969,
-	Data4: [8]byte{0xb7, 0xf3, 0xbd, 0xa5, 0xd3, 0x28, 0x90, 0xa4},
+var guidConditionIPLocalAddress = windows.GUID{
+	Data1: 0xd9ee00de,
+	Data2: 0xc1ef,
+	Data3: 0x4617,
+	Data4: [8]byte{0xbf, 0xe3, 0xff, 0xd8, 0xf5, 0xa0, 0x89, 0x57},
 }
 
 func test(context.Context, []string) error {
@@ -456,32 +449,19 @@ func test(context.Context, []string) error {
 	}
 	defer sess.Close()
 
-	//sess.Dump()
-
-	// guid, err := windows.GenerateGUID()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// r := &wf.Rule{
-	// 	Key:      guid,
-	// 	Name:     "test2",
-	// 	Layer:    guidLayerALEAuthRecvAcceptV4,
-	// 	Sublayer: guidSublayerUniversal,
-	// 	Weight:   10,
-	// 	Conditions: []*wf.Match{
-	// 		&wf.Match{
-	// 			Key:   guidConditionIPLocalInterface,
-	// 			Op:    wf.MatchTypeEqual,
-	// 			Value: uint64(5),
-	// 		},
-	// 	},
-	// 	Action: wf.ActionPermit,
-	// }
-
-	// if err := sess.AddRule(r); err != nil {
-	// 	return fmt.Errorf("failed to add rule: %w", err)
-	// }
-
-	return nil
+	r := &wf.Rule{
+		Key:      mustGUID(),
+		Layer:    guidLayerALEAuthRecvAcceptV4,
+		Sublayer: guidSublayerUniversal,
+		Weight:   1,
+		Action:   wf.ActionBlock,
+		Conditions: []*wf.Match{
+			&wf.Match{
+				Key:   guidConditionIPLocalAddress,
+				Op:    wf.MatchTypeEqual,
+				Value: uint8(42),
+			},
+		},
+	}
+	return sess.AddRule(r)
 }
