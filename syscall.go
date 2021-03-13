@@ -27,7 +27,7 @@ package wf
 
 //sys fwpmNetEventCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *struct{}, handle *windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmNetEventCreateEnumHandle0
 //sys fwpmNetEventDestroyEnumHandle0(engineHandle windows.Handle, enumHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmNetEventDestroyEnumHandle0
-//sys fwpmNetEventEnum0(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmNetEvent0, numEntriesReturned *uint32) (err error) [failretval!=0] = fwpuclnt.FwpmNetEventEnum0
+//sys fwpmNetEventEnum1(engineHandle windows.Handle, enumHandle windows.Handle, numEntriesRequested uint32, entries ***fwpmNetEvent1, numEntriesReturned *uint32) (err error) [failretval!=0] = fwpuclnt.FwpmNetEventEnum1
 
 //sys fwpmTransactionBegin0(engineHandle windows.Handle, flags uint32) (err error) [failretval!=0] = fwpuclnt.FwpmTransactionBegin0
 //sys fwpmTransactionCommit0(engineHandle windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmTransactionCommit0

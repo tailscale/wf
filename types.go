@@ -253,11 +253,18 @@ const (
 	filterEnumFlagsIncludeDisabled
 )
 
+type fwpIPVersion uint32
+
+const (
+	fwpIPVersion4 fwpIPVersion = 0
+	fwpIPVersion6 fwpIPVersion = 1
+)
+
 //go:notinheap
-type fwpmNetEventHeader0 struct {
+type fwpmNetEventHeader1 struct {
 	Timestamp  windows.Filetime
-	Flags      uint32 // enum
-	IPVersion  uint32 // enum
+	Flags      uint32       // enum
+	IPVersion  fwpIPVersion // enum
 	IPProtocol uint8
 	pad        [3]byte
 	LocalAddr  [16]byte
@@ -267,17 +274,44 @@ type fwpmNetEventHeader0 struct {
 	ScopeID    uint32
 	AppID      fwpByteBlob
 	UserID     *windows.SID
+
+	// Random reserved fields for an aborted attempt at including
+	// Ethernet frame information. Not used, but we have to pad out
+	// the struct appropriately.
+	unused1 struct {
+		reserved1 uint32
+		unused2   struct {
+			reserved2  [6]byte
+			reserved3  [6]byte
+			reserved4  uint32
+			reserved5  uint32
+			reserved6  uint16
+			reserved7  uint32
+			reserved8  uint32
+			reserved9  uint16
+			reserved10 uint64
+		}
+	}
 }
 
 //go:notinheap
-type fwpmNetEventClassifyDrop0 struct {
-	FilterID uint64
-	LayerID  uint16
+type fwpmNetEventClassifyDrop1 struct {
+	FilterID        uint64
+	LayerID         uint16
+	ReauthReason    uint32
+	OriginalProfile uint32
+	CurrentProfile  uint32
+	Direction       uint32
+	Loopback        uint32
 }
 
+type fwpmNetEventType uint32
+
+const fwpmNetEventClassifyDrop = 3
+
 //go:notinheap
-type fwpmNetEvent0 struct {
-	Header fwpmNetEventHeader0
-	Type   uint32 // enum
-	Drop   fwpmNetEventClassifyDrop0
+type fwpmNetEvent1 struct {
+	Header fwpmNetEventHeader1
+	Type   fwpmNetEventType
+	Drop   *fwpmNetEventClassifyDrop1
 }
