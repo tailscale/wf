@@ -243,13 +243,6 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			return 0, 0, err
 		}
 		val = uintptr(p)
-	case typeBitmapIndex:
-		typ = dataTypeBitmapIndex
-		i, ok := v.(BitmapIndex)
-		if !ok {
-			return mapErr()
-		}
-		*(*uint8)(unsafe.Pointer(&val)) = uint8(i)
 	case typeArray16:
 		typ = dataTypeByteArray16
 		bs, ok := v.([16]byte)

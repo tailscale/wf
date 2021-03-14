@@ -156,9 +156,6 @@ type Field struct {
 // directly as a value in firewall rules.
 type TokenAccessInformation struct{}
 
-// BitmapIndex is an index into a Bitmap64.
-type BitmapIndex uint8 // TODO: this is a guess, the API doesn't document what the underlying type is.
-
 type Range struct {
 	From, To interface{}
 }

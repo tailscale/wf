@@ -35,7 +35,7 @@ var (
 	typeTokenInformation       = reflect.TypeOf(TokenInformation{})
 	typeTokenAccessInformation = reflect.TypeOf(TokenAccessInformation{})
 	typeMAC                    = reflect.TypeOf(net.HardwareAddr{})
-	typeBitmapIndex            = reflect.TypeOf(BitmapIndex(0))
+	typeBitmapIndex            = reflect.TypeOf(uint8(0))
 	typeIP                     = reflect.TypeOf(netaddr.IP{})
 	typePrefix                 = reflect.TypeOf(netaddr.IPPrefix{})
 	typeRange                  = reflect.TypeOf(Range{})
