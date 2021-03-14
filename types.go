@@ -119,7 +119,7 @@ type fwpmSublayer0 struct {
 	SublayerKey  SublayerID
 	DisplayData  fwpmDisplayData0
 	Flags        fwpmSublayerFlags
-	ProviderKey  *windows.GUID
+	ProviderKey  *ProviderID
 	ProviderData fwpByteBlob
 	Weight       uint16
 }
@@ -133,7 +133,7 @@ const (
 
 //go:notinheap
 type fwpmProvider0 struct {
-	ProviderKey  windows.GUID
+	ProviderKey  ProviderID
 	DisplayData  fwpmDisplayData0
 	Flags        fwpmProviderFlags
 	ProviderData fwpByteBlob
@@ -169,7 +169,7 @@ type fwpmFilter0 struct {
 	FilterKey           windows.GUID
 	DisplayData         fwpmDisplayData0
 	Flags               fwpmFilterFlags
-	ProviderKey         *windows.GUID
+	ProviderKey         *ProviderID
 	ProviderData        fwpByteBlob
 	LayerKey            LayerID
 	SublayerKey         windows.GUID
@@ -209,13 +209,13 @@ type fwpV6AddrAndMask struct {
 
 //go:notinheap
 type fwpmProviderContextEnumTemplate0 struct {
-	ProviderKey         *windows.GUID
+	ProviderKey         *ProviderID
 	ProviderContextType uint32
 }
 
 //go:notinheap
 type fwpmFilterEnumTemplate0 struct {
-	ProviderKey             *windows.GUID
+	ProviderKey             *ProviderID
 	LayerKey                windows.GUID
 	EnumType                filterEnumType
 	Flags                   filterEnumFlags

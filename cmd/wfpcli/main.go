@@ -157,7 +157,7 @@ func listProviders(_ context.Context, _ []string) error {
 	}
 
 	for _, provider := range providers {
-		fmt.Printf("%s\n", displayName(wf.GUIDName(provider.ID), provider.Name))
+		fmt.Printf("%s\n", displayName(provider.ID.String(), provider.Name))
 		fmt.Printf("  GUID: %s\n", provider.ID)
 		fmt.Printf("  Name: %q\n", provider.Name)
 		if provider.Description != "" {
@@ -185,7 +185,7 @@ func addProvider(context.Context, []string) error {
 	defer sess.Close()
 
 	p := &wf.Provider{
-		ID:          mustGUID(),
+		ID:          wf.ProviderID(mustGUID()),
 		Name:        *providerName,
 		Description: *providerDescription,
 		Persistent:  *providerPersistent,
@@ -218,7 +218,7 @@ func delProvider(_ context.Context, args []string) error {
 	}
 	defer sess.Close()
 
-	if err := sess.DeleteProvider(guid); err != nil {
+	if err := sess.DeleteProvider(wf.ProviderID(guid)); err != nil {
 		return fmt.Errorf("deleting provider: %w", err)
 	}
 
@@ -310,7 +310,7 @@ func addSublayer(_ context.Context, _ []string) error {
 		if err != nil {
 			return fmt.Errorf("Parsing provider GUID: %w", err)
 		}
-		sl.Provider = &guid
+		sl.Provider = (*wf.ProviderID)(&guid)
 	}
 
 	if err := sess.AddSublayer(sl); err != nil {

@@ -208,6 +208,7 @@ func (s *Session) getLayerPage(enum windows.Handle) ([]*Layer, error) {
 	return fromLayer0(array, num)
 }
 
+// SublayerID identifies a WFP sublayer.
 type SublayerID windows.GUID
 
 func (id SublayerID) String() string {
@@ -230,7 +231,7 @@ type Sublayer struct {
 	Persistent bool
 	// Provider optionally identifies the Provider that manages this
 	// sublayer.
-	Provider *windows.GUID
+	Provider *ProviderID
 	// ProviderData is optional opaque data that can be held on behalf
 	// of the Provider.
 	ProviderData []byte
@@ -309,10 +310,20 @@ func (s *Session) DeleteSublayer(id SublayerID) error {
 	return fwpmSubLayerDeleteByKey0(s.handle, (*windows.GUID)(&id))
 }
 
+// ProviderID identifies a WFP provider.
+type ProviderID windows.GUID
+
+func (id ProviderID) String() string {
+	if s := guidNames[windows.GUID(id)]; s != "" {
+		return s
+	}
+	return windows.GUID(id).String()
+}
+
 // A Provider is an entity that owns sublayers and filtering rules.
 type Provider struct {
 	// ID is the unique identifier for this provider.
-	ID windows.GUID
+	ID ProviderID
 	// Name is a short descriptive name.
 	Name string
 	// Description is a longer description of the provider.
@@ -374,7 +385,7 @@ func (s *Session) getProviderPage(enum windows.Handle) ([]*Provider, error) {
 
 // AddProvider creates a new provider.
 func (s *Session) AddProvider(p *Provider) error {
-	if p.ID == (windows.GUID{}) {
+	if p.ID == (ProviderID{}) {
 		return errors.New("Provider.ID cannot be zero")
 	}
 
@@ -389,12 +400,12 @@ func (s *Session) AddProvider(p *Provider) error {
 // DeleteProvider deletes the Provider whose GUID is id. A provider
 // can only be deleted once all the resources it owns have been
 // deleted.
-func (s *Session) DeleteProvider(id windows.GUID) error {
-	if id == (windows.GUID{}) {
+func (s *Session) DeleteProvider(id ProviderID) error {
+	if id == (ProviderID{}) {
 		return errors.New("GUID cannot be zero")
 	}
 
-	return fwpmProviderDeleteByKey0(s.handle, &id)
+	return fwpmProviderDeleteByKey0(s.handle, (*windows.GUID)(&id))
 }
 
 // MatchType is the operator to use when testing a field in a Match.
@@ -509,7 +520,7 @@ type Rule struct {
 
 	// Provider optionally identifies the Provider that manages this
 	// rule.
-	Provider *windows.GUID
+	Provider *ProviderID
 	// ProviderData is optional opaque data that can be held on behalf
 	// of the Provider.
 	ProviderData []byte

@@ -49,7 +49,7 @@ func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
 			Name:        toUint16(a, sl.Name),
 			Description: toUint16(a, sl.Description),
 		},
-		ProviderKey: toGUID(a, sl.Provider),
+		ProviderKey: (*ProviderID)(toGUID(a, (*windows.GUID)(sl.Provider))),
 		ProviderData: fwpByteBlob{
 			Size: uint32(len(sl.ProviderData)),
 			Data: toBytes(a, sl.ProviderData),
@@ -102,7 +102,7 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 			Name:        toUint16(a, r.Name),
 			Description: toUint16(a, r.Description),
 		},
-		ProviderKey: toGUID(a, r.Provider),
+		ProviderKey: (*ProviderID)(toGUID(a, (*windows.GUID)(r.Provider))),
 		ProviderData: fwpByteBlob{
 			Size: uint32(len(r.ProviderData)), // todo: overflow?
 			Data: toBytes(a, r.ProviderData),

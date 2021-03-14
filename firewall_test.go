@@ -261,7 +261,7 @@ func TestProviders(t *testing.T) {
 	}
 
 	p := &Provider{
-		ID:          guid,
+		ID:          ProviderID(guid),
 		Name:        "test provider",
 		Description: "a test provider",
 		Data:        []byte("byte blob"),
