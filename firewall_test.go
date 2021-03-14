@@ -2,14 +2,12 @@ package wf
 
 import (
 	"fmt"
-	"reflect"
 	"sort"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/sys/windows"
-	"inet.af/netaddr"
 )
 
 func skipIfUnprivileged(t *testing.T) {
@@ -76,19 +74,6 @@ func TestSession(t *testing.T) {
 	}
 }
 
-var (
-	stringT = reflect.TypeOf("")
-	taiT    = reflect.TypeOf(TokenAccessInformation{})
-	ipT     = reflect.TypeOf(netaddr.IP{})
-	u8T     = reflect.TypeOf(uint8(0))
-	u16T    = reflect.TypeOf(uint16(0))
-	u32T    = reflect.TypeOf(uint32(0))
-	u64T    = reflect.TypeOf(uint64(0))
-	sidT    = reflect.TypeOf(&windows.SID{})
-	bytesT  = reflect.TypeOf([]byte(nil))
-	indexT  = reflect.TypeOf(BitmapIndex(0))
-)
-
 func TestLayers(t *testing.T) {
 	skipIfUnprivileged(t)
 
@@ -112,45 +97,45 @@ func TestLayers(t *testing.T) {
 			Name:            "ALE Receive/Accept v4 Layer",
 			DefaultSublayer: guidSublayerUniversal,
 			Fields: []*Field{
-				{FieldALEAppID, stringT},
-				{FieldALENAPContext, u32T},
-				{FieldALEPackageID, sidT},
-				{FieldALERemoteMachineID, taiT},
-				{FieldALERemoteUserID, taiT},
-				{FieldALESecurityAttributeFqbnValue, bytesT},
-				{FieldALESioFirewallSystemPort, u32T},
-				{FieldALEUserID, taiT},
-				{FieldArrivalInterfaceIndex, u32T},
-				{FieldArrivalInterfaceType, u32T},
-				{FieldArrivalTunnelType, u32T},
-				{FieldBitmapIPLocalAddress, indexT},
-				{FieldBitmapIPLocalPort, indexT},
-				{FieldBitmapIPRemoteAddress, indexT},
-				{FieldBitmapIPRemotePort, indexT},
-				{FieldCompartmentID, u32T},
-				{FieldCurrentProfileID, u32T},
-				{FieldFlags, u32T},
-				{FieldInterfaceIndex, u32T},
-				{FieldInterfaceQuarantineEpoch, u64T},
-				{FieldInterfaceType, u32T},
-				{FieldIPArrivalInterface, u64T},
-				{FieldIPLocalAddress, ipT},
-				{FieldIPLocalAddressType, u8T},
-				{FieldIPLocalInterface, u64T},
-				{FieldIPLocalPort, u16T},
-				{FieldIPNexthopInterface, u64T},
-				{FieldIPProtocol, u8T},
-				{FieldIPRemoteAddress, ipT},
-				{FieldIPRemotePort, u16T},
-				{FieldNexthopInterfaceIndex, u32T},
-				{FieldNexthopInterfaceType, u32T},
-				{FieldNexthopSubInterfaceIndex, u32T},
-				{FieldNexthopTunnelType, u32T},
-				{FieldOriginalICMPType, u16T},
-				{FieldOriginalProfileID, u32T},
-				{FieldReauthorizeReason, u32T},
-				{FieldSubInterfaceIndex, u32T},
-				{FieldTunnelType, u32T},
+				{FieldALEAppID, typeString},
+				{FieldALENAPContext, typeUint32},
+				{FieldALEPackageID, typeSID},
+				{FieldALERemoteMachineID, typeTokenAccessInformation},
+				{FieldALERemoteUserID, typeTokenAccessInformation},
+				{FieldALESecurityAttributeFqbnValue, typeBytes},
+				{FieldALESioFirewallSystemPort, typeUint32},
+				{FieldALEUserID, typeTokenAccessInformation},
+				{FieldArrivalInterfaceIndex, typeUint32},
+				{FieldArrivalInterfaceType, typeUint32},
+				{FieldArrivalTunnelType, typeUint32},
+				{FieldBitmapIPLocalAddress, typeBitmapIndex},
+				{FieldBitmapIPLocalPort, typeBitmapIndex},
+				{FieldBitmapIPRemoteAddress, typeBitmapIndex},
+				{FieldBitmapIPRemotePort, typeBitmapIndex},
+				{FieldCompartmentID, typeUint32},
+				{FieldCurrentProfileID, typeUint32},
+				{FieldFlags, typeUint32},
+				{FieldInterfaceIndex, typeUint32},
+				{FieldInterfaceQuarantineEpoch, typeUint64},
+				{FieldInterfaceType, typeUint32},
+				{FieldIPArrivalInterface, typeUint64},
+				{FieldIPLocalAddress, typeIP},
+				{FieldIPLocalAddressType, typeUint8},
+				{FieldIPLocalInterface, typeUint64},
+				{FieldIPLocalPort, typeUint16},
+				{FieldIPNexthopInterface, typeUint64},
+				{FieldIPProtocol, typeUint8},
+				{FieldIPRemoteAddress, typeIP},
+				{FieldIPRemotePort, typeUint16},
+				{FieldNexthopInterfaceIndex, typeUint32},
+				{FieldNexthopInterfaceType, typeUint32},
+				{FieldNexthopSubInterfaceIndex, typeUint32},
+				{FieldNexthopTunnelType, typeUint32},
+				{FieldOriginalICMPType, typeUint16},
+				{FieldOriginalProfileID, typeUint32},
+				{FieldReauthorizeReason, typeUint32},
+				{FieldSubInterfaceIndex, typeUint32},
+				{FieldTunnelType, typeUint32},
 			},
 		},
 		LayerStreamV4Discard: {
@@ -159,14 +144,14 @@ func TestLayers(t *testing.T) {
 			Name:            "Stream v4 Discard Layer",
 			DefaultSublayer: guidSublayerUniversal,
 			Fields: []*Field{
-				{FieldCompartmentID, u32T},
-				{FieldDirection, u32T},
-				{FieldFlags, u32T},
-				{FieldIPLocalAddress, ipT},
-				{FieldIPLocalAddressType, u8T},
-				{FieldIPLocalPort, u16T},
-				{FieldIPRemoteAddress, ipT},
-				{FieldIPRemotePort, u16T},
+				{FieldCompartmentID, typeUint32},
+				{FieldDirection, typeUint32},
+				{FieldFlags, typeUint32},
+				{FieldIPLocalAddress, typeIP},
+				{FieldIPLocalAddressType, typeUint8},
+				{FieldIPLocalPort, typeUint16},
+				{FieldIPRemoteAddress, typeIP},
+				{FieldIPRemotePort, typeUint16},
 			},
 		},
 	}
