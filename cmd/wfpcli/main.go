@@ -364,14 +364,14 @@ func listRules(context.Context, []string) error {
 	})
 
 	for _, rule := range rules {
-		fmt.Printf("%s\n", displayName(wf.GUIDName(rule.ID), rule.Name))
+		fmt.Printf("%s\n", displayName(rule.ID.String(), rule.Name))
 		fmt.Printf("  GUID: %s\n", rule.ID)
 		fmt.Printf("  Name: %q\n", rule.Name)
 		if rule.Description != "" {
 			fmt.Printf("  Description: %q\n", rule.Description)
 		}
-		fmt.Printf("  Layer: %s\n", wf.GUIDName(windows.GUID(rule.Layer)))
-		fmt.Printf("  Sublayer: %s\n", wf.GUIDName(rule.Sublayer))
+		fmt.Printf("  Layer: %s\n", rule.Layer.String())
+		fmt.Printf("  Sublayer: %s\n", rule.Sublayer.String())
 		fmt.Printf("  Weight: 0x%02x\n", rule.Weight)
 		fmt.Printf("  Action: %s\n", rule.Action)
 		if rule.Callout != (windows.GUID{}) {
@@ -425,7 +425,7 @@ func listEvents(context.Context, []string) error {
 	return nil
 }
 
-var guidSublayerUniversal = windows.GUID{
+var guidSublayerUniversal = wf.SublayerID{
 	Data1: 0xeebecc03,
 	Data2: 0xced4,
 	Data3: 0x4380,
@@ -440,7 +440,7 @@ func test(context.Context, []string) error {
 	defer sess.Close()
 
 	r := &wf.Rule{
-		ID:       mustGUID(),
+		ID:       wf.RuleID(mustGUID()),
 		Layer:    wf.LayerALEAuthRecvAcceptV4,
 		Sublayer: guidSublayerUniversal,
 		Weight:   1,

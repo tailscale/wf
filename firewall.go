@@ -477,11 +477,20 @@ const (
 	ActionCalloutUnknown Action = 0x4005
 )
 
+type RuleID windows.GUID
+
+func (id RuleID) String() string {
+	if s := guidNames[windows.GUID(id)]; s != "" {
+		return s
+	}
+	return windows.GUID(id).String()
+}
+
 // A Rule is an action to take on packets that match a set of
 // conditions.
 type Rule struct {
 	// ID is the unique identifier for this rule.
-	ID windows.GUID
+	ID RuleID
 	// KernelID is the kernel ID for this rule.
 	KernelID uint64
 	// Name is a short descriptive name.
@@ -491,7 +500,7 @@ type Rule struct {
 	// Layer is the ID of the layer in which the rule runs.
 	Layer LayerID
 	// Sublayer is the ID of the sublayer in which the rule runs.
-	Sublayer windows.GUID
+	Sublayer SublayerID
 	// Weight is the priority of the rule relative to other rules in
 	// its sublayer.
 	Weight uint64
@@ -573,7 +582,7 @@ func (s *Session) getRulePage(enum windows.Handle) ([]*Rule, error) {
 }
 
 func (s *Session) AddRule(r *Rule) error {
-	if r.ID == (windows.GUID{}) {
+	if r.ID == (RuleID{}) {
 		return errors.New("Provider.ID cannot be zero")
 	}
 
@@ -592,12 +601,12 @@ func (s *Session) AddRule(r *Rule) error {
 	return nil
 }
 
-func (s *Session) DeleteRule(id windows.GUID) error {
-	if id == (windows.GUID{}) {
+func (s *Session) DeleteRule(id RuleID) error {
+	if id == (RuleID{}) {
 		return errors.New("GUID cannot be zero")
 	}
 
-	return fwpmFilterDeleteByKey0(s.handle, &id)
+	return fwpmFilterDeleteByKey0(s.handle, (*windows.GUID)(&id))
 }
 
 type DropEvent struct {

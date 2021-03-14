@@ -166,13 +166,13 @@ type fwpmAction0 struct {
 
 //go:notinheap
 type fwpmFilter0 struct {
-	FilterKey           windows.GUID
+	FilterKey           RuleID
 	DisplayData         fwpmDisplayData0
 	Flags               fwpmFilterFlags
 	ProviderKey         *ProviderID
 	ProviderData        fwpByteBlob
 	LayerKey            LayerID
-	SublayerKey         windows.GUID
+	SublayerKey         SublayerID
 	Weight              fwpValue0
 	NumFilterConditions uint32
 	FilterConditions    *fwpmFilterCondition0
