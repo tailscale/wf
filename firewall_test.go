@@ -28,7 +28,7 @@ func TestSession(t *testing.T) {
 
 	tests := []struct {
 		name string
-		opts *SessionOptions
+		opts *Options
 	}{
 		{
 			name: "nil",
@@ -36,27 +36,27 @@ func TestSession(t *testing.T) {
 		},
 		{
 			name: "name_only",
-			opts: &SessionOptions{
+			opts: &Options{
 				Name: "test",
 			},
 		},
 		{
 			name: "name_and_desc",
-			opts: &SessionOptions{
+			opts: &Options{
 				Name:        "test2",
 				Description: "unit test session",
 			},
 		},
 		{
 			name: "dynamic",
-			opts: &SessionOptions{
+			opts: &Options{
 				Name:    "test2",
 				Dynamic: true,
 			},
 		},
 		{
 			name: "tx_timeout",
-			opts: &SessionOptions{
+			opts: &Options{
 				Name:                    "test2",
 				TransactionStartTimeout: 5 * time.Minute,
 			},
@@ -204,7 +204,7 @@ func TestLayers(t *testing.T) {
 func TestSublayers(t *testing.T) {
 	skipIfUnprivileged(t)
 
-	s, err := New(&SessionOptions{
+	s, err := New(&Options{
 		Dynamic: true,
 	})
 	if err != nil {
@@ -266,7 +266,7 @@ func TestSublayers(t *testing.T) {
 func TestProviders(t *testing.T) {
 	skipIfUnprivileged(t)
 
-	s, err := New(&SessionOptions{
+	s, err := New(&Options{
 		Dynamic: true,
 	})
 	if err != nil {
