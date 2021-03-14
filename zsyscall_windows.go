@@ -101,7 +101,7 @@ func fwpmFilterCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fwpm
 	return
 }
 
-func fwpmFilterDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) {
+func fwpmFilterDeleteByKey0(engineHandle windows.Handle, guid *RuleID) (err error) {
 	r1, _, e1 := syscall.Syscall(procFwpmFilterDeleteByKey0.Addr(), 2, uintptr(engineHandle), uintptr(unsafe.Pointer(guid)), 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
@@ -194,7 +194,7 @@ func fwpmProviderCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *st
 	return
 }
 
-func fwpmProviderDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) {
+func fwpmProviderDeleteByKey0(engineHandle windows.Handle, guid *ProviderID) (err error) {
 	r1, _, e1 := syscall.Syscall(procFwpmProviderDeleteByKey0.Addr(), 2, uintptr(engineHandle), uintptr(unsafe.Pointer(guid)), 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
@@ -234,7 +234,7 @@ func fwpmSubLayerCreateEnumHandle0(engineHandle windows.Handle, enumTemplate *fw
 	return
 }
 
-func fwpmSubLayerDeleteByKey0(engineHandle windows.Handle, guid *windows.GUID) (err error) {
+func fwpmSubLayerDeleteByKey0(engineHandle windows.Handle, guid *SublayerID) (err error) {
 	r1, _, e1 := syscall.Syscall(procFwpmSubLayerDeleteByKey0.Addr(), 2, uintptr(engineHandle), uintptr(unsafe.Pointer(guid)), 0)
 	if r1 != 0 {
 		err = errnoErr(e1)

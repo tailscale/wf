@@ -298,7 +298,7 @@ func (s *Session) DeleteSublayer(id SublayerID) error {
 		return errors.New("GUID cannot be zero")
 	}
 
-	return fwpmSubLayerDeleteByKey0(s.handle, (*windows.GUID)(&id))
+	return fwpmSubLayerDeleteByKey0(s.handle, &id)
 }
 
 // ProviderID identifies a WFP provider.
@@ -396,7 +396,7 @@ func (s *Session) DeleteProvider(id ProviderID) error {
 		return errors.New("GUID cannot be zero")
 	}
 
-	return fwpmProviderDeleteByKey0(s.handle, (*windows.GUID)(&id))
+	return fwpmProviderDeleteByKey0(s.handle, &id)
 }
 
 // MatchType is the operator to use when testing a field in a Match.
@@ -608,7 +608,7 @@ func (s *Session) DeleteRule(id RuleID) error {
 		return errors.New("GUID cannot be zero")
 	}
 
-	return fwpmFilterDeleteByKey0(s.handle, (*windows.GUID)(&id))
+	return fwpmFilterDeleteByKey0(s.handle, &id)
 }
 
 type DropEvent struct {
