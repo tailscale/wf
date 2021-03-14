@@ -49,7 +49,7 @@ type fwpmLayer0 struct {
 	Flags              uint32
 	NumFields          uint32
 	Fields             *fwpmField0
-	DefaultSublayerKey windows.GUID
+	DefaultSublayerKey SublayerID
 	LayerID            uint16
 }
 
@@ -116,7 +116,7 @@ const fwpmSublayerFlagsPersistent fwpmSublayerFlags = 1
 
 //go:notinheap
 type fwpmSublayer0 struct {
-	SublayerKey  windows.GUID
+	SublayerKey  SublayerID
 	DisplayData  fwpmDisplayData0
 	Flags        fwpmSublayerFlags
 	ProviderKey  *windows.GUID

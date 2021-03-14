@@ -137,11 +137,11 @@ func mustGUID() windows.GUID {
 	return ret
 }
 
-func displayName(guid windows.GUID, name string) string {
+func displayName(guid, name string) string {
 	if name != "" {
 		return name
 	}
-	return wf.GUIDName(guid)
+	return guid
 }
 
 func listProviders(_ context.Context, _ []string) error {
@@ -157,7 +157,7 @@ func listProviders(_ context.Context, _ []string) error {
 	}
 
 	for _, provider := range providers {
-		fmt.Printf("%s\n", displayName(provider.ID, provider.Name))
+		fmt.Printf("%s\n", displayName(wf.GUIDName(provider.ID), provider.Name))
 		fmt.Printf("  GUID: %s\n", provider.ID)
 		fmt.Printf("  Name: %q\n", provider.Name)
 		if provider.Description != "" {
@@ -240,7 +240,7 @@ func listLayers(_ context.Context, _ []string) error {
 	}
 
 	for _, layer := range layers {
-		fmt.Printf("%s\n", displayName(windows.GUID(layer.ID), layer.Name))
+		fmt.Printf("%s\n", displayName(layer.ID.String(), layer.Name))
 		fmt.Printf("  GUID: %s\n", layer.ID)
 		fmt.Printf("  LUID: %d\n", layer.KernelID)
 		fmt.Printf("  Name: %q\n", layer.Name)
@@ -271,7 +271,7 @@ func listSublayers(_ context.Context, _ []string) error {
 	}
 
 	for _, sublayer := range sublayers {
-		fmt.Printf("%s\n", displayName(sublayer.ID, sublayer.Name))
+		fmt.Printf("%s\n", displayName(sublayer.ID.String(), sublayer.Name))
 		fmt.Printf("  GUID: %s\n", sublayer.ID)
 		fmt.Printf("  Name: %q\n", sublayer.Name)
 		if sublayer.Description != "" {
@@ -299,7 +299,7 @@ func addSublayer(_ context.Context, _ []string) error {
 	defer sess.Close()
 
 	sl := &wf.Sublayer{
-		ID:          mustGUID(),
+		ID:          wf.SublayerID(mustGUID()),
 		Name:        *sublayerName,
 		Description: *sublayerDescription,
 		Persistent:  *sublayerPersistent,
@@ -338,7 +338,7 @@ func delSublayer(_ context.Context, args []string) error {
 	}
 	defer sess.Close()
 
-	if err := sess.DeleteSublayer(guid); err != nil {
+	if err := sess.DeleteSublayer(wf.SublayerID(guid)); err != nil {
 		return fmt.Errorf("deleting sublayer: %w", err)
 	}
 
@@ -364,7 +364,7 @@ func listRules(context.Context, []string) error {
 	})
 
 	for _, rule := range rules {
-		fmt.Printf("%s\n", displayName(rule.ID, rule.Name))
+		fmt.Printf("%s\n", displayName(wf.GUIDName(rule.ID), rule.Name))
 		fmt.Printf("  GUID: %s\n", rule.ID)
 		fmt.Printf("  Name: %q\n", rule.Name)
 		if rule.Description != "" {

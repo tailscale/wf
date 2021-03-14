@@ -126,7 +126,7 @@ type Layer struct {
 	Description string
 	// DefaultSublayer is the ID for the default sublayer into which
 	// filter rules are added.
-	DefaultSublayer windows.GUID
+	DefaultSublayer SublayerID
 	// Fields describes the fields that are available in this layer to
 	// be matched against.
 	Fields []*Field
@@ -208,10 +208,19 @@ func (s *Session) getLayerPage(enum windows.Handle) ([]*Layer, error) {
 	return fromLayer0(array, num)
 }
 
+type SublayerID windows.GUID
+
+func (id SublayerID) String() string {
+	if s := guidNames[windows.GUID(id)]; s != "" {
+		return s
+	}
+	return windows.GUID(id).String()
+}
+
 // A Sublayer is a container for filtering rules.
 type Sublayer struct {
 	// ID is the unique identifier for this sublayer.
-	ID windows.GUID
+	ID SublayerID
 	// Name is a short descriptive name.
 	Name string
 	// Description is a longer description of the Sublayer.
@@ -232,7 +241,7 @@ type Sublayer struct {
 
 // Sublayers returns available Sublayers. If provider is non-nil, only
 // Sublayers registered to that Provider are returned.
-func (s *Session) Sublayers(provider *windows.GUID) ([]*Sublayer, error) {
+func (s *Session) Sublayers(provider *SublayerID) ([]*Sublayer, error) {
 	var a arena
 	defer a.Dispose()
 
@@ -280,7 +289,7 @@ func (s *Session) AddSublayer(sl *Sublayer) error {
 	// the WFP API accepts zero GUIDs and interprets it as "give me a
 	// random GUID". However, we can't get that GUID back out, so it
 	// would be pointless to make such a request. Stop it here.
-	if sl.ID == (windows.GUID{}) {
+	if sl.ID == (SublayerID{}) {
 		return errors.New("Sublayer.ID cannot be zero")
 	}
 
@@ -292,12 +301,12 @@ func (s *Session) AddSublayer(sl *Sublayer) error {
 }
 
 // DeleteSublayer deletes the Sublayer whose GUID is id.
-func (s *Session) DeleteSublayer(id windows.GUID) error {
-	if id == (windows.GUID{}) {
+func (s *Session) DeleteSublayer(id SublayerID) error {
+	if id == (SublayerID{}) {
 		return errors.New("GUID cannot be zero")
 	}
 
-	return fwpmSubLayerDeleteByKey0(s.handle, &id)
+	return fwpmSubLayerDeleteByKey0(s.handle, (*windows.GUID)(&id))
 }
 
 // A Provider is an entity that owns sublayers and filtering rules.

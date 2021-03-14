@@ -128,7 +128,7 @@ func (g guidName) Exported() bool {
 // GoType returns the Go type to use when declaring the GUID.
 // e.g. FWPM_LAYER_BLAH -> LayerID
 func (g guidName) GoType() string {
-	if g.Exported() {
+	if g.Exported() || g.Type() == "sublayer" {
 		return strings.Title(g.Type()) + "ID"
 	}
 	return "windows.GUID"

@@ -199,7 +199,7 @@ func TestSublayers(t *testing.T) {
 	}
 
 	sl := &Sublayer{
-		ID:           guid,
+		ID:           SublayerID(guid),
 		Name:         "test sublayer",
 		Description:  "a test sublayer",
 		ProviderData: []byte("byte blob"),
