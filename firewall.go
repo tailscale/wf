@@ -192,7 +192,7 @@ func (s *Session) Layers() ([]*Layer, error) {
 }
 
 func (s *Session) getLayerPage(enum windows.Handle) ([]*Layer, error) {
-	const pageSize = 103
+	const pageSize = 100
 	var (
 		array **fwpmLayer0
 		num   uint32
@@ -523,7 +523,6 @@ func (s *Session) Rules() ([]*Rule, error) { // TODO: support filter settings
 
 	var ret []*Rule
 
-	const pageSize = 100
 	for {
 		rules, err := s.getRulePage(enum)
 		if err != nil {
