@@ -5,6 +5,7 @@
 package wf
 
 import (
+	"os"
 	"sort"
 	"testing"
 	"time"
@@ -15,6 +16,9 @@ import (
 
 func skipIfUnprivileged(t *testing.T) {
 	if !windows.GetCurrentProcessToken().IsElevated() {
+		if os.Getenv("CI") != "" {
+			t.Fatal("test requires admin privileges")
+		}
 		t.Skipf("skipping test that requires admin privileges")
 	}
 }
