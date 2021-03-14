@@ -1,3 +1,7 @@
+// Copyright (c) 2021 The Inet.Af AUTHORS. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package wf
 
 import (
@@ -20,22 +24,22 @@ import (
 // types.
 
 var (
-	typeUint8     = reflect.TypeOf(uint8(0))
-	typeUint16    = reflect.TypeOf(uint16(0))
-	typeUint32    = reflect.TypeOf(uint32(0))
-	typeUint64    = reflect.TypeOf(uint64(0))
-	typeArray16  = reflect.TypeOf([16]byte{})
-	typeBytes  = reflect.TypeOf([]byte(nil))
-	typeSID    = reflect.TypeOf(&windows.SID{})
+	typeUint8                  = reflect.TypeOf(uint8(0))
+	typeUint16                 = reflect.TypeOf(uint16(0))
+	typeUint32                 = reflect.TypeOf(uint32(0))
+	typeUint64                 = reflect.TypeOf(uint64(0))
+	typeArray16                = reflect.TypeOf([16]byte{})
+	typeBytes                  = reflect.TypeOf([]byte(nil))
+	typeSID                    = reflect.TypeOf(&windows.SID{})
 	typeSecurityDescriptor     = reflect.TypeOf(windows.SECURITY_DESCRIPTOR{})
-	typeTokenInformation     = reflect.TypeOf(TokenInformation{})
-	typeTokenAccessInformation    = reflect.TypeOf(TokenAccessInformation{})
-	typeMAC    = reflect.TypeOf(net.HardwareAddr{})
-	typeBitmapIndex  = reflect.TypeOf(BitmapIndex(0))
-	typeIP     = reflect.TypeOf(netaddr.IP{})
-	typePrefix    = reflect.TypeOf(netaddr.IPPrefix{})
-	typeRange  = reflect.TypeOf(Range{})
-	typeString = reflect.TypeOf("")
+	typeTokenInformation       = reflect.TypeOf(TokenInformation{})
+	typeTokenAccessInformation = reflect.TypeOf(TokenAccessInformation{})
+	typeMAC                    = reflect.TypeOf(net.HardwareAddr{})
+	typeBitmapIndex            = reflect.TypeOf(BitmapIndex(0))
+	typeIP                     = reflect.TypeOf(netaddr.IP{})
+	typePrefix                 = reflect.TypeOf(netaddr.IPPrefix{})
+	typeRange                  = reflect.TypeOf(Range{})
+	typeString                 = reflect.TypeOf("")
 )
 
 // fieldTypeMap maps a layer field's dataType to a Go value of that

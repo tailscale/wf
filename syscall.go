@@ -1,3 +1,7 @@
+// Copyright (c) 2021 The Inet.Af AUTHORS. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package wf
 
 //sys fwpmEngineOpen0(mustBeNil *uint16, authnService authnService, authIdentity *uintptr, session *fwpmSession0, engineHandle *windows.Handle) (err error) [failretval!=0] = fwpuclnt.FwpmEngineOpen0
