@@ -2,665 +2,665 @@ package wf
 
 import "golang.org/x/sys/windows"
 
-var guidLayerInboundIPPacketV4 = windows.GUID{
+var LayerInboundIPPacketV4 = LayerID{
 	Data1: 0xc86fd1bf,
 	Data2: 0x21cd,
 	Data3: 0x497e,
 	Data4: [8]byte{0xa0, 0xbb, 0x17, 0x42, 0x5c, 0x88, 0x5c, 0x58},
 }
 
-var guidLayerInboundIPPacketV4Discard = windows.GUID{
+var LayerInboundIPPacketV4Discard = LayerID{
 	Data1: 0xb5a230d0,
 	Data2: 0xa8c0,
 	Data3: 0x44f2,
 	Data4: [8]byte{0x91, 0x6e, 0x99, 0x1b, 0x53, 0xde, 0xd1, 0xf7},
 }
 
-var guidLayerInboundIPPacketV6 = windows.GUID{
+var LayerInboundIPPacketV6 = LayerID{
 	Data1: 0xf52032cb,
 	Data2: 0x991c,
 	Data3: 0x46e7,
 	Data4: [8]byte{0x97, 0x1d, 0x26, 0x01, 0x45, 0x9a, 0x91, 0xca},
 }
 
-var guidLayerInboundIPPacketV6Discard = windows.GUID{
+var LayerInboundIPPacketV6Discard = LayerID{
 	Data1: 0xbb24c279,
 	Data2: 0x93b4,
 	Data3: 0x47a2,
 	Data4: [8]byte{0x83, 0xad, 0xae, 0x16, 0x98, 0xb5, 0x08, 0x85},
 }
 
-var guidLayerOutboundIPPacketV4 = windows.GUID{
+var LayerOutboundIPPacketV4 = LayerID{
 	Data1: 0x1e5c9fae,
 	Data2: 0x8a84,
 	Data3: 0x4135,
 	Data4: [8]byte{0xa3, 0x31, 0x95, 0x0b, 0x54, 0x22, 0x9e, 0xcd},
 }
 
-var guidLayerOutboundIPPacketV4Discard = windows.GUID{
+var LayerOutboundIPPacketV4Discard = LayerID{
 	Data1: 0x08e4bcb5,
 	Data2: 0xb647,
 	Data3: 0x48f3,
 	Data4: [8]byte{0x95, 0x3c, 0xe5, 0xdd, 0xbd, 0x03, 0x93, 0x7e},
 }
 
-var guidLayerOutboundIPPacketV6 = windows.GUID{
+var LayerOutboundIPPacketV6 = LayerID{
 	Data1: 0xa3b3ab6b,
 	Data2: 0x3564,
 	Data3: 0x488c,
 	Data4: [8]byte{0x91, 0x17, 0xf3, 0x4e, 0x82, 0x14, 0x27, 0x63},
 }
 
-var guidLayerOutboundIPPacketV6Discard = windows.GUID{
+var LayerOutboundIPPacketV6Discard = LayerID{
 	Data1: 0x9513d7c4,
 	Data2: 0xa934,
 	Data3: 0x49dc,
 	Data4: [8]byte{0x91, 0xa7, 0x6c, 0xcb, 0x80, 0xcc, 0x02, 0xe3},
 }
 
-var guidLayerIPForwardV4 = windows.GUID{
+var LayerIPForwardV4 = LayerID{
 	Data1: 0xa82acc24,
 	Data2: 0x4ee1,
 	Data3: 0x4ee1,
 	Data4: [8]byte{0xb4, 0x65, 0xfd, 0x1d, 0x25, 0xcb, 0x10, 0xa4},
 }
 
-var guidLayerIPForwardV4Discard = windows.GUID{
+var LayerIPForwardV4Discard = LayerID{
 	Data1: 0x9e9ea773,
 	Data2: 0x2fae,
 	Data3: 0x4210,
 	Data4: [8]byte{0x8f, 0x17, 0x34, 0x12, 0x9e, 0xf3, 0x69, 0xeb},
 }
 
-var guidLayerIPForwardV6 = windows.GUID{
+var LayerIPForwardV6 = LayerID{
 	Data1: 0x7b964818,
 	Data2: 0x19c7,
 	Data3: 0x493a,
 	Data4: [8]byte{0xb7, 0x1f, 0x83, 0x2c, 0x36, 0x84, 0xd2, 0x8c},
 }
 
-var guidLayerIPForwardV6Discard = windows.GUID{
+var LayerIPForwardV6Discard = LayerID{
 	Data1: 0x31524a5d,
 	Data2: 0x1dfe,
 	Data3: 0x472f,
 	Data4: [8]byte{0xbb, 0x93, 0x51, 0x8e, 0xe9, 0x45, 0xd8, 0xa2},
 }
 
-var guidLayerInboundTransportV4 = windows.GUID{
+var LayerInboundTransportV4 = LayerID{
 	Data1: 0x5926dfc8,
 	Data2: 0xe3cf,
 	Data3: 0x4426,
 	Data4: [8]byte{0xa2, 0x83, 0xdc, 0x39, 0x3f, 0x5d, 0x0f, 0x9d},
 }
 
-var guidLayerInboundTransportV4Discard = windows.GUID{
+var LayerInboundTransportV4Discard = LayerID{
 	Data1: 0xac4a9833,
 	Data2: 0xf69d,
 	Data3: 0x4648,
 	Data4: [8]byte{0xb2, 0x61, 0x6d, 0xc8, 0x48, 0x35, 0xef, 0x39},
 }
 
-var guidLayerInboundTransportV6 = windows.GUID{
+var LayerInboundTransportV6 = LayerID{
 	Data1: 0x634a869f,
 	Data2: 0xfc23,
 	Data3: 0x4b90,
 	Data4: [8]byte{0xb0, 0xc1, 0xbf, 0x62, 0x0a, 0x36, 0xae, 0x6f},
 }
 
-var guidLayerInboundTransportV6Discard = windows.GUID{
+var LayerInboundTransportV6Discard = LayerID{
 	Data1: 0x2a6ff955,
 	Data2: 0x3b2b,
 	Data3: 0x49d2,
 	Data4: [8]byte{0x98, 0x48, 0xad, 0x9d, 0x72, 0xdc, 0xaa, 0xb7},
 }
 
-var guidLayerOutboundTransportV4 = windows.GUID{
+var LayerOutboundTransportV4 = LayerID{
 	Data1: 0x09e61aea,
 	Data2: 0xd214,
 	Data3: 0x46e2,
 	Data4: [8]byte{0x9b, 0x21, 0xb2, 0x6b, 0x0b, 0x2f, 0x28, 0xc8},
 }
 
-var guidLayerOutboundTransportV4Discard = windows.GUID{
+var LayerOutboundTransportV4Discard = LayerID{
 	Data1: 0xc5f10551,
 	Data2: 0xbdb0,
 	Data3: 0x43d7,
 	Data4: [8]byte{0xa3, 0x13, 0x50, 0xe2, 0x11, 0xf4, 0xd6, 0x8a},
 }
 
-var guidLayerOutboundTransportV6 = windows.GUID{
+var LayerOutboundTransportV6 = LayerID{
 	Data1: 0xe1735bde,
 	Data2: 0x013f,
 	Data3: 0x4655,
 	Data4: [8]byte{0xb3, 0x51, 0xa4, 0x9e, 0x15, 0x76, 0x2d, 0xf0},
 }
 
-var guidLayerOutboundTransportV6Discard = windows.GUID{
+var LayerOutboundTransportV6Discard = LayerID{
 	Data1: 0xf433df69,
 	Data2: 0xccbd,
 	Data3: 0x482e,
 	Data4: [8]byte{0xb9, 0xb2, 0x57, 0x16, 0x56, 0x58, 0xc3, 0xb3},
 }
 
-var guidLayerStreamV4 = windows.GUID{
+var LayerStreamV4 = LayerID{
 	Data1: 0x3b89653c,
 	Data2: 0xc170,
 	Data3: 0x49e4,
 	Data4: [8]byte{0xb1, 0xcd, 0xe0, 0xee, 0xee, 0xe1, 0x9a, 0x3e},
 }
 
-var guidLayerStreamV4Discard = windows.GUID{
+var LayerStreamV4Discard = LayerID{
 	Data1: 0x25c4c2c2,
 	Data2: 0x25ff,
 	Data3: 0x4352,
 	Data4: [8]byte{0x82, 0xf9, 0xc5, 0x4a, 0x4a, 0x47, 0x26, 0xdc},
 }
 
-var guidLayerStreamV6 = windows.GUID{
+var LayerStreamV6 = LayerID{
 	Data1: 0x47c9137a,
 	Data2: 0x7ec4,
 	Data3: 0x46b3,
 	Data4: [8]byte{0xb6, 0xe4, 0x48, 0xe9, 0x26, 0xb1, 0xed, 0xa4},
 }
 
-var guidLayerStreamV6Discard = windows.GUID{
+var LayerStreamV6Discard = LayerID{
 	Data1: 0x10a59fc7,
 	Data2: 0xb628,
 	Data3: 0x4c41,
 	Data4: [8]byte{0x9e, 0xb8, 0xcf, 0x37, 0xd5, 0x51, 0x03, 0xcf},
 }
 
-var guidLayerDatagramDataV4 = windows.GUID{
+var LayerDatagramDataV4 = LayerID{
 	Data1: 0x3d08bf4e,
 	Data2: 0x45f6,
 	Data3: 0x4930,
 	Data4: [8]byte{0xa9, 0x22, 0x41, 0x70, 0x98, 0xe2, 0x00, 0x27},
 }
 
-var guidLayerDatagramDataV4Discard = windows.GUID{
+var LayerDatagramDataV4Discard = LayerID{
 	Data1: 0x18e330c6,
 	Data2: 0x7248,
 	Data3: 0x4e52,
 	Data4: [8]byte{0xaa, 0xab, 0x47, 0x2e, 0xd6, 0x77, 0x04, 0xfd},
 }
 
-var guidLayerDatagramDataV6 = windows.GUID{
+var LayerDatagramDataV6 = LayerID{
 	Data1: 0xfa45fe2f,
 	Data2: 0x3cba,
 	Data3: 0x4427,
 	Data4: [8]byte{0x87, 0xfc, 0x57, 0xb9, 0xa4, 0xb1, 0x0d, 0x00},
 }
 
-var guidLayerDatagramDataV6Discard = windows.GUID{
+var LayerDatagramDataV6Discard = LayerID{
 	Data1: 0x09d1dfe1,
 	Data2: 0x9b86,
 	Data3: 0x4a42,
 	Data4: [8]byte{0xbe, 0x9d, 0x8c, 0x31, 0x5b, 0x92, 0xa5, 0xd0},
 }
 
-var guidLayerInboundICMPErrorV4 = windows.GUID{
+var LayerInboundICMPErrorV4 = LayerID{
 	Data1: 0x61499990,
 	Data2: 0x3cb6,
 	Data3: 0x4e84,
 	Data4: [8]byte{0xb9, 0x50, 0x53, 0xb9, 0x4b, 0x69, 0x64, 0xf3},
 }
 
-var guidLayerInboundICMPErrorV4Discard = windows.GUID{
+var LayerInboundICMPErrorV4Discard = LayerID{
 	Data1: 0xa6b17075,
 	Data2: 0xebaf,
 	Data3: 0x4053,
 	Data4: [8]byte{0xa4, 0xe7, 0x21, 0x3c, 0x81, 0x21, 0xed, 0xe5},
 }
 
-var guidLayerInboundICMPErrorV6 = windows.GUID{
+var LayerInboundICMPErrorV6 = LayerID{
 	Data1: 0x65f9bdff,
 	Data2: 0x3b2d,
 	Data3: 0x4e5d,
 	Data4: [8]byte{0xb8, 0xc6, 0xc7, 0x20, 0x65, 0x1f, 0xe8, 0x98},
 }
 
-var guidLayerInboundICMPErrorV6Discard = windows.GUID{
+var LayerInboundICMPErrorV6Discard = LayerID{
 	Data1: 0xa6e7ccc0,
 	Data2: 0x08fb,
 	Data3: 0x468d,
 	Data4: [8]byte{0xa4, 0x72, 0x97, 0x71, 0xd5, 0x59, 0x5e, 0x09},
 }
 
-var guidLayerOutboundICMPErrorV4 = windows.GUID{
+var LayerOutboundICMPErrorV4 = LayerID{
 	Data1: 0x41390100,
 	Data2: 0x564c,
 	Data3: 0x4b32,
 	Data4: [8]byte{0xbc, 0x1d, 0x71, 0x80, 0x48, 0x35, 0x4d, 0x7c},
 }
 
-var guidLayerOutboundICMPErrorV4Discard = windows.GUID{
+var LayerOutboundICMPErrorV4Discard = LayerID{
 	Data1: 0xb3598d36,
 	Data2: 0x0561,
 	Data3: 0x4588,
 	Data4: [8]byte{0xa6, 0xbf, 0xe9, 0x55, 0xe3, 0xf6, 0x26, 0x4b},
 }
 
-var guidLayerOutboundICMPErrorV6 = windows.GUID{
+var LayerOutboundICMPErrorV6 = LayerID{
 	Data1: 0x7fb03b60,
 	Data2: 0x7b8d,
 	Data3: 0x4dfa,
 	Data4: [8]byte{0xba, 0xdd, 0x98, 0x01, 0x76, 0xfc, 0x4e, 0x12},
 }
 
-var guidLayerOutboundICMPErrorV6Discard = windows.GUID{
+var LayerOutboundICMPErrorV6Discard = LayerID{
 	Data1: 0x65f2e647,
 	Data2: 0x8d0c,
 	Data3: 0x4f47,
 	Data4: [8]byte{0xb1, 0x9b, 0x33, 0xa4, 0xd3, 0xf1, 0x35, 0x7c},
 }
 
-var guidLayerALEResourceAssignmentV4 = windows.GUID{
+var LayerALEResourceAssignmentV4 = LayerID{
 	Data1: 0x1247d66d,
 	Data2: 0x0b60,
 	Data3: 0x4a15,
 	Data4: [8]byte{0x8d, 0x44, 0x71, 0x55, 0xd0, 0xf5, 0x3a, 0x0c},
 }
 
-var guidLayerALEResourceAssignmentV4Discard = windows.GUID{
+var LayerALEResourceAssignmentV4Discard = LayerID{
 	Data1: 0x0b5812a2,
 	Data2: 0xc3ff,
 	Data3: 0x4eca,
 	Data4: [8]byte{0xb8, 0x8d, 0xc7, 0x9e, 0x20, 0xac, 0x63, 0x22},
 }
 
-var guidLayerALEResourceAssignmentV6 = windows.GUID{
+var LayerALEResourceAssignmentV6 = LayerID{
 	Data1: 0x55a650e1,
 	Data2: 0x5f0a,
 	Data3: 0x4eca,
 	Data4: [8]byte{0xa6, 0x53, 0x88, 0xf5, 0x3b, 0x26, 0xaa, 0x8c},
 }
 
-var guidLayerALEResourceAssignmentV6Discard = windows.GUID{
+var LayerALEResourceAssignmentV6Discard = LayerID{
 	Data1: 0xcbc998bb,
 	Data2: 0xc51f,
 	Data3: 0x4c1a,
 	Data4: [8]byte{0xbb, 0x4f, 0x97, 0x75, 0xfc, 0xac, 0xab, 0x2f},
 }
 
-var guidLayerALEAuthListenV4 = windows.GUID{
+var LayerALEAuthListenV4 = LayerID{
 	Data1: 0x88bb5dad,
 	Data2: 0x76d7,
 	Data3: 0x4227,
 	Data4: [8]byte{0x9c, 0x71, 0xdf, 0x0a, 0x3e, 0xd7, 0xbe, 0x7e},
 }
 
-var guidLayerALEAuthListenV4Discard = windows.GUID{
+var LayerALEAuthListenV4Discard = LayerID{
 	Data1: 0x371dfada,
 	Data2: 0x9f26,
 	Data3: 0x45fd,
 	Data4: [8]byte{0xb4, 0xeb, 0xc2, 0x9e, 0xb2, 0x12, 0x89, 0x3f},
 }
 
-var guidLayerALEAuthListenV6 = windows.GUID{
+var LayerALEAuthListenV6 = LayerID{
 	Data1: 0x7ac9de24,
 	Data2: 0x17dd,
 	Data3: 0x4814,
 	Data4: [8]byte{0xb4, 0xbd, 0xa9, 0xfb, 0xc9, 0x5a, 0x32, 0x1b},
 }
 
-var guidLayerALEAuthListenV6Discard = windows.GUID{
+var LayerALEAuthListenV6Discard = LayerID{
 	Data1: 0x60703b07,
 	Data2: 0x63c8,
 	Data3: 0x48e9,
 	Data4: [8]byte{0xad, 0xa3, 0x12, 0xb1, 0xaf, 0x40, 0xa6, 0x17},
 }
 
-var guidLayerALEAuthRecvAcceptV4 = windows.GUID{
+var LayerALEAuthRecvAcceptV4 = LayerID{
 	Data1: 0xe1cd9fe7,
 	Data2: 0xf4b5,
 	Data3: 0x4273,
 	Data4: [8]byte{0x96, 0xc0, 0x59, 0x2e, 0x48, 0x7b, 0x86, 0x50},
 }
 
-var guidLayerALEAuthRecvAcceptV4Discard = windows.GUID{
+var LayerALEAuthRecvAcceptV4Discard = LayerID{
 	Data1: 0x9eeaa99b,
 	Data2: 0xbd22,
 	Data3: 0x4227,
 	Data4: [8]byte{0x91, 0x9f, 0x00, 0x73, 0xc6, 0x33, 0x57, 0xb1},
 }
 
-var guidLayerALEAuthRecvAcceptV6 = windows.GUID{
+var LayerALEAuthRecvAcceptV6 = LayerID{
 	Data1: 0xa3b42c97,
 	Data2: 0x9f04,
 	Data3: 0x4672,
 	Data4: [8]byte{0xb8, 0x7e, 0xce, 0xe9, 0xc4, 0x83, 0x25, 0x7f},
 }
 
-var guidLayerALEAuthRecvAcceptV6Discard = windows.GUID{
+var LayerALEAuthRecvAcceptV6Discard = LayerID{
 	Data1: 0x89455b97,
 	Data2: 0xdbe1,
 	Data3: 0x453f,
 	Data4: [8]byte{0xa2, 0x24, 0x13, 0xda, 0x89, 0x5a, 0xf3, 0x96},
 }
 
-var guidLayerALEAuthConnectV4 = windows.GUID{
+var LayerALEAuthConnectV4 = LayerID{
 	Data1: 0xc38d57d1,
 	Data2: 0x05a7,
 	Data3: 0x4c33,
 	Data4: [8]byte{0x90, 0x4f, 0x7f, 0xbc, 0xee, 0xe6, 0x0e, 0x82},
 }
 
-var guidLayerALEAuthConnectV4Discard = windows.GUID{
+var LayerALEAuthConnectV4Discard = LayerID{
 	Data1: 0xd632a801,
 	Data2: 0xf5ba,
 	Data3: 0x4ad6,
 	Data4: [8]byte{0x96, 0xe3, 0x60, 0x70, 0x17, 0xd9, 0x83, 0x6a},
 }
 
-var guidLayerALEAuthConnectV6 = windows.GUID{
+var LayerALEAuthConnectV6 = LayerID{
 	Data1: 0x4a72393b,
 	Data2: 0x319f,
 	Data3: 0x44bc,
 	Data4: [8]byte{0x84, 0xc3, 0xba, 0x54, 0xdc, 0xb3, 0xb6, 0xb4},
 }
 
-var guidLayerALEAuthConnectV6Discard = windows.GUID{
+var LayerALEAuthConnectV6Discard = LayerID{
 	Data1: 0xc97bc3b8,
 	Data2: 0xc9a3,
 	Data3: 0x4e33,
 	Data4: [8]byte{0x86, 0x95, 0x8e, 0x17, 0xaa, 0xd4, 0xde, 0x09},
 }
 
-var guidLayerALEFlowEstablishedV4 = windows.GUID{
+var LayerALEFlowEstablishedV4 = LayerID{
 	Data1: 0xaf80470a,
 	Data2: 0x5596,
 	Data3: 0x4c13,
 	Data4: [8]byte{0x99, 0x92, 0x53, 0x9e, 0x6f, 0xe5, 0x79, 0x67},
 }
 
-var guidLayerALEFlowEstablishedV4Discard = windows.GUID{
+var LayerALEFlowEstablishedV4Discard = LayerID{
 	Data1: 0x146ae4a9,
 	Data2: 0xa1d2,
 	Data3: 0x4d43,
 	Data4: [8]byte{0xa3, 0x1a, 0x4c, 0x42, 0x68, 0x2b, 0x8e, 0x4f},
 }
 
-var guidLayerALEFlowEstablishedV6 = windows.GUID{
+var LayerALEFlowEstablishedV6 = LayerID{
 	Data1: 0x7021d2b3,
 	Data2: 0xdfa4,
 	Data3: 0x406e,
 	Data4: [8]byte{0xaf, 0xeb, 0x6a, 0xfa, 0xf7, 0xe7, 0x0e, 0xfd},
 }
 
-var guidLayerALEFlowEstablishedV6Discard = windows.GUID{
+var LayerALEFlowEstablishedV6Discard = LayerID{
 	Data1: 0x46928636,
 	Data2: 0xbbca,
 	Data3: 0x4b76,
 	Data4: [8]byte{0x94, 0x1d, 0x0f, 0xa7, 0xf5, 0xd7, 0xd3, 0x72},
 }
 
-var guidLayerInboundMACFrameEthernet = windows.GUID{
+var LayerInboundMACFrameEthernet = LayerID{
 	Data1: 0xeffb7edb,
 	Data2: 0x0055,
 	Data3: 0x4f9a,
 	Data4: [8]byte{0xa2, 0x31, 0x4f, 0xf8, 0x13, 0x1a, 0xd1, 0x91},
 }
 
-var guidLayerOutboundMACFrameEthernet = windows.GUID{
+var LayerOutboundMACFrameEthernet = LayerID{
 	Data1: 0x694673bc,
 	Data2: 0xd6db,
 	Data3: 0x4870,
 	Data4: [8]byte{0xad, 0xee, 0x0a, 0xcd, 0xbd, 0xb7, 0xf4, 0xb2},
 }
 
-var guidLayerInboundMACFrameNative = windows.GUID{
+var LayerInboundMACFrameNative = LayerID{
 	Data1: 0xd4220bd3,
 	Data2: 0x62ce,
 	Data3: 0x4f08,
 	Data4: [8]byte{0xae, 0x88, 0xb5, 0x6e, 0x85, 0x26, 0xdf, 0x50},
 }
 
-var guidLayerOutboundMACFrameNative = windows.GUID{
+var LayerOutboundMACFrameNative = LayerID{
 	Data1: 0x94c44912,
 	Data2: 0x9d6f,
 	Data3: 0x4ebf,
 	Data4: [8]byte{0xb9, 0x95, 0x05, 0xab, 0x8a, 0x08, 0x8d, 0x1b},
 }
 
-var guidLayerIngressVswitchEthernet = windows.GUID{
+var LayerIngressVswitchEthernet = LayerID{
 	Data1: 0x7d98577a,
 	Data2: 0x9a87,
 	Data3: 0x41ec,
 	Data4: [8]byte{0x97, 0x18, 0x7c, 0xf5, 0x89, 0xc9, 0xf3, 0x2d},
 }
 
-var guidLayerEgressVswitchEthernet = windows.GUID{
+var LayerEgressVswitchEthernet = LayerID{
 	Data1: 0x86c872b0,
 	Data2: 0x76fa,
 	Data3: 0x4b79,
 	Data4: [8]byte{0x93, 0xa4, 0x07, 0x50, 0x53, 0x0a, 0xe2, 0x92},
 }
 
-var guidLayerIngressVswitchTransportV4 = windows.GUID{
+var LayerIngressVswitchTransportV4 = LayerID{
 	Data1: 0xb2696ff6,
 	Data2: 0x774f,
 	Data3: 0x4554,
 	Data4: [8]byte{0x9f, 0x7d, 0x3d, 0xa3, 0x94, 0x5f, 0x8e, 0x85},
 }
 
-var guidLayerIngressVswitchTransportV6 = windows.GUID{
+var LayerIngressVswitchTransportV6 = LayerID{
 	Data1: 0x5ee314fc,
 	Data2: 0x7d8a,
 	Data3: 0x47f4,
 	Data4: [8]byte{0xb7, 0xe3, 0x29, 0x1a, 0x36, 0xda, 0x4e, 0x12},
 }
 
-var guidLayerEgressVswitchTransportV4 = windows.GUID{
+var LayerEgressVswitchTransportV4 = LayerID{
 	Data1: 0xb92350b6,
 	Data2: 0x91f0,
 	Data3: 0x46b6,
 	Data4: [8]byte{0xbd, 0xc4, 0x87, 0x1d, 0xfd, 0x4a, 0x7c, 0x98},
 }
 
-var guidLayerEgressVswitchTransportV6 = windows.GUID{
+var LayerEgressVswitchTransportV6 = LayerID{
 	Data1: 0x1b2def23,
 	Data2: 0x1881,
 	Data3: 0x40bd,
 	Data4: [8]byte{0x82, 0xf4, 0x42, 0x54, 0xe6, 0x31, 0x41, 0xcb},
 }
 
-var guidLayerInboundTransportFast = windows.GUID{
+var LayerInboundTransportFast = LayerID{
 	Data1: 0xe41d2719,
 	Data2: 0x05c7,
 	Data3: 0x40f0,
 	Data4: [8]byte{0x89, 0x83, 0xea, 0x8d, 0x17, 0xbb, 0xc2, 0xf6},
 }
 
-var guidLayerOutboundTransportFast = windows.GUID{
+var LayerOutboundTransportFast = LayerID{
 	Data1: 0x13ed4388,
 	Data2: 0xa070,
 	Data3: 0x4815,
 	Data4: [8]byte{0x99, 0x35, 0x7a, 0x9b, 0xe6, 0x40, 0x8b, 0x78},
 }
 
-var guidLayerInboundMACFrameNativeFast = windows.GUID{
+var LayerInboundMACFrameNativeFast = LayerID{
 	Data1: 0x853aaa8e,
 	Data2: 0x2b78,
 	Data3: 0x4d24,
 	Data4: [8]byte{0xa8, 0x04, 0x36, 0xdb, 0x08, 0xb2, 0x97, 0x11},
 }
 
-var guidLayerOutboundMACFrameNativeFast = windows.GUID{
+var LayerOutboundMACFrameNativeFast = LayerID{
 	Data1: 0x470df946,
 	Data2: 0xc962,
 	Data3: 0x486f,
 	Data4: [8]byte{0x94, 0x46, 0x82, 0x93, 0xcb, 0xc7, 0x5e, 0xb8},
 }
 
-var guidLayerIPSecKMDemuxV4 = windows.GUID{
+var LayerIPSecKMDemuxV4 = LayerID{
 	Data1: 0xf02b1526,
 	Data2: 0xa459,
 	Data3: 0x4a51,
 	Data4: [8]byte{0xb9, 0xe3, 0x75, 0x9d, 0xe5, 0x2b, 0x9d, 0x2c},
 }
 
-var guidLayerIPSecKMDemuxV6 = windows.GUID{
+var LayerIPSecKMDemuxV6 = LayerID{
 	Data1: 0x2f755cf6,
 	Data2: 0x2fd4,
 	Data3: 0x4e88,
 	Data4: [8]byte{0xb3, 0xe4, 0xa9, 0x1b, 0xca, 0x49, 0x52, 0x35},
 }
 
-var guidLayerIPSecV4 = windows.GUID{
+var LayerIPSecV4 = LayerID{
 	Data1: 0xeda65c74,
 	Data2: 0x610d,
 	Data3: 0x4bc5,
 	Data4: [8]byte{0x94, 0x8f, 0x3c, 0x4f, 0x89, 0x55, 0x68, 0x67},
 }
 
-var guidLayerIPSecV6 = windows.GUID{
+var LayerIPSecV6 = LayerID{
 	Data1: 0x13c48442,
 	Data2: 0x8d87,
 	Data3: 0x4261,
 	Data4: [8]byte{0x9a, 0x29, 0x59, 0xd2, 0xab, 0xc3, 0x48, 0xb4},
 }
 
-var guidLayerIKEExtV4 = windows.GUID{
+var LayerIKEExtV4 = LayerID{
 	Data1: 0xb14b7bdb,
 	Data2: 0xdbbd,
 	Data3: 0x473e,
 	Data4: [8]byte{0xbe, 0xd4, 0x8b, 0x47, 0x08, 0xd4, 0xf2, 0x70},
 }
 
-var guidLayerIKEExtV6 = windows.GUID{
+var LayerIKEExtV6 = LayerID{
 	Data1: 0xb64786b3,
 	Data2: 0xf687,
 	Data3: 0x4eb9,
 	Data4: [8]byte{0x89, 0xd2, 0x8e, 0xf3, 0x2a, 0xcd, 0xab, 0xe2},
 }
 
-var guidLayerRPCUM = windows.GUID{
+var LayerRPCUM = LayerID{
 	Data1: 0x75a89dda,
 	Data2: 0x95e4,
 	Data3: 0x40f3,
 	Data4: [8]byte{0xad, 0xc7, 0x76, 0x88, 0xa9, 0xc8, 0x47, 0xe1},
 }
 
-var guidLayerRPCEPMap = windows.GUID{
+var LayerRPCEPMap = LayerID{
 	Data1: 0x9247bc61,
 	Data2: 0xeb07,
 	Data3: 0x47ee,
 	Data4: [8]byte{0x87, 0x2c, 0xbf, 0xd7, 0x8b, 0xfd, 0x16, 0x16},
 }
 
-var guidLayerRPCEPAdd = windows.GUID{
+var LayerRPCEPAdd = LayerID{
 	Data1: 0x618dffc7,
 	Data2: 0xc450,
 	Data3: 0x4943,
 	Data4: [8]byte{0x95, 0xdb, 0x99, 0xb4, 0xc1, 0x6a, 0x55, 0xd4},
 }
 
-var guidLayerRPCProxyConn = windows.GUID{
+var LayerRPCProxyConn = LayerID{
 	Data1: 0x94a4b50b,
 	Data2: 0xba5c,
 	Data3: 0x4f27,
 	Data4: [8]byte{0x90, 0x7a, 0x22, 0x9f, 0xac, 0x0c, 0x2a, 0x7a},
 }
 
-var guidLayerRPCProxyIf = windows.GUID{
+var LayerRPCProxyIf = LayerID{
 	Data1: 0xf8a38615,
 	Data2: 0xe12c,
 	Data3: 0x41ac,
 	Data4: [8]byte{0x98, 0xdf, 0x12, 0x1a, 0xd9, 0x81, 0xaa, 0xde},
 }
 
-var guidLayerKMAuthorization = windows.GUID{
+var LayerKMAuthorization = LayerID{
 	Data1: 0x4aa226e9,
 	Data2: 0x9020,
 	Data3: 0x45fb,
 	Data4: [8]byte{0x95, 0x6a, 0xc0, 0x24, 0x9d, 0x84, 0x11, 0x95},
 }
 
-var guidLayerNameResolutionCacheV4 = windows.GUID{
+var LayerNameResolutionCacheV4 = LayerID{
 	Data1: 0x0c2aa681,
 	Data2: 0x905b,
 	Data3: 0x4ccd,
 	Data4: [8]byte{0xa4, 0x67, 0x4d, 0xd8, 0x11, 0xd0, 0x7b, 0x7b},
 }
 
-var guidLayerNameResolutionCacheV6 = windows.GUID{
+var LayerNameResolutionCacheV6 = LayerID{
 	Data1: 0x92d592fa,
 	Data2: 0x6b01,
 	Data3: 0x434a,
 	Data4: [8]byte{0x9d, 0xea, 0xd1, 0xe9, 0x6e, 0xa9, 0x7d, 0xa9},
 }
 
-var guidLayerALEResourceReleaseV4 = windows.GUID{
+var LayerALEResourceReleaseV4 = LayerID{
 	Data1: 0x74365cce,
 	Data2: 0xccb0,
 	Data3: 0x401a,
 	Data4: [8]byte{0xbf, 0xc1, 0xb8, 0x99, 0x34, 0xad, 0x7e, 0x15},
 }
 
-var guidLayerALEResourceReleaseV6 = windows.GUID{
+var LayerALEResourceReleaseV6 = LayerID{
 	Data1: 0xf4e5ce80,
 	Data2: 0xedcc,
 	Data3: 0x4e13,
 	Data4: [8]byte{0x8a, 0x2f, 0xb9, 0x14, 0x54, 0xbb, 0x05, 0x7b},
 }
 
-var guidLayerALEEndpointClosureV4 = windows.GUID{
+var LayerALEEndpointClosureV4 = LayerID{
 	Data1: 0xb4766427,
 	Data2: 0xe2a2,
 	Data3: 0x467a,
 	Data4: [8]byte{0xbd, 0x7e, 0xdb, 0xcd, 0x1b, 0xd8, 0x5a, 0x09},
 }
 
-var guidLayerALEEndpointClosureV6 = windows.GUID{
+var LayerALEEndpointClosureV6 = LayerID{
 	Data1: 0xbb536ccd,
 	Data2: 0x4755,
 	Data3: 0x4ba9,
 	Data4: [8]byte{0x9f, 0xf7, 0xf9, 0xed, 0xf8, 0x69, 0x9c, 0x7b},
 }
 
-var guidLayerALEConnectRedirectV4 = windows.GUID{
+var LayerALEConnectRedirectV4 = LayerID{
 	Data1: 0xc6e63c8c,
 	Data2: 0xb784,
 	Data3: 0x4562,
 	Data4: [8]byte{0xaa, 0x7d, 0x0a, 0x67, 0xcf, 0xca, 0xf9, 0xa3},
 }
 
-var guidLayerALEConnectRedirectV6 = windows.GUID{
+var LayerALEConnectRedirectV6 = LayerID{
 	Data1: 0x587e54a7,
 	Data2: 0x8046,
 	Data3: 0x42ba,
 	Data4: [8]byte{0xa0, 0xaa, 0xb7, 0x16, 0x25, 0x0f, 0xc7, 0xfd},
 }
 
-var guidLayerALEBindRedirectV4 = windows.GUID{
+var LayerALEBindRedirectV4 = LayerID{
 	Data1: 0x66978cad,
 	Data2: 0xc704,
 	Data3: 0x42ac,
 	Data4: [8]byte{0x86, 0xac, 0x7c, 0x1a, 0x23, 0x1b, 0xd2, 0x53},
 }
 
-var guidLayerALEBindRedirectV6 = windows.GUID{
+var LayerALEBindRedirectV6 = LayerID{
 	Data1: 0xbef02c9c,
 	Data2: 0x606b,
 	Data3: 0x4536,
 	Data4: [8]byte{0x8c, 0x26, 0x1c, 0x2f, 0xc7, 0xb6, 0x31, 0xd4},
 }
 
-var guidLayerStreamPacketV4 = windows.GUID{
+var LayerStreamPacketV4 = LayerID{
 	Data1: 0xaf52d8ec,
 	Data2: 0xcb2d,
 	Data3: 0x44e5,
 	Data4: [8]byte{0xad, 0x92, 0xf8, 0xdc, 0x38, 0xd2, 0xeb, 0x29},
 }
 
-var guidLayerStreamPacketV6 = windows.GUID{
+var LayerStreamPacketV6 = LayerID{
 	Data1: 0x779a8ca3,
 	Data2: 0xf099,
 	Data3: 0x468f,
 	Data4: [8]byte{0xb5, 0xd4, 0x83, 0x53, 0x5c, 0x46, 0x1c, 0x02},
 }
 
-var guidLayerInboundReserved2 = windows.GUID{
+var LayerInboundReserved2 = LayerID{
 	Data1: 0xf4fb8d55,
 	Data2: 0xc076,
 	Data3: 0x46d8,
@@ -2117,306 +2117,306 @@ var guidKeyingModuleIKEv2 = windows.GUID{
 }
 
 var guidNames = map[windows.GUID]string{
-	guidLayerInboundIPPacketV4:                       "FWPM_LAYER_INBOUND_IPPACKET_V4",
-	guidLayerInboundIPPacketV4Discard:                "FWPM_LAYER_INBOUND_IPPACKET_V4_DISCARD",
-	guidLayerInboundIPPacketV6:                       "FWPM_LAYER_INBOUND_IPPACKET_V6",
-	guidLayerInboundIPPacketV6Discard:                "FWPM_LAYER_INBOUND_IPPACKET_V6_DISCARD",
-	guidLayerOutboundIPPacketV4:                      "FWPM_LAYER_OUTBOUND_IPPACKET_V4",
-	guidLayerOutboundIPPacketV4Discard:               "FWPM_LAYER_OUTBOUND_IPPACKET_V4_DISCARD",
-	guidLayerOutboundIPPacketV6:                      "FWPM_LAYER_OUTBOUND_IPPACKET_V6",
-	guidLayerOutboundIPPacketV6Discard:               "FWPM_LAYER_OUTBOUND_IPPACKET_V6_DISCARD",
-	guidLayerIPForwardV4:                             "FWPM_LAYER_IPFORWARD_V4",
-	guidLayerIPForwardV4Discard:                      "FWPM_LAYER_IPFORWARD_V4_DISCARD",
-	guidLayerIPForwardV6:                             "FWPM_LAYER_IPFORWARD_V6",
-	guidLayerIPForwardV6Discard:                      "FWPM_LAYER_IPFORWARD_V6_DISCARD",
-	guidLayerInboundTransportV4:                      "FWPM_LAYER_INBOUND_TRANSPORT_V4",
-	guidLayerInboundTransportV4Discard:               "FWPM_LAYER_INBOUND_TRANSPORT_V4_DISCARD",
-	guidLayerInboundTransportV6:                      "FWPM_LAYER_INBOUND_TRANSPORT_V6",
-	guidLayerInboundTransportV6Discard:               "FWPM_LAYER_INBOUND_TRANSPORT_V6_DISCARD",
-	guidLayerOutboundTransportV4:                     "FWPM_LAYER_OUTBOUND_TRANSPORT_V4",
-	guidLayerOutboundTransportV4Discard:              "FWPM_LAYER_OUTBOUND_TRANSPORT_V4_DISCARD",
-	guidLayerOutboundTransportV6:                     "FWPM_LAYER_OUTBOUND_TRANSPORT_V6",
-	guidLayerOutboundTransportV6Discard:              "FWPM_LAYER_OUTBOUND_TRANSPORT_V6_DISCARD",
-	guidLayerStreamV4:                                "FWPM_LAYER_STREAM_V4",
-	guidLayerStreamV4Discard:                         "FWPM_LAYER_STREAM_V4_DISCARD",
-	guidLayerStreamV6:                                "FWPM_LAYER_STREAM_V6",
-	guidLayerStreamV6Discard:                         "FWPM_LAYER_STREAM_V6_DISCARD",
-	guidLayerDatagramDataV4:                          "FWPM_LAYER_DATAGRAM_DATA_V4",
-	guidLayerDatagramDataV4Discard:                   "FWPM_LAYER_DATAGRAM_DATA_V4_DISCARD",
-	guidLayerDatagramDataV6:                          "FWPM_LAYER_DATAGRAM_DATA_V6",
-	guidLayerDatagramDataV6Discard:                   "FWPM_LAYER_DATAGRAM_DATA_V6_DISCARD",
-	guidLayerInboundICMPErrorV4:                      "FWPM_LAYER_INBOUND_ICMP_ERROR_V4",
-	guidLayerInboundICMPErrorV4Discard:               "FWPM_LAYER_INBOUND_ICMP_ERROR_V4_DISCARD",
-	guidLayerInboundICMPErrorV6:                      "FWPM_LAYER_INBOUND_ICMP_ERROR_V6",
-	guidLayerInboundICMPErrorV6Discard:               "FWPM_LAYER_INBOUND_ICMP_ERROR_V6_DISCARD",
-	guidLayerOutboundICMPErrorV4:                     "FWPM_LAYER_OUTBOUND_ICMP_ERROR_V4",
-	guidLayerOutboundICMPErrorV4Discard:              "FWPM_LAYER_OUTBOUND_ICMP_ERROR_V4_DISCARD",
-	guidLayerOutboundICMPErrorV6:                     "FWPM_LAYER_OUTBOUND_ICMP_ERROR_V6",
-	guidLayerOutboundICMPErrorV6Discard:              "FWPM_LAYER_OUTBOUND_ICMP_ERROR_V6_DISCARD",
-	guidLayerALEResourceAssignmentV4:                 "FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V4",
-	guidLayerALEResourceAssignmentV4Discard:          "FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V4_DISCARD",
-	guidLayerALEResourceAssignmentV6:                 "FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V6",
-	guidLayerALEResourceAssignmentV6Discard:          "FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V6_DISCARD",
-	guidLayerALEAuthListenV4:                         "FWPM_LAYER_ALE_AUTH_LISTEN_V4",
-	guidLayerALEAuthListenV4Discard:                  "FWPM_LAYER_ALE_AUTH_LISTEN_V4_DISCARD",
-	guidLayerALEAuthListenV6:                         "FWPM_LAYER_ALE_AUTH_LISTEN_V6",
-	guidLayerALEAuthListenV6Discard:                  "FWPM_LAYER_ALE_AUTH_LISTEN_V6_DISCARD",
-	guidLayerALEAuthRecvAcceptV4:                     "FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4",
-	guidLayerALEAuthRecvAcceptV4Discard:              "FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4_DISCARD",
-	guidLayerALEAuthRecvAcceptV6:                     "FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6",
-	guidLayerALEAuthRecvAcceptV6Discard:              "FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6_DISCARD",
-	guidLayerALEAuthConnectV4:                        "FWPM_LAYER_ALE_AUTH_CONNECT_V4",
-	guidLayerALEAuthConnectV4Discard:                 "FWPM_LAYER_ALE_AUTH_CONNECT_V4_DISCARD",
-	guidLayerALEAuthConnectV6:                        "FWPM_LAYER_ALE_AUTH_CONNECT_V6",
-	guidLayerALEAuthConnectV6Discard:                 "FWPM_LAYER_ALE_AUTH_CONNECT_V6_DISCARD",
-	guidLayerALEFlowEstablishedV4:                    "FWPM_LAYER_ALE_FLOW_ESTABLISHED_V4",
-	guidLayerALEFlowEstablishedV4Discard:             "FWPM_LAYER_ALE_FLOW_ESTABLISHED_V4_DISCARD",
-	guidLayerALEFlowEstablishedV6:                    "FWPM_LAYER_ALE_FLOW_ESTABLISHED_V6",
-	guidLayerALEFlowEstablishedV6Discard:             "FWPM_LAYER_ALE_FLOW_ESTABLISHED_V6_DISCARD",
-	guidLayerInboundMACFrameEthernet:                 "FWPM_LAYER_INBOUND_MAC_FRAME_ETHERNET",
-	guidLayerOutboundMACFrameEthernet:                "FWPM_LAYER_OUTBOUND_MAC_FRAME_ETHERNET",
-	guidLayerInboundMACFrameNative:                   "FWPM_LAYER_INBOUND_MAC_FRAME_NATIVE",
-	guidLayerOutboundMACFrameNative:                  "FWPM_LAYER_OUTBOUND_MAC_FRAME_NATIVE",
-	guidLayerIngressVswitchEthernet:                  "FWPM_LAYER_INGRESS_VSWITCH_ETHERNET",
-	guidLayerEgressVswitchEthernet:                   "FWPM_LAYER_EGRESS_VSWITCH_ETHERNET",
-	guidLayerIngressVswitchTransportV4:               "FWPM_LAYER_INGRESS_VSWITCH_TRANSPORT_V4",
-	guidLayerIngressVswitchTransportV6:               "FWPM_LAYER_INGRESS_VSWITCH_TRANSPORT_V6",
-	guidLayerEgressVswitchTransportV4:                "FWPM_LAYER_EGRESS_VSWITCH_TRANSPORT_V4",
-	guidLayerEgressVswitchTransportV6:                "FWPM_LAYER_EGRESS_VSWITCH_TRANSPORT_V6",
-	guidLayerInboundTransportFast:                    "FWPM_LAYER_INBOUND_TRANSPORT_FAST",
-	guidLayerOutboundTransportFast:                   "FWPM_LAYER_OUTBOUND_TRANSPORT_FAST",
-	guidLayerInboundMACFrameNativeFast:               "FWPM_LAYER_INBOUND_MAC_FRAME_NATIVE_FAST",
-	guidLayerOutboundMACFrameNativeFast:              "FWPM_LAYER_OUTBOUND_MAC_FRAME_NATIVE_FAST",
-	guidLayerIPSecKMDemuxV4:                          "FWPM_LAYER_IPSEC_KM_DEMUX_V4",
-	guidLayerIPSecKMDemuxV6:                          "FWPM_LAYER_IPSEC_KM_DEMUX_V6",
-	guidLayerIPSecV4:                                 "FWPM_LAYER_IPSEC_V4",
-	guidLayerIPSecV6:                                 "FWPM_LAYER_IPSEC_V6",
-	guidLayerIKEExtV4:                                "FWPM_LAYER_IKEEXT_V4",
-	guidLayerIKEExtV6:                                "FWPM_LAYER_IKEEXT_V6",
-	guidLayerRPCUM:                                   "FWPM_LAYER_RPC_UM",
-	guidLayerRPCEPMap:                                "FWPM_LAYER_RPC_EPMAP",
-	guidLayerRPCEPAdd:                                "FWPM_LAYER_RPC_EP_ADD",
-	guidLayerRPCProxyConn:                            "FWPM_LAYER_RPC_PROXY_CONN",
-	guidLayerRPCProxyIf:                              "FWPM_LAYER_RPC_PROXY_IF",
-	guidLayerKMAuthorization:                         "FWPM_LAYER_KM_AUTHORIZATION",
-	guidLayerNameResolutionCacheV4:                   "FWPM_LAYER_NAME_RESOLUTION_CACHE_V4",
-	guidLayerNameResolutionCacheV6:                   "FWPM_LAYER_NAME_RESOLUTION_CACHE_V6",
-	guidLayerALEResourceReleaseV4:                    "FWPM_LAYER_ALE_RESOURCE_RELEASE_V4",
-	guidLayerALEResourceReleaseV6:                    "FWPM_LAYER_ALE_RESOURCE_RELEASE_V6",
-	guidLayerALEEndpointClosureV4:                    "FWPM_LAYER_ALE_ENDPOINT_CLOSURE_V4",
-	guidLayerALEEndpointClosureV6:                    "FWPM_LAYER_ALE_ENDPOINT_CLOSURE_V6",
-	guidLayerALEConnectRedirectV4:                    "FWPM_LAYER_ALE_CONNECT_REDIRECT_V4",
-	guidLayerALEConnectRedirectV6:                    "FWPM_LAYER_ALE_CONNECT_REDIRECT_V6",
-	guidLayerALEBindRedirectV4:                       "FWPM_LAYER_ALE_BIND_REDIRECT_V4",
-	guidLayerALEBindRedirectV6:                       "FWPM_LAYER_ALE_BIND_REDIRECT_V6",
-	guidLayerStreamPacketV4:                          "FWPM_LAYER_STREAM_PACKET_V4",
-	guidLayerStreamPacketV6:                          "FWPM_LAYER_STREAM_PACKET_V6",
-	guidLayerInboundReserved2:                        "FWPM_LAYER_INBOUND_RESERVED2",
-	guidSublayerRPCAudit:                             "FWPM_SUBLAYER_RPC_AUDIT",
-	guidSublayerIPSecTunnel:                          "FWPM_SUBLAYER_IPSEC_TUNNEL",
-	guidSublayerUniversal:                            "FWPM_SUBLAYER_UNIVERSAL",
-	guidSublayerLIPS:                                 "FWPM_SUBLAYER_LIPS",
-	guidSublayerSecureSocket:                         "FWPM_SUBLAYER_SECURE_SOCKET",
-	guidSublayerTCPChimneyOffload:                    "FWPM_SUBLAYER_TCP_CHIMNEY_OFFLOAD",
-	guidSublayerInspection:                           "FWPM_SUBLAYER_INSPECTION",
-	guidSublayerTeredo:                               "FWPM_SUBLAYER_TEREDO",
-	guidSublayerIPSecForwardOutboundTunnel:           "FWPM_SUBLAYER_IPSEC_FORWARD_OUTBOUND_TUNNEL",
-	guidSublayerIPSecDosp:                            "FWPM_SUBLAYER_IPSEC_DOSP",
-	guidSublayerTCPTemplates:                         "FWPM_SUBLAYER_TCP_TEMPLATES",
-	guidSublayerIPSecSecurityRealm:                   "FWPM_SUBLAYER_IPSEC_SECURITY_REALM",
-	guidConditionInterfaceMACAddress:                 "FWPM_CONDITION_INTERFACE_MAC_ADDRESS",
-	guidConditionMACLocalAddress:                     "FWPM_CONDITION_MAC_LOCAL_ADDRESS",
-	guidConditionMACRemoteAddress:                    "FWPM_CONDITION_MAC_REMOTE_ADDRESS",
-	guidConditionEtherType:                           "FWPM_CONDITION_ETHER_TYPE",
-	guidConditionVLANID:                              "FWPM_CONDITION_VLAN_ID",
-	guidConditionVswitchTenantNetworkID:              "FWPM_CONDITION_VSWITCH_TENANT_NETWORK_ID",
-	guidConditionNdisPort:                            "FWPM_CONDITION_NDIS_PORT",
-	guidConditionNdisMediaType:                       "FWPM_CONDITION_NDIS_MEDIA_TYPE",
-	guidConditionNdisPhysicalMediaType:               "FWPM_CONDITION_NDIS_PHYSICAL_MEDIA_TYPE",
-	guidConditionL2Flags:                             "FWPM_CONDITION_L2_FLAGS",
-	guidConditionMACLocalAddressType:                 "FWPM_CONDITION_MAC_LOCAL_ADDRESS_TYPE",
-	guidConditionMACRemoteAddressType:                "FWPM_CONDITION_MAC_REMOTE_ADDRESS_TYPE",
-	guidConditionALEPackageID:                        "FWPM_CONDITION_ALE_PACKAGE_ID",
-	guidConditionMACSourceAddress:                    "FWPM_CONDITION_MAC_SOURCE_ADDRESS",
-	guidConditionMACDestinationAddress:               "FWPM_CONDITION_MAC_DESTINATION_ADDRESS",
-	guidConditionMACSourceAddressType:                "FWPM_CONDITION_MAC_SOURCE_ADDRESS_TYPE",
-	guidConditionMACDestinationAddressType:           "FWPM_CONDITION_MAC_DESTINATION_ADDRESS_TYPE",
-	guidConditionIPSourcePort:                        "FWPM_CONDITION_IP_SOURCE_PORT",
-	guidConditionIPDestinationPort:                   "FWPM_CONDITION_IP_DESTINATION_PORT",
-	guidConditionVswitchID:                           "FWPM_CONDITION_VSWITCH_ID",
-	guidConditionVswitchNetworkType:                  "FWPM_CONDITION_VSWITCH_NETWORK_TYPE",
-	guidConditionVswitchSourceInterfaceID:            "FWPM_CONDITION_VSWITCH_SOURCE_INTERFACE_ID",
-	guidConditionVswitchDestinationInterfaceID:       "FWPM_CONDITION_VSWITCH_DESTINATION_INTERFACE_ID",
-	guidConditionVswitchSourceVmID:                   "FWPM_CONDITION_VSWITCH_SOURCE_VM_ID",
-	guidConditionVswitchDestinationVmID:              "FWPM_CONDITION_VSWITCH_DESTINATION_VM_ID",
-	guidConditionVswitchSourceInterfaceType:          "FWPM_CONDITION_VSWITCH_SOURCE_INTERFACE_TYPE",
-	guidConditionVswitchDestinationInterfaceType:     "FWPM_CONDITION_VSWITCH_DESTINATION_INTERFACE_TYPE",
-	guidConditionALESecurityAttributeFqbnValue:       "FWPM_CONDITION_ALE_SECURITY_ATTRIBUTE_FQBN_VALUE",
-	guidConditionIPSecSecurityRealmID:                "FWPM_CONDITION_IPSEC_SECURITY_REALM_ID",
-	guidConditionALEEffectiveName:                    "FWPM_CONDITION_ALE_EFFECTIVE_NAME",
-	guidConditionIPLocalAddress:                      "FWPM_CONDITION_IP_LOCAL_ADDRESS",
-	guidConditionIPRemoteAddress:                     "FWPM_CONDITION_IP_REMOTE_ADDRESS",
-	guidConditionIPSourceAddress:                     "FWPM_CONDITION_IP_SOURCE_ADDRESS",
-	guidConditionIPDestinationAddress:                "FWPM_CONDITION_IP_DESTINATION_ADDRESS",
-	guidConditionIPLocalAddressType:                  "FWPM_CONDITION_IP_LOCAL_ADDRESS_TYPE",
-	guidConditionIPDestinationAddressType:            "FWPM_CONDITION_IP_DESTINATION_ADDRESS_TYPE",
-	guidConditionBitmapIPLocalAddress:                "FWPM_CONDITION_BITMAP_IP_LOCAL_ADDRESS",
-	guidConditionBitmapIPLocalPort:                   "FWPM_CONDITION_BITMAP_IP_LOCAL_PORT",
-	guidConditionBitmapIPRemoteAddress:               "FWPM_CONDITION_BITMAP_IP_REMOTE_ADDRESS",
-	guidConditionBitmapIPRemotePort:                  "FWPM_CONDITION_BITMAP_IP_REMOTE_PORT",
-	guidConditionIPNexthopAddress:                    "FWPM_CONDITION_IP_NEXTHOP_ADDRESS",
-	guidConditionBitmapIndexKey:                      "FWPM_CONDITION_BITMAP_INDEX_KEY",
-	guidConditionIPLocalInterface:                    "FWPM_CONDITION_IP_LOCAL_INTERFACE",
-	guidConditionIPArrivalInterface:                  "FWPM_CONDITION_IP_ARRIVAL_INTERFACE",
-	guidConditionArrivalInterfaceType:                "FWPM_CONDITION_ARRIVAL_INTERFACE_TYPE",
-	guidConditionArrivalTunnelType:                   "FWPM_CONDITION_ARRIVAL_TUNNEL_TYPE",
-	guidConditionArrivalInterfaceIndex:               "FWPM_CONDITION_ARRIVAL_INTERFACE_INDEX",
-	guidConditionNexthopSubInterfaceIndex:            "FWPM_CONDITION_NEXTHOP_SUB_INTERFACE_INDEX",
-	guidConditionIPNexthopInterface:                  "FWPM_CONDITION_IP_NEXTHOP_INTERFACE",
-	guidConditionNexthopInterfaceType:                "FWPM_CONDITION_NEXTHOP_INTERFACE_TYPE",
-	guidConditionNexthopTunnelType:                   "FWPM_CONDITION_NEXTHOP_TUNNEL_TYPE",
-	guidConditionNexthopInterfaceIndex:               "FWPM_CONDITION_NEXTHOP_INTERFACE_INDEX",
-	guidConditionOriginalProfileID:                   "FWPM_CONDITION_ORIGINAL_PROFILE_ID",
-	guidConditionCurrentProfileID:                    "FWPM_CONDITION_CURRENT_PROFILE_ID",
-	guidConditionLocalInterfaceProfileID:             "FWPM_CONDITION_LOCAL_INTERFACE_PROFILE_ID",
-	guidConditionArrivalInterfaceProfileID:           "FWPM_CONDITION_ARRIVAL_INTERFACE_PROFILE_ID",
-	guidConditionNexthopInterfaceProfileID:           "FWPM_CONDITION_NEXTHOP_INTERFACE_PROFILE_ID",
-	guidConditionReauthorizeReason:                   "FWPM_CONDITION_REAUTHORIZE_REASON",
-	guidConditionOriginalICMPType:                    "FWPM_CONDITION_ORIGINAL_ICMP_TYPE",
-	guidConditionIPPhysicalArrivalInterface:          "FWPM_CONDITION_IP_PHYSICAL_ARRIVAL_INTERFACE",
-	guidConditionIPPhysicalNexthopInterface:          "FWPM_CONDITION_IP_PHYSICAL_NEXTHOP_INTERFACE",
-	guidConditionInterfaceQuarantineEpoch:            "FWPM_CONDITION_INTERFACE_QUARANTINE_EPOCH",
-	guidConditionInterfaceType:                       "FWPM_CONDITION_INTERFACE_TYPE",
-	guidConditionTunnelType:                          "FWPM_CONDITION_TUNNEL_TYPE",
-	guidConditionIPForwardInterface:                  "FWPM_CONDITION_IP_FORWARD_INTERFACE",
-	guidConditionIPProtocol:                          "FWPM_CONDITION_IP_PROTOCOL",
-	guidConditionIPLocalPort:                         "FWPM_CONDITION_IP_LOCAL_PORT",
-	guidConditionIPRemotePort:                        "FWPM_CONDITION_IP_REMOTE_PORT",
-	guidConditionEmbeddedLocalAddressType:            "FWPM_CONDITION_EMBEDDED_LOCAL_ADDRESS_TYPE",
-	guidConditionEmbeddedRemoteAddress:               "FWPM_CONDITION_EMBEDDED_REMOTE_ADDRESS",
-	guidConditionEmbeddedProtocol:                    "FWPM_CONDITION_EMBEDDED_PROTOCOL",
-	guidConditionEmbeddedLocalPort:                   "FWPM_CONDITION_EMBEDDED_LOCAL_PORT",
-	guidConditionEmbeddedRemotePort:                  "FWPM_CONDITION_EMBEDDED_REMOTE_PORT",
-	guidConditionFlags:                               "FWPM_CONDITION_FLAGS",
-	guidConditionDirection:                           "FWPM_CONDITION_DIRECTION",
-	guidConditionInterfaceIndex:                      "FWPM_CONDITION_INTERFACE_INDEX",
-	guidConditionSubInterfaceIndex:                   "FWPM_CONDITION_SUB_INTERFACE_INDEX",
-	guidConditionSourceInterfaceIndex:                "FWPM_CONDITION_SOURCE_INTERFACE_INDEX",
-	guidConditionSourceSubInterfaceIndex:             "FWPM_CONDITION_SOURCE_SUB_INTERFACE_INDEX",
-	guidConditionDestinationInterfaceIndex:           "FWPM_CONDITION_DESTINATION_INTERFACE_INDEX",
-	guidConditionDestinationSubInterfaceIndex:        "FWPM_CONDITION_DESTINATION_SUB_INTERFACE_INDEX",
-	guidConditionALEAppID:                            "FWPM_CONDITION_ALE_APP_ID",
-	guidConditionALEOriginalAppID:                    "FWPM_CONDITION_ALE_ORIGINAL_APP_ID",
-	guidConditionALEUserID:                           "FWPM_CONDITION_ALE_USER_ID",
-	guidConditionALERemoteUserID:                     "FWPM_CONDITION_ALE_REMOTE_USER_ID",
-	guidConditionALERemoteMachineID:                  "FWPM_CONDITION_ALE_REMOTE_MACHINE_ID",
-	guidConditionALEPromiscuousMode:                  "FWPM_CONDITION_ALE_PROMISCUOUS_MODE",
-	guidConditionALESioFirewallSystemPort:            "FWPM_CONDITION_ALE_SIO_FIREWALL_SYSTEM_PORT",
-	guidConditionALEReauthReason:                     "FWPM_CONDITION_ALE_REAUTH_REASON",
-	guidConditionALENapContext:                       "FWPM_CONDITION_ALE_NAP_CONTEXT",
-	guidConditionKMAuthNapContext:                    "FWPM_CONDITION_KM_AUTH_NAP_CONTEXT",
-	guidConditionRemoteUserToken:                     "FWPM_CONDITION_REMOTE_USER_TOKEN",
-	guidConditionRPCIfUUID:                           "FWPM_CONDITION_RPC_IF_UUID",
-	guidConditionRPCIfVersion:                        "FWPM_CONDITION_RPC_IF_VERSION",
-	guidConditionRPCIfFlag:                           "FWPM_CONDITION_RPC_IF_FLAG",
-	guidConditionDCOMAppID:                           "FWPM_CONDITION_DCOM_APP_ID",
-	guidConditionImageName:                           "FWPM_CONDITION_IMAGE_NAME",
-	guidConditionRPCProtocol:                         "FWPM_CONDITION_RPC_PROTOCOL",
-	guidConditionRPCAuthType:                         "FWPM_CONDITION_RPC_AUTH_TYPE",
-	guidConditionRPCAuthLevel:                        "FWPM_CONDITION_RPC_AUTH_LEVEL",
-	guidConditionSecEncryptAlgorithm:                 "FWPM_CONDITION_SEC_ENCRYPT_ALGORITHM",
-	guidConditionSecKeySize:                          "FWPM_CONDITION_SEC_KEY_SIZE",
-	guidConditionIPLocalAddressV4:                    "FWPM_CONDITION_IP_LOCAL_ADDRESS_V4",
-	guidConditionIPLocalAddressV6:                    "FWPM_CONDITION_IP_LOCAL_ADDRESS_V6",
-	guidConditionPipe:                                "FWPM_CONDITION_PIPE",
-	guidConditionIPRemoteAddressV4:                   "FWPM_CONDITION_IP_REMOTE_ADDRESS_V4",
-	guidConditionIPRemoteAddressV6:                   "FWPM_CONDITION_IP_REMOTE_ADDRESS_V6",
-	guidConditionProcessWithRPCIfUUID:                "FWPM_CONDITION_PROCESS_WITH_RPC_IF_UUID",
-	guidConditionRPCEPValue:                          "FWPM_CONDITION_RPC_EP_VALUE",
-	guidConditionRPCEPFlags:                          "FWPM_CONDITION_RPC_EP_FLAGS",
-	guidConditionClientToken:                         "FWPM_CONDITION_CLIENT_TOKEN",
-	guidConditionRPCServerName:                       "FWPM_CONDITION_RPC_SERVER_NAME",
-	guidConditionRPCServerPort:                       "FWPM_CONDITION_RPC_SERVER_PORT",
-	guidConditionRPCProxyAuthType:                    "FWPM_CONDITION_RPC_PROXY_AUTH_TYPE",
-	guidConditionClientCertKeyLength:                 "FWPM_CONDITION_CLIENT_CERT_KEY_LENGTH",
-	guidConditionClientCertOid:                       "FWPM_CONDITION_CLIENT_CERT_OID",
-	guidConditionNetEventType:                        "FWPM_CONDITION_NET_EVENT_TYPE",
-	guidConditionPeerName:                            "FWPM_CONDITION_PEER_NAME",
-	guidConditionRemoteID:                            "FWPM_CONDITION_REMOTE_ID",
-	guidConditionAuthenticationType:                  "FWPM_CONDITION_AUTHENTICATION_TYPE",
-	guidConditionKMType:                              "FWPM_CONDITION_KM_TYPE",
-	guidConditionKMMode:                              "FWPM_CONDITION_KM_MODE",
-	guidConditionIPSecPolicyKey:                      "FWPM_CONDITION_IPSEC_POLICY_KEY",
-	guidConditionQmMode:                              "FWPM_CONDITION_QM_MODE",
-	guidConditionCompartmentID:                       "FWPM_CONDITION_COMPARTMENT_ID",
-	guidConditionReserved0:                           "FWPM_CONDITION_RESERVED0",
-	guidConditionReserved1:                           "FWPM_CONDITION_RESERVED1",
-	guidConditionReserved2:                           "FWPM_CONDITION_RESERVED2",
-	guidConditionReserved3:                           "FWPM_CONDITION_RESERVED3",
-	guidConditionReserved4:                           "FWPM_CONDITION_RESERVED4",
-	guidConditionReserved5:                           "FWPM_CONDITION_RESERVED5",
-	guidConditionReserved6:                           "FWPM_CONDITION_RESERVED6",
-	guidConditionReserved7:                           "FWPM_CONDITION_RESERVED7",
-	guidConditionReserved8:                           "FWPM_CONDITION_RESERVED8",
-	guidConditionReserved9:                           "FWPM_CONDITION_RESERVED9",
-	guidConditionReserved10:                          "FWPM_CONDITION_RESERVED10",
-	guidConditionReserved11:                          "FWPM_CONDITION_RESERVED11",
-	guidConditionReserved12:                          "FWPM_CONDITION_RESERVED12",
-	guidConditionReserved13:                          "FWPM_CONDITION_RESERVED13",
-	guidConditionReserved14:                          "FWPM_CONDITION_RESERVED14",
-	guidConditionReserved15:                          "FWPM_CONDITION_RESERVED15",
-	guidProviderIKEExt:                               "FWPM_PROVIDER_IKEEXT",
-	guidProviderIPSecDospConfig:                      "FWPM_PROVIDER_IPSEC_DOSP_CONFIG",
-	guidProviderTCPChimneyOffload:                    "FWPM_PROVIDER_TCP_CHIMNEY_OFFLOAD",
-	guidProviderTCPTemplates:                         "FWPM_PROVIDER_TCP_TEMPLATES",
-	guidCalloutIPSecInboundTransportV4:               "FWPM_CALLOUT_IPSEC_INBOUND_TRANSPORT_V4",
-	guidCalloutIPSecInboundTransportV6:               "FWPM_CALLOUT_IPSEC_INBOUND_TRANSPORT_V6",
-	guidCalloutIPSecOutboundTransportV4:              "FWPM_CALLOUT_IPSEC_OUTBOUND_TRANSPORT_V4",
-	guidCalloutIPSecOutboundTransportV6:              "FWPM_CALLOUT_IPSEC_OUTBOUND_TRANSPORT_V6",
-	guidCalloutIPSecInboundTunnelV4:                  "FWPM_CALLOUT_IPSEC_INBOUND_TUNNEL_V4",
-	guidCalloutIPSecInboundTunnelV6:                  "FWPM_CALLOUT_IPSEC_INBOUND_TUNNEL_V6",
-	guidCalloutIPSecOutboundTunnelV4:                 "FWPM_CALLOUT_IPSEC_OUTBOUND_TUNNEL_V4",
-	guidCalloutIPSecOutboundTunnelV6:                 "FWPM_CALLOUT_IPSEC_OUTBOUND_TUNNEL_V6",
-	guidCalloutIPSecForwardInboundTunnelV4:           "FWPM_CALLOUT_IPSEC_FORWARD_INBOUND_TUNNEL_V4",
-	guidCalloutIPSecForwardInboundTunnelV6:           "FWPM_CALLOUT_IPSEC_FORWARD_INBOUND_TUNNEL_V6",
-	guidCalloutIPSecForwardOutboundTunnelV4:          "FWPM_CALLOUT_IPSEC_FORWARD_OUTBOUND_TUNNEL_V4",
-	guidCalloutIPSecForwardOutboundTunnelV6:          "FWPM_CALLOUT_IPSEC_FORWARD_OUTBOUND_TUNNEL_V6",
-	guidCalloutIPSecInboundInitiateSecureV4:          "FWPM_CALLOUT_IPSEC_INBOUND_INITIATE_SECURE_V4",
-	guidCalloutIPSecInboundInitiateSecureV6:          "FWPM_CALLOUT_IPSEC_INBOUND_INITIATE_SECURE_V6",
-	guidCalloutIPSecInboundTunnelALEAcceptV4:         "FWPM_CALLOUT_IPSEC_INBOUND_TUNNEL_ALE_ACCEPT_V4",
-	guidCalloutIPSecInboundTunnelALEAcceptV6:         "FWPM_CALLOUT_IPSEC_INBOUND_TUNNEL_ALE_ACCEPT_V6",
-	guidCalloutIPSecALEConnectV4:                     "FWPM_CALLOUT_IPSEC_ALE_CONNECT_V4",
-	guidCalloutIPSecALEConnectV6:                     "FWPM_CALLOUT_IPSEC_ALE_CONNECT_V6",
-	guidCalloutIPSecDospForwardV6:                    "FWPM_CALLOUT_IPSEC_DOSP_FORWARD_V6",
-	guidCalloutIPSecDospForwardV4:                    "FWPM_CALLOUT_IPSEC_DOSP_FORWARD_V4",
-	guidCalloutWFPTransportLayerV4SilentDrop:         "FWPM_CALLOUT_WFP_TRANSPORT_LAYER_V4_SILENT_DROP",
-	guidCalloutWFPTransportLayerV6SilentDrop:         "FWPM_CALLOUT_WFP_TRANSPORT_LAYER_V6_SILENT_DROP",
-	guidCalloutTCPChimneyConnectLayerV4:              "FWPM_CALLOUT_TCP_CHIMNEY_CONNECT_LAYER_V4",
-	guidCalloutTCPChimneyConnectLayerV6:              "FWPM_CALLOUT_TCP_CHIMNEY_CONNECT_LAYER_V6",
-	guidCalloutTCPChimneyAcceptLayerV4:               "FWPM_CALLOUT_TCP_CHIMNEY_ACCEPT_LAYER_V4",
-	guidCalloutTCPChimneyAcceptLayerV6:               "FWPM_CALLOUT_TCP_CHIMNEY_ACCEPT_LAYER_V6",
-	guidCalloutSetOptionsAuthConnectLayerV4:          "FWPM_CALLOUT_SET_OPTIONS_AUTH_CONNECT_LAYER_V4",
-	guidCalloutSetOptionsAuthConnectLayerV6:          "FWPM_CALLOUT_SET_OPTIONS_AUTH_CONNECT_LAYER_V6",
-	guidCalloutSetOptionsAuthRecvAcceptLayerV4:       "FWPM_CALLOUT_SET_OPTIONS_AUTH_RECV_ACCEPT_LAYER_V4",
-	guidCalloutSetOptionsAuthRecvAcceptLayerV6:       "FWPM_CALLOUT_SET_OPTIONS_AUTH_RECV_ACCEPT_LAYER_V6",
-	guidCalloutReservedAuthConnectLayerV4:            "FWPM_CALLOUT_RESERVED_AUTH_CONNECT_LAYER_V4",
-	guidCalloutReservedAuthConnectLayerV6:            "FWPM_CALLOUT_RESERVED_AUTH_CONNECT_LAYER_V6",
-	guidCalloutTeredoALEResourceAssignmentV6:         "FWPM_CALLOUT_TEREDO_ALE_RESOURCE_ASSIGNMENT_V6",
-	guidCalloutEdgeTraversalALEResourceAssignmentV4:  "FWPM_CALLOUT_EDGE_TRAVERSAL_ALE_RESOURCE_ASSIGNMENT_V4",
-	guidCalloutTeredoALEListenV6:                     "FWPM_CALLOUT_TEREDO_ALE_LISTEN_V6",
-	guidCalloutEdgeTraversalALEListenV4:              "FWPM_CALLOUT_EDGE_TRAVERSAL_ALE_LISTEN_V4",
-	guidCalloutTCPTemplatesConnectLayerV4:            "FWPM_CALLOUT_TCP_TEMPLATES_CONNECT_LAYER_V4",
-	guidCalloutTCPTemplatesConnectLayerV6:            "FWPM_CALLOUT_TCP_TEMPLATES_CONNECT_LAYER_V6",
-	guidCalloutTCPTemplatesAcceptLayerV4:             "FWPM_CALLOUT_TCP_TEMPLATES_ACCEPT_LAYER_V4",
-	guidCalloutTCPTemplatesAcceptLayerV6:             "FWPM_CALLOUT_TCP_TEMPLATES_ACCEPT_LAYER_V6",
-	guidCalloutPolicySilentModeAuthConnectLayerV4:    "FWPM_CALLOUT_POLICY_SILENT_MODE_AUTH_CONNECT_LAYER_V4",
-	guidCalloutPolicySilentModeAuthConnectLayerV6:    "FWPM_CALLOUT_POLICY_SILENT_MODE_AUTH_CONNECT_LAYER_V6",
-	guidCalloutPolicySilentModeAuthRecvAcceptLayerV4: "FWPM_CALLOUT_POLICY_SILENT_MODE_AUTH_RECV_ACCEPT_LAYER_V4",
-	guidCalloutPolicySilentModeAuthRecvAcceptLayerV6: "FWPM_CALLOUT_POLICY_SILENT_MODE_AUTH_RECV_ACCEPT_LAYER_V6",
-	guidCalloutHttpTemplateSslHandshake:              "FWPM_CALLOUT_HTTP_TEMPLATE_SSL_HANDSHAKE",
-	guidProviderContextSecureSocketAuthIP:            "FWPM_PROVIDER_CONTEXT_SECURE_SOCKET_AUTHIP",
-	guidProviderContextSecureSocketIPSec:             "FWPM_PROVIDER_CONTEXT_SECURE_SOCKET_IPSEC",
-	guidKeyingModuleIKE:                              "FWPM_KEYING_MODULE_IKE",
-	guidKeyingModuleAuthIP:                           "FWPM_KEYING_MODULE_AUTHIP",
-	guidKeyingModuleIKEv2:                            "FWPM_KEYING_MODULE_IKEV2",
+	windows.GUID(LayerInboundIPPacketV4):                           "FWPM_LAYER_INBOUND_IPPACKET_V4",
+	windows.GUID(LayerInboundIPPacketV4Discard):                    "FWPM_LAYER_INBOUND_IPPACKET_V4_DISCARD",
+	windows.GUID(LayerInboundIPPacketV6):                           "FWPM_LAYER_INBOUND_IPPACKET_V6",
+	windows.GUID(LayerInboundIPPacketV6Discard):                    "FWPM_LAYER_INBOUND_IPPACKET_V6_DISCARD",
+	windows.GUID(LayerOutboundIPPacketV4):                          "FWPM_LAYER_OUTBOUND_IPPACKET_V4",
+	windows.GUID(LayerOutboundIPPacketV4Discard):                   "FWPM_LAYER_OUTBOUND_IPPACKET_V4_DISCARD",
+	windows.GUID(LayerOutboundIPPacketV6):                          "FWPM_LAYER_OUTBOUND_IPPACKET_V6",
+	windows.GUID(LayerOutboundIPPacketV6Discard):                   "FWPM_LAYER_OUTBOUND_IPPACKET_V6_DISCARD",
+	windows.GUID(LayerIPForwardV4):                                 "FWPM_LAYER_IPFORWARD_V4",
+	windows.GUID(LayerIPForwardV4Discard):                          "FWPM_LAYER_IPFORWARD_V4_DISCARD",
+	windows.GUID(LayerIPForwardV6):                                 "FWPM_LAYER_IPFORWARD_V6",
+	windows.GUID(LayerIPForwardV6Discard):                          "FWPM_LAYER_IPFORWARD_V6_DISCARD",
+	windows.GUID(LayerInboundTransportV4):                          "FWPM_LAYER_INBOUND_TRANSPORT_V4",
+	windows.GUID(LayerInboundTransportV4Discard):                   "FWPM_LAYER_INBOUND_TRANSPORT_V4_DISCARD",
+	windows.GUID(LayerInboundTransportV6):                          "FWPM_LAYER_INBOUND_TRANSPORT_V6",
+	windows.GUID(LayerInboundTransportV6Discard):                   "FWPM_LAYER_INBOUND_TRANSPORT_V6_DISCARD",
+	windows.GUID(LayerOutboundTransportV4):                         "FWPM_LAYER_OUTBOUND_TRANSPORT_V4",
+	windows.GUID(LayerOutboundTransportV4Discard):                  "FWPM_LAYER_OUTBOUND_TRANSPORT_V4_DISCARD",
+	windows.GUID(LayerOutboundTransportV6):                         "FWPM_LAYER_OUTBOUND_TRANSPORT_V6",
+	windows.GUID(LayerOutboundTransportV6Discard):                  "FWPM_LAYER_OUTBOUND_TRANSPORT_V6_DISCARD",
+	windows.GUID(LayerStreamV4):                                    "FWPM_LAYER_STREAM_V4",
+	windows.GUID(LayerStreamV4Discard):                             "FWPM_LAYER_STREAM_V4_DISCARD",
+	windows.GUID(LayerStreamV6):                                    "FWPM_LAYER_STREAM_V6",
+	windows.GUID(LayerStreamV6Discard):                             "FWPM_LAYER_STREAM_V6_DISCARD",
+	windows.GUID(LayerDatagramDataV4):                              "FWPM_LAYER_DATAGRAM_DATA_V4",
+	windows.GUID(LayerDatagramDataV4Discard):                       "FWPM_LAYER_DATAGRAM_DATA_V4_DISCARD",
+	windows.GUID(LayerDatagramDataV6):                              "FWPM_LAYER_DATAGRAM_DATA_V6",
+	windows.GUID(LayerDatagramDataV6Discard):                       "FWPM_LAYER_DATAGRAM_DATA_V6_DISCARD",
+	windows.GUID(LayerInboundICMPErrorV4):                          "FWPM_LAYER_INBOUND_ICMP_ERROR_V4",
+	windows.GUID(LayerInboundICMPErrorV4Discard):                   "FWPM_LAYER_INBOUND_ICMP_ERROR_V4_DISCARD",
+	windows.GUID(LayerInboundICMPErrorV6):                          "FWPM_LAYER_INBOUND_ICMP_ERROR_V6",
+	windows.GUID(LayerInboundICMPErrorV6Discard):                   "FWPM_LAYER_INBOUND_ICMP_ERROR_V6_DISCARD",
+	windows.GUID(LayerOutboundICMPErrorV4):                         "FWPM_LAYER_OUTBOUND_ICMP_ERROR_V4",
+	windows.GUID(LayerOutboundICMPErrorV4Discard):                  "FWPM_LAYER_OUTBOUND_ICMP_ERROR_V4_DISCARD",
+	windows.GUID(LayerOutboundICMPErrorV6):                         "FWPM_LAYER_OUTBOUND_ICMP_ERROR_V6",
+	windows.GUID(LayerOutboundICMPErrorV6Discard):                  "FWPM_LAYER_OUTBOUND_ICMP_ERROR_V6_DISCARD",
+	windows.GUID(LayerALEResourceAssignmentV4):                     "FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V4",
+	windows.GUID(LayerALEResourceAssignmentV4Discard):              "FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V4_DISCARD",
+	windows.GUID(LayerALEResourceAssignmentV6):                     "FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V6",
+	windows.GUID(LayerALEResourceAssignmentV6Discard):              "FWPM_LAYER_ALE_RESOURCE_ASSIGNMENT_V6_DISCARD",
+	windows.GUID(LayerALEAuthListenV4):                             "FWPM_LAYER_ALE_AUTH_LISTEN_V4",
+	windows.GUID(LayerALEAuthListenV4Discard):                      "FWPM_LAYER_ALE_AUTH_LISTEN_V4_DISCARD",
+	windows.GUID(LayerALEAuthListenV6):                             "FWPM_LAYER_ALE_AUTH_LISTEN_V6",
+	windows.GUID(LayerALEAuthListenV6Discard):                      "FWPM_LAYER_ALE_AUTH_LISTEN_V6_DISCARD",
+	windows.GUID(LayerALEAuthRecvAcceptV4):                         "FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4",
+	windows.GUID(LayerALEAuthRecvAcceptV4Discard):                  "FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4_DISCARD",
+	windows.GUID(LayerALEAuthRecvAcceptV6):                         "FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6",
+	windows.GUID(LayerALEAuthRecvAcceptV6Discard):                  "FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6_DISCARD",
+	windows.GUID(LayerALEAuthConnectV4):                            "FWPM_LAYER_ALE_AUTH_CONNECT_V4",
+	windows.GUID(LayerALEAuthConnectV4Discard):                     "FWPM_LAYER_ALE_AUTH_CONNECT_V4_DISCARD",
+	windows.GUID(LayerALEAuthConnectV6):                            "FWPM_LAYER_ALE_AUTH_CONNECT_V6",
+	windows.GUID(LayerALEAuthConnectV6Discard):                     "FWPM_LAYER_ALE_AUTH_CONNECT_V6_DISCARD",
+	windows.GUID(LayerALEFlowEstablishedV4):                        "FWPM_LAYER_ALE_FLOW_ESTABLISHED_V4",
+	windows.GUID(LayerALEFlowEstablishedV4Discard):                 "FWPM_LAYER_ALE_FLOW_ESTABLISHED_V4_DISCARD",
+	windows.GUID(LayerALEFlowEstablishedV6):                        "FWPM_LAYER_ALE_FLOW_ESTABLISHED_V6",
+	windows.GUID(LayerALEFlowEstablishedV6Discard):                 "FWPM_LAYER_ALE_FLOW_ESTABLISHED_V6_DISCARD",
+	windows.GUID(LayerInboundMACFrameEthernet):                     "FWPM_LAYER_INBOUND_MAC_FRAME_ETHERNET",
+	windows.GUID(LayerOutboundMACFrameEthernet):                    "FWPM_LAYER_OUTBOUND_MAC_FRAME_ETHERNET",
+	windows.GUID(LayerInboundMACFrameNative):                       "FWPM_LAYER_INBOUND_MAC_FRAME_NATIVE",
+	windows.GUID(LayerOutboundMACFrameNative):                      "FWPM_LAYER_OUTBOUND_MAC_FRAME_NATIVE",
+	windows.GUID(LayerIngressVswitchEthernet):                      "FWPM_LAYER_INGRESS_VSWITCH_ETHERNET",
+	windows.GUID(LayerEgressVswitchEthernet):                       "FWPM_LAYER_EGRESS_VSWITCH_ETHERNET",
+	windows.GUID(LayerIngressVswitchTransportV4):                   "FWPM_LAYER_INGRESS_VSWITCH_TRANSPORT_V4",
+	windows.GUID(LayerIngressVswitchTransportV6):                   "FWPM_LAYER_INGRESS_VSWITCH_TRANSPORT_V6",
+	windows.GUID(LayerEgressVswitchTransportV4):                    "FWPM_LAYER_EGRESS_VSWITCH_TRANSPORT_V4",
+	windows.GUID(LayerEgressVswitchTransportV6):                    "FWPM_LAYER_EGRESS_VSWITCH_TRANSPORT_V6",
+	windows.GUID(LayerInboundTransportFast):                        "FWPM_LAYER_INBOUND_TRANSPORT_FAST",
+	windows.GUID(LayerOutboundTransportFast):                       "FWPM_LAYER_OUTBOUND_TRANSPORT_FAST",
+	windows.GUID(LayerInboundMACFrameNativeFast):                   "FWPM_LAYER_INBOUND_MAC_FRAME_NATIVE_FAST",
+	windows.GUID(LayerOutboundMACFrameNativeFast):                  "FWPM_LAYER_OUTBOUND_MAC_FRAME_NATIVE_FAST",
+	windows.GUID(LayerIPSecKMDemuxV4):                              "FWPM_LAYER_IPSEC_KM_DEMUX_V4",
+	windows.GUID(LayerIPSecKMDemuxV6):                              "FWPM_LAYER_IPSEC_KM_DEMUX_V6",
+	windows.GUID(LayerIPSecV4):                                     "FWPM_LAYER_IPSEC_V4",
+	windows.GUID(LayerIPSecV6):                                     "FWPM_LAYER_IPSEC_V6",
+	windows.GUID(LayerIKEExtV4):                                    "FWPM_LAYER_IKEEXT_V4",
+	windows.GUID(LayerIKEExtV6):                                    "FWPM_LAYER_IKEEXT_V6",
+	windows.GUID(LayerRPCUM):                                       "FWPM_LAYER_RPC_UM",
+	windows.GUID(LayerRPCEPMap):                                    "FWPM_LAYER_RPC_EPMAP",
+	windows.GUID(LayerRPCEPAdd):                                    "FWPM_LAYER_RPC_EP_ADD",
+	windows.GUID(LayerRPCProxyConn):                                "FWPM_LAYER_RPC_PROXY_CONN",
+	windows.GUID(LayerRPCProxyIf):                                  "FWPM_LAYER_RPC_PROXY_IF",
+	windows.GUID(LayerKMAuthorization):                             "FWPM_LAYER_KM_AUTHORIZATION",
+	windows.GUID(LayerNameResolutionCacheV4):                       "FWPM_LAYER_NAME_RESOLUTION_CACHE_V4",
+	windows.GUID(LayerNameResolutionCacheV6):                       "FWPM_LAYER_NAME_RESOLUTION_CACHE_V6",
+	windows.GUID(LayerALEResourceReleaseV4):                        "FWPM_LAYER_ALE_RESOURCE_RELEASE_V4",
+	windows.GUID(LayerALEResourceReleaseV6):                        "FWPM_LAYER_ALE_RESOURCE_RELEASE_V6",
+	windows.GUID(LayerALEEndpointClosureV4):                        "FWPM_LAYER_ALE_ENDPOINT_CLOSURE_V4",
+	windows.GUID(LayerALEEndpointClosureV6):                        "FWPM_LAYER_ALE_ENDPOINT_CLOSURE_V6",
+	windows.GUID(LayerALEConnectRedirectV4):                        "FWPM_LAYER_ALE_CONNECT_REDIRECT_V4",
+	windows.GUID(LayerALEConnectRedirectV6):                        "FWPM_LAYER_ALE_CONNECT_REDIRECT_V6",
+	windows.GUID(LayerALEBindRedirectV4):                           "FWPM_LAYER_ALE_BIND_REDIRECT_V4",
+	windows.GUID(LayerALEBindRedirectV6):                           "FWPM_LAYER_ALE_BIND_REDIRECT_V6",
+	windows.GUID(LayerStreamPacketV4):                              "FWPM_LAYER_STREAM_PACKET_V4",
+	windows.GUID(LayerStreamPacketV6):                              "FWPM_LAYER_STREAM_PACKET_V6",
+	windows.GUID(LayerInboundReserved2):                            "FWPM_LAYER_INBOUND_RESERVED2",
+	windows.GUID(guidSublayerRPCAudit):                             "FWPM_SUBLAYER_RPC_AUDIT",
+	windows.GUID(guidSublayerIPSecTunnel):                          "FWPM_SUBLAYER_IPSEC_TUNNEL",
+	windows.GUID(guidSublayerUniversal):                            "FWPM_SUBLAYER_UNIVERSAL",
+	windows.GUID(guidSublayerLIPS):                                 "FWPM_SUBLAYER_LIPS",
+	windows.GUID(guidSublayerSecureSocket):                         "FWPM_SUBLAYER_SECURE_SOCKET",
+	windows.GUID(guidSublayerTCPChimneyOffload):                    "FWPM_SUBLAYER_TCP_CHIMNEY_OFFLOAD",
+	windows.GUID(guidSublayerInspection):                           "FWPM_SUBLAYER_INSPECTION",
+	windows.GUID(guidSublayerTeredo):                               "FWPM_SUBLAYER_TEREDO",
+	windows.GUID(guidSublayerIPSecForwardOutboundTunnel):           "FWPM_SUBLAYER_IPSEC_FORWARD_OUTBOUND_TUNNEL",
+	windows.GUID(guidSublayerIPSecDosp):                            "FWPM_SUBLAYER_IPSEC_DOSP",
+	windows.GUID(guidSublayerTCPTemplates):                         "FWPM_SUBLAYER_TCP_TEMPLATES",
+	windows.GUID(guidSublayerIPSecSecurityRealm):                   "FWPM_SUBLAYER_IPSEC_SECURITY_REALM",
+	windows.GUID(guidConditionInterfaceMACAddress):                 "FWPM_CONDITION_INTERFACE_MAC_ADDRESS",
+	windows.GUID(guidConditionMACLocalAddress):                     "FWPM_CONDITION_MAC_LOCAL_ADDRESS",
+	windows.GUID(guidConditionMACRemoteAddress):                    "FWPM_CONDITION_MAC_REMOTE_ADDRESS",
+	windows.GUID(guidConditionEtherType):                           "FWPM_CONDITION_ETHER_TYPE",
+	windows.GUID(guidConditionVLANID):                              "FWPM_CONDITION_VLAN_ID",
+	windows.GUID(guidConditionVswitchTenantNetworkID):              "FWPM_CONDITION_VSWITCH_TENANT_NETWORK_ID",
+	windows.GUID(guidConditionNdisPort):                            "FWPM_CONDITION_NDIS_PORT",
+	windows.GUID(guidConditionNdisMediaType):                       "FWPM_CONDITION_NDIS_MEDIA_TYPE",
+	windows.GUID(guidConditionNdisPhysicalMediaType):               "FWPM_CONDITION_NDIS_PHYSICAL_MEDIA_TYPE",
+	windows.GUID(guidConditionL2Flags):                             "FWPM_CONDITION_L2_FLAGS",
+	windows.GUID(guidConditionMACLocalAddressType):                 "FWPM_CONDITION_MAC_LOCAL_ADDRESS_TYPE",
+	windows.GUID(guidConditionMACRemoteAddressType):                "FWPM_CONDITION_MAC_REMOTE_ADDRESS_TYPE",
+	windows.GUID(guidConditionALEPackageID):                        "FWPM_CONDITION_ALE_PACKAGE_ID",
+	windows.GUID(guidConditionMACSourceAddress):                    "FWPM_CONDITION_MAC_SOURCE_ADDRESS",
+	windows.GUID(guidConditionMACDestinationAddress):               "FWPM_CONDITION_MAC_DESTINATION_ADDRESS",
+	windows.GUID(guidConditionMACSourceAddressType):                "FWPM_CONDITION_MAC_SOURCE_ADDRESS_TYPE",
+	windows.GUID(guidConditionMACDestinationAddressType):           "FWPM_CONDITION_MAC_DESTINATION_ADDRESS_TYPE",
+	windows.GUID(guidConditionIPSourcePort):                        "FWPM_CONDITION_IP_SOURCE_PORT",
+	windows.GUID(guidConditionIPDestinationPort):                   "FWPM_CONDITION_IP_DESTINATION_PORT",
+	windows.GUID(guidConditionVswitchID):                           "FWPM_CONDITION_VSWITCH_ID",
+	windows.GUID(guidConditionVswitchNetworkType):                  "FWPM_CONDITION_VSWITCH_NETWORK_TYPE",
+	windows.GUID(guidConditionVswitchSourceInterfaceID):            "FWPM_CONDITION_VSWITCH_SOURCE_INTERFACE_ID",
+	windows.GUID(guidConditionVswitchDestinationInterfaceID):       "FWPM_CONDITION_VSWITCH_DESTINATION_INTERFACE_ID",
+	windows.GUID(guidConditionVswitchSourceVmID):                   "FWPM_CONDITION_VSWITCH_SOURCE_VM_ID",
+	windows.GUID(guidConditionVswitchDestinationVmID):              "FWPM_CONDITION_VSWITCH_DESTINATION_VM_ID",
+	windows.GUID(guidConditionVswitchSourceInterfaceType):          "FWPM_CONDITION_VSWITCH_SOURCE_INTERFACE_TYPE",
+	windows.GUID(guidConditionVswitchDestinationInterfaceType):     "FWPM_CONDITION_VSWITCH_DESTINATION_INTERFACE_TYPE",
+	windows.GUID(guidConditionALESecurityAttributeFqbnValue):       "FWPM_CONDITION_ALE_SECURITY_ATTRIBUTE_FQBN_VALUE",
+	windows.GUID(guidConditionIPSecSecurityRealmID):                "FWPM_CONDITION_IPSEC_SECURITY_REALM_ID",
+	windows.GUID(guidConditionALEEffectiveName):                    "FWPM_CONDITION_ALE_EFFECTIVE_NAME",
+	windows.GUID(guidConditionIPLocalAddress):                      "FWPM_CONDITION_IP_LOCAL_ADDRESS",
+	windows.GUID(guidConditionIPRemoteAddress):                     "FWPM_CONDITION_IP_REMOTE_ADDRESS",
+	windows.GUID(guidConditionIPSourceAddress):                     "FWPM_CONDITION_IP_SOURCE_ADDRESS",
+	windows.GUID(guidConditionIPDestinationAddress):                "FWPM_CONDITION_IP_DESTINATION_ADDRESS",
+	windows.GUID(guidConditionIPLocalAddressType):                  "FWPM_CONDITION_IP_LOCAL_ADDRESS_TYPE",
+	windows.GUID(guidConditionIPDestinationAddressType):            "FWPM_CONDITION_IP_DESTINATION_ADDRESS_TYPE",
+	windows.GUID(guidConditionBitmapIPLocalAddress):                "FWPM_CONDITION_BITMAP_IP_LOCAL_ADDRESS",
+	windows.GUID(guidConditionBitmapIPLocalPort):                   "FWPM_CONDITION_BITMAP_IP_LOCAL_PORT",
+	windows.GUID(guidConditionBitmapIPRemoteAddress):               "FWPM_CONDITION_BITMAP_IP_REMOTE_ADDRESS",
+	windows.GUID(guidConditionBitmapIPRemotePort):                  "FWPM_CONDITION_BITMAP_IP_REMOTE_PORT",
+	windows.GUID(guidConditionIPNexthopAddress):                    "FWPM_CONDITION_IP_NEXTHOP_ADDRESS",
+	windows.GUID(guidConditionBitmapIndexKey):                      "FWPM_CONDITION_BITMAP_INDEX_KEY",
+	windows.GUID(guidConditionIPLocalInterface):                    "FWPM_CONDITION_IP_LOCAL_INTERFACE",
+	windows.GUID(guidConditionIPArrivalInterface):                  "FWPM_CONDITION_IP_ARRIVAL_INTERFACE",
+	windows.GUID(guidConditionArrivalInterfaceType):                "FWPM_CONDITION_ARRIVAL_INTERFACE_TYPE",
+	windows.GUID(guidConditionArrivalTunnelType):                   "FWPM_CONDITION_ARRIVAL_TUNNEL_TYPE",
+	windows.GUID(guidConditionArrivalInterfaceIndex):               "FWPM_CONDITION_ARRIVAL_INTERFACE_INDEX",
+	windows.GUID(guidConditionNexthopSubInterfaceIndex):            "FWPM_CONDITION_NEXTHOP_SUB_INTERFACE_INDEX",
+	windows.GUID(guidConditionIPNexthopInterface):                  "FWPM_CONDITION_IP_NEXTHOP_INTERFACE",
+	windows.GUID(guidConditionNexthopInterfaceType):                "FWPM_CONDITION_NEXTHOP_INTERFACE_TYPE",
+	windows.GUID(guidConditionNexthopTunnelType):                   "FWPM_CONDITION_NEXTHOP_TUNNEL_TYPE",
+	windows.GUID(guidConditionNexthopInterfaceIndex):               "FWPM_CONDITION_NEXTHOP_INTERFACE_INDEX",
+	windows.GUID(guidConditionOriginalProfileID):                   "FWPM_CONDITION_ORIGINAL_PROFILE_ID",
+	windows.GUID(guidConditionCurrentProfileID):                    "FWPM_CONDITION_CURRENT_PROFILE_ID",
+	windows.GUID(guidConditionLocalInterfaceProfileID):             "FWPM_CONDITION_LOCAL_INTERFACE_PROFILE_ID",
+	windows.GUID(guidConditionArrivalInterfaceProfileID):           "FWPM_CONDITION_ARRIVAL_INTERFACE_PROFILE_ID",
+	windows.GUID(guidConditionNexthopInterfaceProfileID):           "FWPM_CONDITION_NEXTHOP_INTERFACE_PROFILE_ID",
+	windows.GUID(guidConditionReauthorizeReason):                   "FWPM_CONDITION_REAUTHORIZE_REASON",
+	windows.GUID(guidConditionOriginalICMPType):                    "FWPM_CONDITION_ORIGINAL_ICMP_TYPE",
+	windows.GUID(guidConditionIPPhysicalArrivalInterface):          "FWPM_CONDITION_IP_PHYSICAL_ARRIVAL_INTERFACE",
+	windows.GUID(guidConditionIPPhysicalNexthopInterface):          "FWPM_CONDITION_IP_PHYSICAL_NEXTHOP_INTERFACE",
+	windows.GUID(guidConditionInterfaceQuarantineEpoch):            "FWPM_CONDITION_INTERFACE_QUARANTINE_EPOCH",
+	windows.GUID(guidConditionInterfaceType):                       "FWPM_CONDITION_INTERFACE_TYPE",
+	windows.GUID(guidConditionTunnelType):                          "FWPM_CONDITION_TUNNEL_TYPE",
+	windows.GUID(guidConditionIPForwardInterface):                  "FWPM_CONDITION_IP_FORWARD_INTERFACE",
+	windows.GUID(guidConditionIPProtocol):                          "FWPM_CONDITION_IP_PROTOCOL",
+	windows.GUID(guidConditionIPLocalPort):                         "FWPM_CONDITION_IP_LOCAL_PORT",
+	windows.GUID(guidConditionIPRemotePort):                        "FWPM_CONDITION_IP_REMOTE_PORT",
+	windows.GUID(guidConditionEmbeddedLocalAddressType):            "FWPM_CONDITION_EMBEDDED_LOCAL_ADDRESS_TYPE",
+	windows.GUID(guidConditionEmbeddedRemoteAddress):               "FWPM_CONDITION_EMBEDDED_REMOTE_ADDRESS",
+	windows.GUID(guidConditionEmbeddedProtocol):                    "FWPM_CONDITION_EMBEDDED_PROTOCOL",
+	windows.GUID(guidConditionEmbeddedLocalPort):                   "FWPM_CONDITION_EMBEDDED_LOCAL_PORT",
+	windows.GUID(guidConditionEmbeddedRemotePort):                  "FWPM_CONDITION_EMBEDDED_REMOTE_PORT",
+	windows.GUID(guidConditionFlags):                               "FWPM_CONDITION_FLAGS",
+	windows.GUID(guidConditionDirection):                           "FWPM_CONDITION_DIRECTION",
+	windows.GUID(guidConditionInterfaceIndex):                      "FWPM_CONDITION_INTERFACE_INDEX",
+	windows.GUID(guidConditionSubInterfaceIndex):                   "FWPM_CONDITION_SUB_INTERFACE_INDEX",
+	windows.GUID(guidConditionSourceInterfaceIndex):                "FWPM_CONDITION_SOURCE_INTERFACE_INDEX",
+	windows.GUID(guidConditionSourceSubInterfaceIndex):             "FWPM_CONDITION_SOURCE_SUB_INTERFACE_INDEX",
+	windows.GUID(guidConditionDestinationInterfaceIndex):           "FWPM_CONDITION_DESTINATION_INTERFACE_INDEX",
+	windows.GUID(guidConditionDestinationSubInterfaceIndex):        "FWPM_CONDITION_DESTINATION_SUB_INTERFACE_INDEX",
+	windows.GUID(guidConditionALEAppID):                            "FWPM_CONDITION_ALE_APP_ID",
+	windows.GUID(guidConditionALEOriginalAppID):                    "FWPM_CONDITION_ALE_ORIGINAL_APP_ID",
+	windows.GUID(guidConditionALEUserID):                           "FWPM_CONDITION_ALE_USER_ID",
+	windows.GUID(guidConditionALERemoteUserID):                     "FWPM_CONDITION_ALE_REMOTE_USER_ID",
+	windows.GUID(guidConditionALERemoteMachineID):                  "FWPM_CONDITION_ALE_REMOTE_MACHINE_ID",
+	windows.GUID(guidConditionALEPromiscuousMode):                  "FWPM_CONDITION_ALE_PROMISCUOUS_MODE",
+	windows.GUID(guidConditionALESioFirewallSystemPort):            "FWPM_CONDITION_ALE_SIO_FIREWALL_SYSTEM_PORT",
+	windows.GUID(guidConditionALEReauthReason):                     "FWPM_CONDITION_ALE_REAUTH_REASON",
+	windows.GUID(guidConditionALENapContext):                       "FWPM_CONDITION_ALE_NAP_CONTEXT",
+	windows.GUID(guidConditionKMAuthNapContext):                    "FWPM_CONDITION_KM_AUTH_NAP_CONTEXT",
+	windows.GUID(guidConditionRemoteUserToken):                     "FWPM_CONDITION_REMOTE_USER_TOKEN",
+	windows.GUID(guidConditionRPCIfUUID):                           "FWPM_CONDITION_RPC_IF_UUID",
+	windows.GUID(guidConditionRPCIfVersion):                        "FWPM_CONDITION_RPC_IF_VERSION",
+	windows.GUID(guidConditionRPCIfFlag):                           "FWPM_CONDITION_RPC_IF_FLAG",
+	windows.GUID(guidConditionDCOMAppID):                           "FWPM_CONDITION_DCOM_APP_ID",
+	windows.GUID(guidConditionImageName):                           "FWPM_CONDITION_IMAGE_NAME",
+	windows.GUID(guidConditionRPCProtocol):                         "FWPM_CONDITION_RPC_PROTOCOL",
+	windows.GUID(guidConditionRPCAuthType):                         "FWPM_CONDITION_RPC_AUTH_TYPE",
+	windows.GUID(guidConditionRPCAuthLevel):                        "FWPM_CONDITION_RPC_AUTH_LEVEL",
+	windows.GUID(guidConditionSecEncryptAlgorithm):                 "FWPM_CONDITION_SEC_ENCRYPT_ALGORITHM",
+	windows.GUID(guidConditionSecKeySize):                          "FWPM_CONDITION_SEC_KEY_SIZE",
+	windows.GUID(guidConditionIPLocalAddressV4):                    "FWPM_CONDITION_IP_LOCAL_ADDRESS_V4",
+	windows.GUID(guidConditionIPLocalAddressV6):                    "FWPM_CONDITION_IP_LOCAL_ADDRESS_V6",
+	windows.GUID(guidConditionPipe):                                "FWPM_CONDITION_PIPE",
+	windows.GUID(guidConditionIPRemoteAddressV4):                   "FWPM_CONDITION_IP_REMOTE_ADDRESS_V4",
+	windows.GUID(guidConditionIPRemoteAddressV6):                   "FWPM_CONDITION_IP_REMOTE_ADDRESS_V6",
+	windows.GUID(guidConditionProcessWithRPCIfUUID):                "FWPM_CONDITION_PROCESS_WITH_RPC_IF_UUID",
+	windows.GUID(guidConditionRPCEPValue):                          "FWPM_CONDITION_RPC_EP_VALUE",
+	windows.GUID(guidConditionRPCEPFlags):                          "FWPM_CONDITION_RPC_EP_FLAGS",
+	windows.GUID(guidConditionClientToken):                         "FWPM_CONDITION_CLIENT_TOKEN",
+	windows.GUID(guidConditionRPCServerName):                       "FWPM_CONDITION_RPC_SERVER_NAME",
+	windows.GUID(guidConditionRPCServerPort):                       "FWPM_CONDITION_RPC_SERVER_PORT",
+	windows.GUID(guidConditionRPCProxyAuthType):                    "FWPM_CONDITION_RPC_PROXY_AUTH_TYPE",
+	windows.GUID(guidConditionClientCertKeyLength):                 "FWPM_CONDITION_CLIENT_CERT_KEY_LENGTH",
+	windows.GUID(guidConditionClientCertOid):                       "FWPM_CONDITION_CLIENT_CERT_OID",
+	windows.GUID(guidConditionNetEventType):                        "FWPM_CONDITION_NET_EVENT_TYPE",
+	windows.GUID(guidConditionPeerName):                            "FWPM_CONDITION_PEER_NAME",
+	windows.GUID(guidConditionRemoteID):                            "FWPM_CONDITION_REMOTE_ID",
+	windows.GUID(guidConditionAuthenticationType):                  "FWPM_CONDITION_AUTHENTICATION_TYPE",
+	windows.GUID(guidConditionKMType):                              "FWPM_CONDITION_KM_TYPE",
+	windows.GUID(guidConditionKMMode):                              "FWPM_CONDITION_KM_MODE",
+	windows.GUID(guidConditionIPSecPolicyKey):                      "FWPM_CONDITION_IPSEC_POLICY_KEY",
+	windows.GUID(guidConditionQmMode):                              "FWPM_CONDITION_QM_MODE",
+	windows.GUID(guidConditionCompartmentID):                       "FWPM_CONDITION_COMPARTMENT_ID",
+	windows.GUID(guidConditionReserved0):                           "FWPM_CONDITION_RESERVED0",
+	windows.GUID(guidConditionReserved1):                           "FWPM_CONDITION_RESERVED1",
+	windows.GUID(guidConditionReserved2):                           "FWPM_CONDITION_RESERVED2",
+	windows.GUID(guidConditionReserved3):                           "FWPM_CONDITION_RESERVED3",
+	windows.GUID(guidConditionReserved4):                           "FWPM_CONDITION_RESERVED4",
+	windows.GUID(guidConditionReserved5):                           "FWPM_CONDITION_RESERVED5",
+	windows.GUID(guidConditionReserved6):                           "FWPM_CONDITION_RESERVED6",
+	windows.GUID(guidConditionReserved7):                           "FWPM_CONDITION_RESERVED7",
+	windows.GUID(guidConditionReserved8):                           "FWPM_CONDITION_RESERVED8",
+	windows.GUID(guidConditionReserved9):                           "FWPM_CONDITION_RESERVED9",
+	windows.GUID(guidConditionReserved10):                          "FWPM_CONDITION_RESERVED10",
+	windows.GUID(guidConditionReserved11):                          "FWPM_CONDITION_RESERVED11",
+	windows.GUID(guidConditionReserved12):                          "FWPM_CONDITION_RESERVED12",
+	windows.GUID(guidConditionReserved13):                          "FWPM_CONDITION_RESERVED13",
+	windows.GUID(guidConditionReserved14):                          "FWPM_CONDITION_RESERVED14",
+	windows.GUID(guidConditionReserved15):                          "FWPM_CONDITION_RESERVED15",
+	windows.GUID(guidProviderIKEExt):                               "FWPM_PROVIDER_IKEEXT",
+	windows.GUID(guidProviderIPSecDospConfig):                      "FWPM_PROVIDER_IPSEC_DOSP_CONFIG",
+	windows.GUID(guidProviderTCPChimneyOffload):                    "FWPM_PROVIDER_TCP_CHIMNEY_OFFLOAD",
+	windows.GUID(guidProviderTCPTemplates):                         "FWPM_PROVIDER_TCP_TEMPLATES",
+	windows.GUID(guidCalloutIPSecInboundTransportV4):               "FWPM_CALLOUT_IPSEC_INBOUND_TRANSPORT_V4",
+	windows.GUID(guidCalloutIPSecInboundTransportV6):               "FWPM_CALLOUT_IPSEC_INBOUND_TRANSPORT_V6",
+	windows.GUID(guidCalloutIPSecOutboundTransportV4):              "FWPM_CALLOUT_IPSEC_OUTBOUND_TRANSPORT_V4",
+	windows.GUID(guidCalloutIPSecOutboundTransportV6):              "FWPM_CALLOUT_IPSEC_OUTBOUND_TRANSPORT_V6",
+	windows.GUID(guidCalloutIPSecInboundTunnelV4):                  "FWPM_CALLOUT_IPSEC_INBOUND_TUNNEL_V4",
+	windows.GUID(guidCalloutIPSecInboundTunnelV6):                  "FWPM_CALLOUT_IPSEC_INBOUND_TUNNEL_V6",
+	windows.GUID(guidCalloutIPSecOutboundTunnelV4):                 "FWPM_CALLOUT_IPSEC_OUTBOUND_TUNNEL_V4",
+	windows.GUID(guidCalloutIPSecOutboundTunnelV6):                 "FWPM_CALLOUT_IPSEC_OUTBOUND_TUNNEL_V6",
+	windows.GUID(guidCalloutIPSecForwardInboundTunnelV4):           "FWPM_CALLOUT_IPSEC_FORWARD_INBOUND_TUNNEL_V4",
+	windows.GUID(guidCalloutIPSecForwardInboundTunnelV6):           "FWPM_CALLOUT_IPSEC_FORWARD_INBOUND_TUNNEL_V6",
+	windows.GUID(guidCalloutIPSecForwardOutboundTunnelV4):          "FWPM_CALLOUT_IPSEC_FORWARD_OUTBOUND_TUNNEL_V4",
+	windows.GUID(guidCalloutIPSecForwardOutboundTunnelV6):          "FWPM_CALLOUT_IPSEC_FORWARD_OUTBOUND_TUNNEL_V6",
+	windows.GUID(guidCalloutIPSecInboundInitiateSecureV4):          "FWPM_CALLOUT_IPSEC_INBOUND_INITIATE_SECURE_V4",
+	windows.GUID(guidCalloutIPSecInboundInitiateSecureV6):          "FWPM_CALLOUT_IPSEC_INBOUND_INITIATE_SECURE_V6",
+	windows.GUID(guidCalloutIPSecInboundTunnelALEAcceptV4):         "FWPM_CALLOUT_IPSEC_INBOUND_TUNNEL_ALE_ACCEPT_V4",
+	windows.GUID(guidCalloutIPSecInboundTunnelALEAcceptV6):         "FWPM_CALLOUT_IPSEC_INBOUND_TUNNEL_ALE_ACCEPT_V6",
+	windows.GUID(guidCalloutIPSecALEConnectV4):                     "FWPM_CALLOUT_IPSEC_ALE_CONNECT_V4",
+	windows.GUID(guidCalloutIPSecALEConnectV6):                     "FWPM_CALLOUT_IPSEC_ALE_CONNECT_V6",
+	windows.GUID(guidCalloutIPSecDospForwardV6):                    "FWPM_CALLOUT_IPSEC_DOSP_FORWARD_V6",
+	windows.GUID(guidCalloutIPSecDospForwardV4):                    "FWPM_CALLOUT_IPSEC_DOSP_FORWARD_V4",
+	windows.GUID(guidCalloutWFPTransportLayerV4SilentDrop):         "FWPM_CALLOUT_WFP_TRANSPORT_LAYER_V4_SILENT_DROP",
+	windows.GUID(guidCalloutWFPTransportLayerV6SilentDrop):         "FWPM_CALLOUT_WFP_TRANSPORT_LAYER_V6_SILENT_DROP",
+	windows.GUID(guidCalloutTCPChimneyConnectLayerV4):              "FWPM_CALLOUT_TCP_CHIMNEY_CONNECT_LAYER_V4",
+	windows.GUID(guidCalloutTCPChimneyConnectLayerV6):              "FWPM_CALLOUT_TCP_CHIMNEY_CONNECT_LAYER_V6",
+	windows.GUID(guidCalloutTCPChimneyAcceptLayerV4):               "FWPM_CALLOUT_TCP_CHIMNEY_ACCEPT_LAYER_V4",
+	windows.GUID(guidCalloutTCPChimneyAcceptLayerV6):               "FWPM_CALLOUT_TCP_CHIMNEY_ACCEPT_LAYER_V6",
+	windows.GUID(guidCalloutSetOptionsAuthConnectLayerV4):          "FWPM_CALLOUT_SET_OPTIONS_AUTH_CONNECT_LAYER_V4",
+	windows.GUID(guidCalloutSetOptionsAuthConnectLayerV6):          "FWPM_CALLOUT_SET_OPTIONS_AUTH_CONNECT_LAYER_V6",
+	windows.GUID(guidCalloutSetOptionsAuthRecvAcceptLayerV4):       "FWPM_CALLOUT_SET_OPTIONS_AUTH_RECV_ACCEPT_LAYER_V4",
+	windows.GUID(guidCalloutSetOptionsAuthRecvAcceptLayerV6):       "FWPM_CALLOUT_SET_OPTIONS_AUTH_RECV_ACCEPT_LAYER_V6",
+	windows.GUID(guidCalloutReservedAuthConnectLayerV4):            "FWPM_CALLOUT_RESERVED_AUTH_CONNECT_LAYER_V4",
+	windows.GUID(guidCalloutReservedAuthConnectLayerV6):            "FWPM_CALLOUT_RESERVED_AUTH_CONNECT_LAYER_V6",
+	windows.GUID(guidCalloutTeredoALEResourceAssignmentV6):         "FWPM_CALLOUT_TEREDO_ALE_RESOURCE_ASSIGNMENT_V6",
+	windows.GUID(guidCalloutEdgeTraversalALEResourceAssignmentV4):  "FWPM_CALLOUT_EDGE_TRAVERSAL_ALE_RESOURCE_ASSIGNMENT_V4",
+	windows.GUID(guidCalloutTeredoALEListenV6):                     "FWPM_CALLOUT_TEREDO_ALE_LISTEN_V6",
+	windows.GUID(guidCalloutEdgeTraversalALEListenV4):              "FWPM_CALLOUT_EDGE_TRAVERSAL_ALE_LISTEN_V4",
+	windows.GUID(guidCalloutTCPTemplatesConnectLayerV4):            "FWPM_CALLOUT_TCP_TEMPLATES_CONNECT_LAYER_V4",
+	windows.GUID(guidCalloutTCPTemplatesConnectLayerV6):            "FWPM_CALLOUT_TCP_TEMPLATES_CONNECT_LAYER_V6",
+	windows.GUID(guidCalloutTCPTemplatesAcceptLayerV4):             "FWPM_CALLOUT_TCP_TEMPLATES_ACCEPT_LAYER_V4",
+	windows.GUID(guidCalloutTCPTemplatesAcceptLayerV6):             "FWPM_CALLOUT_TCP_TEMPLATES_ACCEPT_LAYER_V6",
+	windows.GUID(guidCalloutPolicySilentModeAuthConnectLayerV4):    "FWPM_CALLOUT_POLICY_SILENT_MODE_AUTH_CONNECT_LAYER_V4",
+	windows.GUID(guidCalloutPolicySilentModeAuthConnectLayerV6):    "FWPM_CALLOUT_POLICY_SILENT_MODE_AUTH_CONNECT_LAYER_V6",
+	windows.GUID(guidCalloutPolicySilentModeAuthRecvAcceptLayerV4): "FWPM_CALLOUT_POLICY_SILENT_MODE_AUTH_RECV_ACCEPT_LAYER_V4",
+	windows.GUID(guidCalloutPolicySilentModeAuthRecvAcceptLayerV6): "FWPM_CALLOUT_POLICY_SILENT_MODE_AUTH_RECV_ACCEPT_LAYER_V6",
+	windows.GUID(guidCalloutHttpTemplateSslHandshake):              "FWPM_CALLOUT_HTTP_TEMPLATE_SSL_HANDSHAKE",
+	windows.GUID(guidProviderContextSecureSocketAuthIP):            "FWPM_PROVIDER_CONTEXT_SECURE_SOCKET_AUTHIP",
+	windows.GUID(guidProviderContextSecureSocketIPSec):             "FWPM_PROVIDER_CONTEXT_SECURE_SOCKET_IPSEC",
+	windows.GUID(guidKeyingModuleIKE):                              "FWPM_KEYING_MODULE_IKE",
+	windows.GUID(guidKeyingModuleAuthIP):                           "FWPM_KEYING_MODULE_AUTHIP",
+	windows.GUID(guidKeyingModuleIKEv2):                            "FWPM_KEYING_MODULE_IKEV2",
 }

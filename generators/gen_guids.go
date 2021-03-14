@@ -54,20 +54,20 @@ import "golang.org/x/sys/windows"
 			fatalf("reading GUID def: %v", err)
 		}
 
-		fmt.Fprintf(&out, `var %s = windows.GUID{
+		fmt.Fprintf(&out, `var %s = %s{
 Data1: %s,
 Data2: %s,
 Data3: %s,
 Data4: [8]byte{%s},
 }
 
-`, varName(name), g1, g2, g3, g4)
+`, varName(name), typeName(name), g1, g2, g3, g4)
 		generated = append(generated, name)
 	}
 
 	out.WriteString("var guidNames = map[windows.GUID]string{\n")
 	for _, name := range generated {
-		fmt.Fprintf(&out, "%s: %q,\n", varName(name), name)
+		fmt.Fprintf(&out, "windows.GUID(%s): %q,\n", varName(name), name)
 	}
 	out.WriteString("}\n")
 
@@ -112,9 +112,17 @@ var replacements = map[string]string{
 	"EPMAP":     "EPMap",
 }
 
+var exported = map[string]bool{
+	"LAYER": true,
+}
+
 func varName(guidName string) string {
 	fs := strings.Split(guidName, "_")
-	fs[0] = "guid"
+	if exported[fs[1]] {
+		fs[0] = ""
+	} else {
+		fs[0] = "guid"
+	}
 remapLoop:
 	for i, f := range fs[1:] {
 		for _, k := range keepUpper {
@@ -130,6 +138,15 @@ remapLoop:
 	}
 
 	return strings.Join(fs, "")
+}
+
+func typeName(name string) string {
+	switch guidType(name) {
+	case "LAYER":
+		return "LayerID"
+	default:
+		return "windows.GUID"
+	}
 }
 
 func guidType(name string) string {

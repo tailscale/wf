@@ -40,7 +40,7 @@ type fwpmLayerEnumTemplate0 struct {
 
 //go:notinheap
 type fwpmLayer0 struct {
-	LayerKey           windows.GUID
+	LayerKey           LayerID
 	DisplayData        fwpmDisplayData0
 	Flags              uint32
 	NumFields          uint32
@@ -167,7 +167,7 @@ type fwpmFilter0 struct {
 	Flags               fwpmFilterFlags
 	ProviderKey         *windows.GUID
 	ProviderData        fwpByteBlob
-	LayerKey            windows.GUID
+	LayerKey            LayerID
 	SublayerKey         windows.GUID
 	Weight              fwpValue0
 	NumFilterConditions uint32
