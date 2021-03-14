@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -36,6 +37,8 @@ import "golang.org/x/sys/windows"
 
 `)
 
+	defs := map[string][]string{}
+
 	for {
 		l, err := r.ReadString('\n')
 		if err == io.EOF {
@@ -54,20 +57,34 @@ import "golang.org/x/sys/windows"
 			fatalf("reading GUID def: %v", err)
 		}
 
-		fmt.Fprintf(&out, `var %s = %s{
-Data1: %s,
-Data2: %s,
-Data3: %s,
-Data4: [8]byte{%s},
-}
-
-`, varName(name), typeName(name), g1, g2, g3, g4)
+		defs[guidType(name)] = append(defs[guidType(name)], fmt.Sprintf("%s = %s{%s, %s, %s, [8]byte{%s}}", varName(name), typeName(name), g1, g2, g3, g4))
 		generated = append(generated, name)
 	}
 
+	var types []string
+	for typ := range defs {
+		types = append(types, typ)
+	}
+	sort.Strings(types)
+	for _, typ := range types {
+		fmt.Fprintf(&out, "var (\n")
+		vars := defs[typ]
+		sort.Strings(vars)
+		for _, v := range vars {
+			fmt.Fprintf(&out, "%s\n", v)
+		}
+		fmt.Fprintf(&out, ")\n\n")
+	}
+
+	sort.Strings(generated)
+
 	out.WriteString("var guidNames = map[windows.GUID]string{\n")
 	for _, name := range generated {
-		fmt.Fprintf(&out, "windows.GUID(%s): %q,\n", varName(name), name)
+		v := varName(name)
+		if typeName(name) != "windows.GUID" {
+			v = fmt.Sprintf("windows.GUID(%s)", v)
+		}
+		fmt.Fprintf(&out, "%s: %q,\n", v, stringName(name))
 	}
 	out.WriteString("}\n")
 
@@ -92,7 +109,9 @@ var keepUpper = []string{
 	"KM",
 	"LIPS",
 	"MAC",
+	"NAP",
 	"OUI",
+	"QM",
 	"RPC",
 	"SNAP",
 	"TCP",
@@ -103,17 +122,25 @@ var keepUpper = []string{
 	"WFP",
 }
 var replacements = map[string]string{
-	"IPSEC":     "IPSec",
-	"IKEV2":     "IKEv2",
 	"AUTHIP":    "AuthIP",
-	"IPPACKET":  "IPPacket",
-	"IPFORWARD": "IPForward",
-	"IKEEXT":    "IKEExt",
 	"EPMAP":     "EPMap",
+	"IKEEXT":    "IKEExt",
+	"IKEV2":     "IKEv2",
+	"IPFORWARD": "IPForward",
+	"IPPACKET":  "IPPacket",
+	"IPSEC":     "IPSec",
+	"VSWITCH":   "VSwitch",
 }
 
 var exported = map[string]bool{
 	"LAYER": true,
+}
+
+func stringName(name string) string {
+	if exported[guidType(name)] {
+		return strings.SplitN(name, "_", 3)[2]
+	}
+	return strings.SplitN(name, "_", 2)[1]
 }
 
 func varName(guidName string) string {
