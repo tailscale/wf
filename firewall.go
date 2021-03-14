@@ -477,6 +477,7 @@ const (
 	ActionCalloutUnknown Action = 0x4005
 )
 
+// RuleID identifies a WFP filtering rule.
 type RuleID windows.GUID
 
 func (id RuleID) String() string {
