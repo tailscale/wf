@@ -38,20 +38,11 @@ type fwpmLayerEnumTemplate0 struct {
 	reserved uint64
 }
 
-type fwpmLayerFlags uint32
-
-const (
-	fwpmLayerFlagsKernel fwpmLayerFlags = 1 << iota
-	fwpmLayerFlagsBuiltin
-	fwpmLayerFlagsClassifyMostly
-	fwpmLayerFlagsBuffered
-)
-
 //go:notinheap
 type fwpmLayer0 struct {
 	LayerKey           windows.GUID
 	DisplayData        fwpmDisplayData0
-	Flags              fwpmLayerFlags
+	Flags              uint32
 	NumFields          uint32
 	Fields             *fwpmField0
 	DefaultSublayerKey windows.GUID

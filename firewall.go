@@ -104,22 +104,12 @@ func (s *Session) Close() error {
 type Layer struct {
 	// ID is the unique identifier for this layer.
 	ID windows.GUID
-	// KernelID is the kernel ID for this layer.
+	// KernelID is the internal kernel ID for this layer.
 	KernelID uint16
 	// Name is a short descriptive name.
 	Name string
 	// Description is a longer description of the layer's function.
 	Description string
-	// InKernel reports whether this layer's filtering is done in
-	// kernel mode.
-	InKernel bool
-	// ClassifyMostly reports whether this layer is optimized for
-	// packet classification at the expense of enumeration
-	// performance.
-	ClassifyMostly bool
-	// Buffered reports whether this layer is buffered (unknown what
-	// that actually means).
-	Buffered bool
 	// DefaultSublayer is the ID for the default sublayer into which
 	// filter rules are added.
 	DefaultSublayer windows.GUID
