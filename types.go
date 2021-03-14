@@ -90,7 +90,7 @@ const (
 
 //go:notinheap
 type fwpmField0 struct {
-	FieldKey *windows.GUID
+	FieldKey *FieldID
 	Type     fwpmFieldType
 	DataType dataType
 }
@@ -187,7 +187,7 @@ type fwpConditionValue0 struct {
 
 //go:notinheap
 type fwpmFilterCondition0 struct {
-	FieldKey  windows.GUID
+	FieldKey  FieldID
 	MatchType MatchType
 	Value     fwpConditionValue0
 }

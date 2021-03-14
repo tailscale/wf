@@ -244,7 +244,7 @@ func listLayers(_ context.Context, _ []string) error {
 			fmt.Printf("  Description: %q\n", layer.Description)
 		}
 		for _, field := range layer.Fields {
-			fmt.Printf("  Field: %s\n", wf.GUIDName(field.ID))
+			fmt.Printf("  Field: %s\n", field.ID)
 			fmt.Printf("    GUID: %s\n", field.ID)
 			fmt.Printf("    Type: %s\n", field.Type)
 		}
@@ -421,25 +421,11 @@ func listEvents(context.Context, []string) error {
 	return nil
 }
 
-var guidLayerALEAuthRecvAcceptV4 = windows.GUID{
-	Data1: 0xe1cd9fe7,
-	Data2: 0xf4b5,
-	Data3: 0x4273,
-	Data4: [8]byte{0x96, 0xc0, 0x59, 0x2e, 0x48, 0x7b, 0x86, 0x50},
-}
-
 var guidSublayerUniversal = windows.GUID{
 	Data1: 0xeebecc03,
 	Data2: 0xced4,
 	Data3: 0x4380,
 	Data4: [8]byte{0x81, 0x9a, 0x27, 0x34, 0x39, 0x7b, 0x2b, 0x74},
-}
-
-var guidConditionIPLocalAddress = windows.GUID{
-	Data1: 0xd9ee00de,
-	Data2: 0xc1ef,
-	Data3: 0x4617,
-	Data4: [8]byte{0xbf, 0xe3, 0xff, 0xd8, 0xf5, 0xa0, 0x89, 0x57},
 }
 
 func test(context.Context, []string) error {
@@ -457,7 +443,7 @@ func test(context.Context, []string) error {
 		Action:   wf.ActionBlock,
 		Conditions: []*wf.Match{
 			&wf.Match{
-				Field: guidConditionIPLocalAddress,
+				Field: wf.FieldIPLocalAddress,
 				Op:    wf.MatchTypeEqual,
 				Value: uint8(42),
 			},

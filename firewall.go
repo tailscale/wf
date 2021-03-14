@@ -20,7 +20,7 @@ func GUIDName(g windows.GUID) string {
 	return g.String()
 }
 
-type fieldTypes map[windows.GUID]reflect.Type
+type fieldTypes map[FieldID]reflect.Type
 type layerTypes map[LayerID]fieldTypes
 
 // Session is a connection to the WFP API.
@@ -103,7 +103,10 @@ func (s *Session) Close() error {
 type LayerID windows.GUID
 
 func (id LayerID) String() string {
-	return guidNames[windows.GUID(id)]
+	if s := guidNames[windows.GUID(id)]; s != "" {
+		return s
+	}
+	return windows.GUID(id).String()
 }
 
 // Layer is a point in the packet processing path where filter rules
@@ -125,11 +128,21 @@ type Layer struct {
 	Fields []*Field
 }
 
+// FieldID identifies a WFP layer field.
+type FieldID windows.GUID
+
+func (id FieldID) String() string {
+	if s := guidNames[windows.GUID(id)]; s != "" {
+		return s
+	}
+	return windows.GUID(id).String()
+}
+
 // Field is a piece of information that a layer makes available to
 // filter rules for matching.
 type Field struct {
 	// ID is the unique identifier for the field.
-	ID windows.GUID
+	ID FieldID
 	// Type is the type of the field.
 	Type reflect.Type
 }
@@ -412,13 +425,13 @@ func (m MatchType) String() string {
 
 // Match is a matching test that gets run against a layer's field.
 type Match struct {
-	Field windows.GUID
+	Field FieldID
 	Op    MatchType
 	Value interface{}
 }
 
 func (m Match) String() string {
-	return fmt.Sprintf("%s %s %v (%T)", GUIDName(m.Field), m.Op, m.Value, m.Value)
+	return fmt.Sprintf("%s %s %v (%T)", m.Field, m.Op, m.Value, m.Value)
 }
 
 // Action is an action the filtering engine can execute.
