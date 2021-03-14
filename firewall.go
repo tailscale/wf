@@ -21,7 +21,7 @@ func GUIDName(g windows.GUID) string {
 }
 
 type fieldTypes map[windows.GUID]reflect.Type
-type layerTypes map[windows.GUID]fieldTypes
+type layerTypes map[LayerID]fieldTypes
 
 // Session is a connection to the WFP API.
 type Session struct {
@@ -99,11 +99,18 @@ func (s *Session) Close() error {
 	return err
 }
 
+// LayerID identifies a WFP layer.
+type LayerID windows.GUID
+
+func (id LayerID) String() string {
+	return guidNames[windows.GUID(id)]
+}
+
 // Layer is a point in the packet processing path where filter rules
 // can be applied.
 type Layer struct {
 	// ID is the unique identifier for this layer.
-	ID windows.GUID
+	ID LayerID
 	// KernelID is the internal kernel ID for this layer.
 	KernelID uint16
 	// Name is a short descriptive name.
@@ -445,7 +452,7 @@ type Rule struct {
 	// Description is a longer description of the rule.
 	Description string
 	// Layer is the ID of the layer in which the rule runs.
-	Layer windows.GUID
+	Layer LayerID
 	// Sublayer is the ID of the sublayer in which the rule runs.
 	Sublayer windows.GUID
 	// Weight is the priority of the rule relative to other rules in

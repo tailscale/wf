@@ -105,14 +105,11 @@ func TestLayers(t *testing.T) {
 
 	// Try to find a couple of the well-known layers that Windows
 	// should definitely have.
-	wantLayers := map[windows.GUID]*Layer{
-		guidLayerALEAuthRecvAcceptV4: {
-			ID:              guidLayerALEAuthRecvAcceptV4,
+	wantLayers := map[LayerID]*Layer{
+		LayerALEAuthRecvAcceptV4: {
+			ID:              LayerALEAuthRecvAcceptV4,
 			KernelID:        44,
 			Name:            "ALE Receive/Accept v4 Layer",
-			InKernel:        true,
-			ClassifyMostly:  true,
-			Buffered:        false,
 			DefaultSublayer: guidSublayerUniversal,
 			Fields: []*Field{
 				{guidConditionALEAppID, stringT},
@@ -156,13 +153,10 @@ func TestLayers(t *testing.T) {
 				{guidConditionTunnelType, u32T},
 			},
 		},
-		guidLayerStreamV4Discard: {
-			ID:              guidLayerStreamV4Discard,
+		LayerStreamV4Discard: {
+			ID:              LayerStreamV4Discard,
 			KernelID:        21,
 			Name:            "Stream v4 Discard Layer",
-			InKernel:        true,
-			ClassifyMostly:  true,
-			Buffered:        true,
 			DefaultSublayer: guidSublayerUniversal,
 			Fields: []*Field{
 				{guidConditionCompartmentID, u32T},
@@ -196,7 +190,7 @@ func TestLayers(t *testing.T) {
 			break
 		}
 		if !found {
-			t.Errorf("layer %s (%s) not found", guid, GUIDName(guid))
+			t.Errorf("layer %s (%s) not found", guid, windows.GUID(guid))
 		}
 	}
 }

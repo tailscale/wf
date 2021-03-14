@@ -236,7 +236,7 @@ func listLayers(_ context.Context, _ []string) error {
 	}
 
 	for _, layer := range layers {
-		fmt.Printf("%s\n", displayName(layer.ID, layer.Name))
+		fmt.Printf("%s\n", displayName(windows.GUID(layer.ID), layer.Name))
 		fmt.Printf("  GUID: %s\n", layer.ID)
 		fmt.Printf("  LUID: %d\n", layer.KernelID)
 		fmt.Printf("  Name: %q\n", layer.Name)
@@ -366,7 +366,7 @@ func listRules(context.Context, []string) error {
 		if rule.Description != "" {
 			fmt.Printf("  Description: %q\n", rule.Description)
 		}
-		fmt.Printf("  Layer: %s\n", wf.GUIDName(rule.Layer))
+		fmt.Printf("  Layer: %s\n", wf.GUIDName(windows.GUID(rule.Layer)))
 		fmt.Printf("  Sublayer: %s\n", wf.GUIDName(rule.Sublayer))
 		fmt.Printf("  Weight: 0x%02x\n", rule.Weight)
 		fmt.Printf("  Action: %s\n", rule.Action)
@@ -451,7 +451,7 @@ func test(context.Context, []string) error {
 
 	r := &wf.Rule{
 		ID:       mustGUID(),
-		Layer:    guidLayerALEAuthRecvAcceptV4,
+		Layer:    wf.LayerALEAuthRecvAcceptV4,
 		Sublayer: guidSublayerUniversal,
 		Weight:   1,
 		Action:   wf.ActionBlock,
