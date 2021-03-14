@@ -26,5 +26,8 @@ jobs:
     - name: Check license
       run: ./check_license_headers.sh
 
+    - name: Get staticcheck
+      run: go get honnef.co/go/tools/cmd/staticcheck
+
     - name: Run staticcheck
       run: go run honnef.co/go/tools/cmd/staticcheck
