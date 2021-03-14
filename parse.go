@@ -19,24 +19,43 @@ import (
 // structs (which require unsafe pointers to traverse) into safe Go
 // types.
 
+var (
+	typeUint8     = reflect.TypeOf(uint8(0))
+	typeUint16    = reflect.TypeOf(uint16(0))
+	typeUint32    = reflect.TypeOf(uint32(0))
+	typeUint64    = reflect.TypeOf(uint64(0))
+	typeArray16  = reflect.TypeOf([16]byte{})
+	typeBytes  = reflect.TypeOf([]byte(nil))
+	typeSID    = reflect.TypeOf(&windows.SID{})
+	typeSecurityDescriptor     = reflect.TypeOf(windows.SECURITY_DESCRIPTOR{})
+	typeTokenInformation     = reflect.TypeOf(TokenInformation{})
+	typeTokenAccessInformation    = reflect.TypeOf(TokenAccessInformation{})
+	typeMAC    = reflect.TypeOf(net.HardwareAddr{})
+	typeBitmapIndex  = reflect.TypeOf(BitmapIndex(0))
+	typeIP     = reflect.TypeOf(netaddr.IP{})
+	typePrefix    = reflect.TypeOf(netaddr.IPPrefix{})
+	typeRange  = reflect.TypeOf(Range{})
+	typeString = reflect.TypeOf("")
+)
+
 // fieldTypeMap maps a layer field's dataType to a Go value of that
 // type.
 var fieldTypeMap = map[dataType]reflect.Type{
-	dataTypeUint8:                  reflect.TypeOf(uint8(0)),
-	dataTypeUint16:                 reflect.TypeOf(uint16(0)),
-	dataTypeUint32:                 reflect.TypeOf(uint32(0)),
-	dataTypeUint64:                 reflect.TypeOf(uint64(0)),
-	dataTypeByteArray16:            reflect.TypeOf([16]byte{}),
-	dataTypeByteBlob:               reflect.TypeOf([]byte(nil)),
-	dataTypeSID:                    reflect.TypeOf(&windows.SID{}),
-	dataTypeSecurityDescriptor:     reflect.TypeOf(windows.SECURITY_DESCRIPTOR{}),
-	dataTypeTokenInformation:       reflect.TypeOf(TokenInformation{}),
-	dataTypeTokenAccessInformation: reflect.TypeOf(TokenAccessInformation{}),
-	dataTypeArray6:                 reflect.TypeOf(net.HardwareAddr{}),
-	dataTypeBitmapIndex:            reflect.TypeOf(BitmapIndex(0)),
-	dataTypeV4AddrMask:             reflect.TypeOf(netaddr.IPPrefix{}),
-	dataTypeV6AddrMask:             reflect.TypeOf(netaddr.IPPrefix{}),
-	dataTypeRange:                  reflect.TypeOf(Range{}),
+	dataTypeUint8:                  typeUint8,
+	dataTypeUint16:                 typeUint16,
+	dataTypeUint32:                 typeUint32,
+	dataTypeUint64:                 typeUint64,
+	dataTypeByteArray16:            typeArray16,
+	dataTypeByteBlob:               typeBytes,
+	dataTypeSID:                    typeSID,
+	dataTypeSecurityDescriptor:     typeSecurityDescriptor,
+	dataTypeTokenInformation:       typeTokenInformation,
+	dataTypeTokenAccessInformation: typeTokenAccessInformation,
+	dataTypeArray6:                 typeMAC,
+	dataTypeBitmapIndex:            typeBitmapIndex,
+	dataTypeV4AddrMask:             typePrefix,
+	dataTypeV6AddrMask:             typePrefix,
+	dataTypeRange:                  typeRange,
 }
 
 // fieldType returns the reflect.Type for a layer field, or an error
@@ -49,7 +68,7 @@ func fieldType(f *fwpmField0) (reflect.Type, error) {
 		if f.DataType != dataTypeUint32 && f.DataType != dataTypeByteArray16 {
 			return nil, fmt.Errorf("field has IP address type, but underlying datatype is %s (want Uint32 or ByteArray16)", f.DataType)
 		}
-		return reflect.TypeOf(netaddr.IP{}), nil
+		return typeIP, nil
 	}
 	// Flags are a uint32 with a modifier. This just checks that there
 	// are no surprise flag fields of other types.
@@ -57,7 +76,7 @@ func fieldType(f *fwpmField0) (reflect.Type, error) {
 		if f.DataType != dataTypeUint32 {
 			return nil, fmt.Errorf("field has flag type, but underlying datatype is %s (want Uint32)", f.DataType)
 		}
-		return reflect.TypeOf(uint32(0)), nil
+		return typeUint32, nil
 	}
 
 	// FWPM_CONDITION_ALE_APP_ID is provided by WFP as a byte blob
@@ -66,7 +85,7 @@ func fieldType(f *fwpmField0) (reflect.Type, error) {
 	// string" datatype for anything, we use Go strings as a special
 	// case for thtat one field.
 	if f.DataType == dataTypeByteBlob && *f.FieldKey == FieldALEAppID {
-		return reflect.TypeOf(""), nil
+		return typeString, nil
 	}
 
 	// For everything else, there's a simple mapping.
@@ -318,7 +337,7 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 		return *(*uint16)(unsafe.Pointer(&v.Value)), nil
 	case dataTypeUint32:
 		u := *(*uint32)(unsafe.Pointer(&v.Value))
-		if ftype == reflect.TypeOf(netaddr.IP{}) {
+		if ftype == typeIP {
 			return ipv4From32(u), nil
 		}
 		return u, nil
@@ -327,12 +346,12 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 	case dataTypeByteArray16:
 		var ret [16]byte
 		copy(ret[:], fromBytes(v.Value, 16))
-		if ftype == reflect.TypeOf(netaddr.IP{}) {
+		if ftype == typeIP {
 			return netaddr.IPFrom16(ret), nil
 		}
 		return ret, nil
 	case dataTypeByteBlob:
-		if ftype == reflect.TypeOf("") {
+		if ftype == typeString {
 			return fromByteBlobToString(*(**fwpByteBlob)(unsafe.Pointer(&v.Value)))
 		} else {
 			return fromByteBlob(*(**fwpByteBlob)(unsafe.Pointer(&v.Value))), nil
@@ -410,7 +429,7 @@ func parseRange0(v *uintptr, ftype reflect.Type) (interface{}, error) {
 	if reflect.TypeOf(from) != reflect.TypeOf(to) {
 		return nil, fmt.Errorf("range.From and range.To types don't match: %s / %s", reflect.TypeOf(from), reflect.TypeOf(to))
 	}
-	if reflect.TypeOf(from) == reflect.TypeOf(netaddr.IP{}) {
+	if reflect.TypeOf(from) == typeIP {
 		return netaddr.IPRange{
 			From: from.(netaddr.IP),
 			To:   to.(netaddr.IP),

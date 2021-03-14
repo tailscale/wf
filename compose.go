@@ -86,7 +86,7 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 		return nil, err
 	}
 
-	typ, val, err := toValue0(a, r.Weight, reflect.TypeOf(uint64(0)))
+	typ, val, err := toValue0(a, r.Weight, typeUint64)
 	if err != nil {
 		return nil, err
 	}
@@ -171,28 +171,28 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 	}
 
 	switch ftype {
-	case reflect.TypeOf(uint8(0)):
+	case typeUint8:
 		typ = dataTypeUint8
 		u, ok := v.(uint8)
 		if !ok {
 			return mapErr()
 		}
 		*(*uint8)(unsafe.Pointer(&val)) = u
-	case reflect.TypeOf(uint16(0)):
+	case typeUint16:
 		typ = dataTypeUint16
 		u, ok := v.(uint16)
 		if !ok {
 			return mapErr()
 		}
 		*(*uint16)(unsafe.Pointer(&val)) = u
-	case reflect.TypeOf(uint32(0)):
+	case typeUint32:
 		typ = dataTypeUint32
 		u, ok := v.(uint32)
 		if !ok {
 			return mapErr()
 		}
 		*(*uint32)(unsafe.Pointer(&val)) = u
-	case reflect.TypeOf(uint64(0)):
+	case typeUint64:
 		typ = dataTypeUint64
 		u, ok := v.(uint64)
 		if !ok {
@@ -201,7 +201,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		p := a.Alloc(unsafe.Sizeof(u))
 		*(*uint64)(p) = u
 		val = uintptr(p)
-	case reflect.TypeOf([]byte(nil)):
+	case typeBytes:
 		typ = dataTypeByteBlob
 		bb, ok := v.([]byte)
 		if !ok {
@@ -214,7 +214,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			Data: toBytes(a, bb),
 		}
 		val = uintptr(p)
-	case reflect.TypeOf(""):
+	case typeString:
 		s, ok := v.(string)
 		if !ok {
 			return mapErr()
@@ -227,7 +227,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			Data: bb,
 		}
 		typ = dataTypeByteBlob
-	case reflect.TypeOf(&windows.SID{}):
+	case typeSID:
 		typ = dataTypeSID
 		s, ok := v.(*windows.SID)
 		if !ok {
@@ -239,21 +239,21 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			return 0, 0, err
 		}
 		val = uintptr(p)
-	case reflect.TypeOf(BitmapIndex(0)):
+	case typeBitmapIndex:
 		typ = dataTypeBitmapIndex
 		i, ok := v.(BitmapIndex)
 		if !ok {
 			return mapErr()
 		}
 		*(*uint8)(unsafe.Pointer(&val)) = uint8(i)
-	case reflect.TypeOf([16]byte{}):
+	case typeArray16:
 		typ = dataTypeByteArray16
 		bs, ok := v.([16]byte)
 		if !ok {
 			return mapErr()
 		}
 		val = uintptr(unsafe.Pointer(toBytes(a, bs[:])))
-	case reflect.TypeOf(net.HardwareAddr{}):
+	case typeMAC:
 		typ = dataTypeArray6
 		mac, ok := v.(net.HardwareAddr)
 		if !ok {
@@ -263,7 +263,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			return mapErr() // TODO: better error
 		}
 		val = uintptr(unsafe.Pointer(toBytes(a, mac[:])))
-	case reflect.TypeOf(netaddr.IP{}):
+	case typeIP:
 		switch m := v.(type) {
 		case netaddr.IP:
 			if m.Is4() {
@@ -295,7 +295,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		default:
 			return mapErr()
 		}
-	case reflect.TypeOf((*windows.SECURITY_DESCRIPTOR)(nil)):
+	case typeSecurityDescriptor:
 		sd, ok := v.(*windows.SECURITY_DESCRIPTOR)
 		if !ok {
 			return mapErr()
@@ -306,7 +306,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		}
 		typ = dataTypeSecurityDescriptor
 		val = uintptr(unsafe.Pointer(csd))
-	case reflect.TypeOf(Range{}):
+	case typeRange:
 		r, ok := v.(Range)
 		if !ok {
 			return mapErr()
