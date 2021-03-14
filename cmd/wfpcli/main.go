@@ -375,7 +375,7 @@ func listRules(context.Context, []string) error {
 		fmt.Printf("  Weight: 0x%02x\n", rule.Weight)
 		fmt.Printf("  Action: %s\n", rule.Action)
 		if rule.Callout != (windows.GUID{}) {
-			fmt.Printf("  Callout: %s\n", wf.GUIDName(rule.Callout))
+			fmt.Printf("  Callout: %s\n", rule.Callout)
 		}
 		if rule.Action == wf.ActionCalloutTerminating || rule.Action == wf.ActionCalloutUnknown {
 			fmt.Printf("  Permit if missing: %v\n", rule.PermitIfMissing)

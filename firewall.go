@@ -15,15 +15,6 @@ import (
 	"inet.af/netaddr"
 )
 
-// GUIDName returns a human-readable name for standard WFP GUIDs. If g
-// is not a standard WFP GUID, g.String() is returned.
-func GUIDName(g windows.GUID) string {
-	if n := guidNames[g]; n != "" {
-		return n
-	}
-	return g.String()
-}
-
 type fieldTypes map[FieldID]reflect.Type
 type layerTypes map[LayerID]fieldTypes
 
