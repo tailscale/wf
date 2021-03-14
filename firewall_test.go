@@ -113,7 +113,7 @@ func TestLayers(t *testing.T) {
 			DefaultSublayer: guidSublayerUniversal,
 			Fields: []*Field{
 				{guidConditionALEAppID, stringT},
-				{guidConditionALENapContext, u32T},
+				{guidConditionALENAPContext, u32T},
 				{guidConditionALEPackageID, sidT},
 				{guidConditionALERemoteMachineID, taiT},
 				{guidConditionALERemoteUserID, taiT},
