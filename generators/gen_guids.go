@@ -17,8 +17,6 @@ func fatalf(msg string, args ...interface{}) {
 	os.Exit(1)
 }
 
-var generated []string
-
 func main() {
 	fwpmuPath, outPath := os.Args[1], os.Args[2]
 
@@ -38,6 +36,7 @@ import "golang.org/x/sys/windows"
 `)
 
 	defs := map[string][]string{}
+	var generated []guidName
 
 	for {
 		l, err := r.ReadString('\n')
@@ -48,7 +47,7 @@ import "golang.org/x/sys/windows"
 		}
 		l = strings.TrimSpace(l)
 
-		if !strings.HasPrefix(l, "DEFINE_GUID") {
+		if !strings.HasPrefix(l, "DEFINE_GUID(") {
 			continue
 		}
 
@@ -57,7 +56,7 @@ import "golang.org/x/sys/windows"
 			fatalf("reading GUID def: %v", err)
 		}
 
-		defs[guidType(name)] = append(defs[guidType(name)], fmt.Sprintf("%s = %s{%s, %s, %s, [8]byte{%s}}", varName(name), typeName(name), g1, g2, g3, g4))
+		defs[name.Type()] = append(defs[name.Type()], fmt.Sprintf("%s = %s{%s, %s, %s, [8]byte{%s}}", name.VarName(), name.GoType(), g1, g2, g3, g4))
 		generated = append(generated, name)
 	}
 
@@ -67,6 +66,7 @@ import "golang.org/x/sys/windows"
 	}
 	sort.Strings(types)
 	for _, typ := range types {
+		fmt.Fprintf(&out, "// Well-known %s IDs.\n", strings.ToLower(typ))
 		fmt.Fprintf(&out, "var (\n")
 		vars := defs[typ]
 		sort.Strings(vars)
@@ -76,15 +76,15 @@ import "golang.org/x/sys/windows"
 		fmt.Fprintf(&out, ")\n\n")
 	}
 
-	sort.Strings(generated)
+	sort.Slice(generated, func(i, j int) bool { return generated[i] < generated[j] })
 
 	out.WriteString("var guidNames = map[windows.GUID]string{\n")
 	for _, name := range generated {
-		v := varName(name)
-		if typeName(name) != "windows.GUID" {
+		v := name.VarName()
+		if name.GoType() != "windows.GUID" {
 			v = fmt.Sprintf("windows.GUID(%s)", v)
 		}
-		fmt.Fprintf(&out, "%s: %q,\n", v, stringName(name))
+		fmt.Fprintf(&out, "%s: %q,\n", v, name.String())
 	}
 	out.WriteString("}\n")
 
@@ -98,29 +98,72 @@ import "golang.org/x/sys/windows"
 	}
 }
 
-var keepUpper = []string{
-	"ALE",
-	"DCOM",
-	"EP",
-	"ICMP",
-	"ID",
-	"IKE",
-	"IP",
-	"KM",
-	"LIPS",
-	"MAC",
-	"NAP",
-	"OUI",
-	"QM",
-	"RPC",
-	"SNAP",
-	"TCP",
-	"UDP",
-	"UM",
-	"UUID",
-	"VLAN",
-	"WFP",
+type guidName string
+
+// Type returns the datatype of the GUID.
+// e.g. FWPM_LAYER_BLAH_BLAH -> "layer"
+func (g guidName) Type() string {
+	ret := strings.ToLower(strings.Split(string(g), "_")[1])
+	switch ret {
+	case "condition":
+		return "field"
+	default:
+		return ret
+	}
 }
+
+func (g guidName) Exported() bool {
+	switch g.Type() {
+	case "layer", "field":
+		return true
+	default:
+		return false
+	}
+}
+
+// GoType returns the Go type to use when declaring the GUID.
+// e.g. FWPM_LAYER_BLAH -> LayerID
+func (g guidName) GoType() string {
+	if g.Exported() {
+		return strings.Title(g.Type()) + "ID"
+	}
+	return "windows.GUID"
+}
+
+// String returns the pretty string for the GUID.
+// e.g. "FWPM_LAYER_BLAH" -> "BLAH"
+// e.g. "FWPM_SUBLAYER_LIPS" -> "SUBLAYER_LIPS"
+func (g guidName) String() string {
+	if g.Exported() {
+		return strings.SplitN(string(g), "_", 3)[2]
+	}
+	return strings.SplitN(string(g), "_", 2)[1]
+}
+
+var keepUpper = map[string]bool{
+	"ALE":  true,
+	"DCOM": true,
+	"EP":   true,
+	"ICMP": true,
+	"ID":   true,
+	"IKE":  true,
+	"IP":   true,
+	"KM":   true,
+	"LIPS": true,
+	"MAC":  true,
+	"NAP":  true,
+	"OUI":  true,
+	"QM":   true,
+	"RPC":  true,
+	"SNAP": true,
+	"TCP":  true,
+	"UDP":  true,
+	"UM":   true,
+	"UUID": true,
+	"VLAN": true,
+	"WFP":  true,
+}
+
 var replacements = map[string]string{
 	"AUTHIP":    "AuthIP",
 	"EPMAP":     "EPMap",
@@ -132,30 +175,18 @@ var replacements = map[string]string{
 	"VSWITCH":   "VSwitch",
 }
 
-var exported = map[string]bool{
-	"LAYER": true,
-}
-
-func stringName(name string) string {
-	if exported[guidType(name)] {
-		return strings.SplitN(name, "_", 3)[2]
-	}
-	return strings.SplitN(name, "_", 2)[1]
-}
-
-func varName(guidName string) string {
-	fs := strings.Split(guidName, "_")
-	if exported[fs[1]] {
+func (g guidName) VarName() string {
+	fs := strings.Split(string(g), "_")
+	if g.Exported() {
 		fs[0] = ""
 	} else {
 		fs[0] = "guid"
 	}
-remapLoop:
+	fs[1] = g.Type()
+
 	for i, f := range fs[1:] {
-		for _, k := range keepUpper {
-			if k == f {
-				continue remapLoop
-			}
+		if keepUpper[f] {
+			continue
 		}
 		if rep, ok := replacements[f]; ok {
 			fs[i+1] = rep
@@ -167,35 +198,22 @@ remapLoop:
 	return strings.Join(fs, "")
 }
 
-func typeName(name string) string {
-	switch guidType(name) {
-	case "LAYER":
-		return "LayerID"
-	default:
-		return "windows.GUID"
-	}
-}
-
-func guidType(name string) string {
-	fs := strings.Split(name, "_")
-	return fs[1]
-}
-
-func readGUIDDef(r *bufio.Reader, l string) (name, g1, g2, g3, g4 string, err error) {
+func readGUIDDef(r *bufio.Reader, l string) (name guidName, g1, g2, g3, g4 string, err error) {
 	clean := func(s string) string {
 		s = strings.TrimSpace(s)
 		return strings.TrimSuffix(s, ",")
 	}
 
+	var n string
 	if strings.HasPrefix(l, "DEFINE_GUID(FWPM_") {
-		name = strings.Split(l, "(")[1]
+		n = strings.Split(l, "(")[1]
 	} else {
-		name, err = r.ReadString('\n')
+		n, err = r.ReadString('\n')
 		if err != nil {
 			return
 		}
 	}
-	name = clean(name)
+	name = guidName(clean(n))
 
 	g1, err = r.ReadString('\n')
 	if err != nil {
