@@ -478,6 +478,16 @@ func (id RuleID) String() string {
 	return windows.GUID(id).String()
 }
 
+// CalloutID identifies a WFP callout function.
+type CalloutID windows.GUID
+
+func (id CalloutID) String() string {
+	if s := guidNames[windows.GUID(id)]; s != "" {
+		return s
+	}
+	return windows.GUID(id).String()
+}
+
 // A Rule is an action to take on packets that match a set of
 // conditions.
 type Rule struct {
@@ -504,7 +514,7 @@ type Rule struct {
 	// Callout is the ID of the callout to invoke. Only valid if
 	// Action is ActionCalloutTerminating, ActionCalloutInspection, or
 	// ActionCalloutUnknown.
-	Callout windows.GUID
+	Callout CalloutID
 	// PermitIfMissing, if set, indicates that a callout action to a
 	// callout ID that isn't registered should be translated into an
 	// ActionPermit, rather than an ActionBlock. Only relevant if

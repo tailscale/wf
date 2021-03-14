@@ -161,7 +161,7 @@ const (
 //go:notinheap
 type fwpmAction0 struct {
 	Type Action
-	GUID windows.GUID
+	GUID CalloutID
 }
 
 //go:notinheap

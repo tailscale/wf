@@ -374,7 +374,7 @@ func listRules(context.Context, []string) error {
 		fmt.Printf("  Sublayer: %s\n", rule.Sublayer.String())
 		fmt.Printf("  Weight: 0x%02x\n", rule.Weight)
 		fmt.Printf("  Action: %s\n", rule.Action)
-		if rule.Callout != (windows.GUID{}) {
+		if rule.Callout != (wf.CalloutID{}) {
 			fmt.Printf("  Callout: %s\n", rule.Callout)
 		}
 		if rule.Action == wf.ActionCalloutTerminating || rule.Action == wf.ActionCalloutUnknown {
