@@ -383,7 +383,7 @@ func listRules(context.Context, []string) error {
 		fmt.Printf("  Persistent: %v\n", rule.Persistent)
 		fmt.Printf("  Boot-time: %v\n", rule.BootTime)
 		if rule.Provider != nil {
-			//fmt.Printf("  Provider: %s\n", wf.GUIDName(*rule.Provider))
+			fmt.Printf("  Provider: %s\n", rule.Provider)
 		}
 		if rule.Disabled {
 			fmt.Printf("  Disabled: %v\n", rule.Disabled)
