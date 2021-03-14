@@ -65,7 +65,7 @@ func fieldType(f *fwpmField0) (reflect.Type, error) {
 	// UTF-16 encoded string. Since WFP doesn't use its own "unicode
 	// string" datatype for anything, we use Go strings as a special
 	// case for thtat one field.
-	if f.DataType == dataTypeByteBlob && *f.FieldKey == guidConditionALEAppID {
+	if f.DataType == dataTypeByteBlob && *f.FieldKey == FieldALEAppID {
 		return reflect.TypeOf(""), nil
 	}
 
@@ -106,7 +106,7 @@ func fromLayer0(array **fwpmLayer0, num uint32) ([]*Layer, error) {
 			field := &fields[i]
 			typ, err := fieldType(field)
 			if err != nil {
-				return nil, fmt.Errorf("finding type of field %s: %w", GUIDName(*field.FieldKey), err)
+				return nil, fmt.Errorf("finding type of field %s: %w", *field.FieldKey, err)
 			}
 			l.Fields = append(l.Fields, &Field{
 				ID:   *field.FieldKey,
@@ -295,7 +295,7 @@ func fromCondition0(condArray *fwpmFilterCondition0, num uint32, fieldTypes fiel
 
 		v, err := fromValue0((*fwpValue0)(unsafe.Pointer(&cond.Value)), fieldType)
 		if err != nil {
-			return nil, fmt.Errorf("getting value for match [%s %s]: %w", GUIDName(cond.FieldKey), cond.MatchType, err)
+			return nil, fmt.Errorf("getting value for match [%s %s]: %w", cond.FieldKey, cond.MatchType, err)
 		}
 		m := &Match{
 			Field: cond.FieldKey,
