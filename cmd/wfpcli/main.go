@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
 	"golang.org/x/sys/windows"
@@ -53,10 +54,13 @@ var (
 		Exec:       listLayers,
 	}
 
-	listSublayersC = &ffcli.Command{
+	listSublayerFS    = flag.NewFlagSet("wfpcli list-sublayers", flag.ExitOnError)
+	sublayerProviders = listSublayerFS.String("providers", "", "Limit to given provider GUIDs")
+	listSublayersC    = &ffcli.Command{
 		Name:       "list-sublayers",
 		ShortUsage: "wfpcli list-sublayers",
 		ShortHelp:  "List WFP sublayers.",
+		FlagSet:    listSublayerFS,
 		Exec:       listSublayers,
 	}
 
@@ -265,7 +269,16 @@ func listSublayers(_ context.Context, _ []string) error {
 	}
 	defer sess.Close()
 
-	sublayers, err := sess.Sublayers(wf.ProviderID{})
+	var providers []wf.ProviderID
+	for _, f := range strings.Split(*sublayerProviders, ",") {
+		guid, err := windows.GUIDFromString(f)
+		if err != nil {
+			return fmt.Errorf("parsing GUID %q: %v", f, err)
+		}
+		providers = append(providers, wf.ProviderID(guid))
+	}
+
+	sublayers, err := sess.Sublayers(providers...)
 	if err != nil {
 		return fmt.Errorf("listing WFP sublayers: %w", err)
 	}

@@ -243,9 +243,28 @@ type Sublayer struct {
 	Weight uint16
 }
 
-// Sublayers returns available Sublayers. If provider is non-zero, only
-// Sublayers registered to that Provider are returned.
-func (s *Session) Sublayers(provider ProviderID) ([]*Sublayer, error) {
+// Sublayers returns available Sublayers. If providers are given,
+// returns only sublayers registered to those providers.
+func (s *Session) Sublayers(providers ...ProviderID) ([]*Sublayer, error) {
+	if len(providers) == 0 {
+		// Do one lookup with a zero provider, which returns all
+		// sublayers.
+		providers = []ProviderID{ProviderID{}}
+	}
+
+	var ret []*Sublayer
+	for _, provider := range providers {
+		sls, err := s.getOneProvider(provider)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, sls...)
+	}
+
+	return ret, nil
+}
+
+func (s *Session) getOneProvider(provider ProviderID) ([]*Sublayer, error) {
 	var a arena
 	defer a.Dispose()
 
