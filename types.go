@@ -261,7 +261,7 @@ type fwpmNetEventHeader1 struct {
 	Flags      uint32       // enum
 	IPVersion  fwpIPVersion // enum
 	IPProtocol uint8
-	pad        [3]byte
+	_          [3]byte
 	LocalAddr  [16]byte
 	RemoteAddr [16]byte
 	LocalPort  uint16
@@ -273,7 +273,7 @@ type fwpmNetEventHeader1 struct {
 	// Random reserved fields for an aborted attempt at including
 	// Ethernet frame information. Not used, but we have to pad out
 	// the struct appropriately.
-	unused1 struct {
+	_ struct {
 		reserved1 uint32
 		unused2   struct {
 			reserved2  [6]byte

@@ -5,7 +5,6 @@
 package wf
 
 import (
-	"fmt"
 	"sort"
 	"testing"
 	"time"
@@ -15,12 +14,7 @@ import (
 )
 
 func skipIfUnprivileged(t *testing.T) {
-	tok, err := windows.OpenCurrentProcessToken()
-	if err != nil {
-		panic(fmt.Sprintf("getting process token: %v", err))
-	}
-	defer tok.Close()
-	if !tok.IsElevated() {
+	if !windows.GetCurrentProcessToken().IsElevated() {
 		t.Skipf("skipping test that requires admin privileges")
 	}
 }
