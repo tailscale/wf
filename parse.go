@@ -272,6 +272,10 @@ func fromFilter0(array **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rul
 			ProviderData: fromByteBlob(&rule.ProviderData),
 			Disabled:     (rule.Flags & fwpmFilterFlagsDisabled) != 0,
 		}
+		if rule.ProviderKey != nil {
+			r.Provider = &ProviderID{}
+			*r.Provider = *rule.ProviderKey
+		}
 		if rule.EffectiveWeight.Type == dataTypeUint64 {
 			r.Weight = **(**uint64)(unsafe.Pointer(&rule.EffectiveWeight.Value))
 		}

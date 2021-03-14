@@ -104,6 +104,10 @@ func (id LayerID) String() string {
 	return windows.GUID(id).String()
 }
 
+func (id *LayerID) IsZero() bool {
+	return id == nil || *id == LayerID{}
+}
+
 // Layer is a point in the packet processing path where filter rules
 // can be applied.
 type Layer struct {
@@ -131,6 +135,10 @@ func (id FieldID) String() string {
 		return s
 	}
 	return windows.GUID(id).String()
+}
+
+func (id *FieldID) IsZero() bool {
+	return id == nil || *id == FieldID{}
 }
 
 // Field is a piece of information that a layer makes available to
@@ -209,6 +217,10 @@ func (id SublayerID) String() string {
 	return windows.GUID(id).String()
 }
 
+func (id *SublayerID) IsZero() bool {
+	return id == nil || *id == SublayerID{}
+}
+
 // A Sublayer is a container for filtering rules.
 type Sublayer struct {
 	// ID is the unique identifier for this sublayer.
@@ -281,7 +293,7 @@ func (s *Session) AddSublayer(sl *Sublayer) error {
 	// the WFP API accepts zero GUIDs and interprets it as "give me a
 	// random GUID". However, we can't get that GUID back out, so it
 	// would be pointless to make such a request. Stop it here.
-	if sl.ID == (SublayerID{}) {
+	if sl.ID.IsZero() {
 		return errors.New("Sublayer.ID cannot be zero")
 	}
 
@@ -294,7 +306,7 @@ func (s *Session) AddSublayer(sl *Sublayer) error {
 
 // DeleteSublayer deletes the Sublayer whose GUID is id.
 func (s *Session) DeleteSublayer(id SublayerID) error {
-	if id == (SublayerID{}) {
+	if id.IsZero() {
 		return errors.New("GUID cannot be zero")
 	}
 
@@ -309,6 +321,10 @@ func (id ProviderID) String() string {
 		return s
 	}
 	return windows.GUID(id).String()
+}
+
+func (id *ProviderID) IsZero() bool {
+	return id == nil || *id == ProviderID{}
 }
 
 // A Provider is an entity that owns sublayers and filtering rules.
@@ -376,7 +392,7 @@ func (s *Session) getProviderPage(enum windows.Handle) ([]*Provider, error) {
 
 // AddProvider creates a new provider.
 func (s *Session) AddProvider(p *Provider) error {
-	if p.ID == (ProviderID{}) {
+	if p.ID.IsZero() {
 		return errors.New("Provider.ID cannot be zero")
 	}
 
@@ -392,7 +408,7 @@ func (s *Session) AddProvider(p *Provider) error {
 // can only be deleted once all the resources it owns have been
 // deleted.
 func (s *Session) DeleteProvider(id ProviderID) error {
-	if id == (ProviderID{}) {
+	if id.IsZero() {
 		return errors.New("GUID cannot be zero")
 	}
 
@@ -478,6 +494,10 @@ func (id RuleID) String() string {
 	return windows.GUID(id).String()
 }
 
+func (id *RuleID) IsZero() bool {
+	return id == nil || *id == RuleID{}
+}
+
 // CalloutID identifies a WFP callout function.
 type CalloutID windows.GUID
 
@@ -486,6 +506,10 @@ func (id CalloutID) String() string {
 		return s
 	}
 	return windows.GUID(id).String()
+}
+
+func (id *CalloutID) IsZero() bool {
+	return id == nil || *id == CalloutID{}
 }
 
 // A Rule is an action to take on packets that match a set of
@@ -584,7 +608,7 @@ func (s *Session) getRulePage(enum windows.Handle) ([]*Rule, error) {
 }
 
 func (s *Session) AddRule(r *Rule) error {
-	if r.ID == (RuleID{}) {
+	if r.ID.IsZero() {
 		return errors.New("Provider.ID cannot be zero")
 	}
 
@@ -604,7 +628,7 @@ func (s *Session) AddRule(r *Rule) error {
 }
 
 func (s *Session) DeleteRule(id RuleID) error {
-	if id == (RuleID{}) {
+	if id.IsZero() {
 		return errors.New("GUID cannot be zero")
 	}
 
