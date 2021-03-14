@@ -30,8 +30,8 @@ type Session struct {
 	layerTypes layerTypes
 }
 
-// SessionOptions configure a Session.
-type SessionOptions struct {
+// Options configures a Session.
+type Options struct {
 	// Name is a short name for the session, shown in Windows
 	// administrative tools.
 	Name string
@@ -40,8 +40,8 @@ type SessionOptions struct {
 	Description string
 	// Dynamic, if true, indicates that all objects created during the
 	// session should be removed when the session is closed or the
-	// session-owning process terminates. Dynamic sessions are meant
-	// for adding firewall configuration that should not outlast your
+	// current process terminates. Dynamic sessions are meant for
+	// adding firewall configuration that should not outlast your
 	// program's execution.
 	Dynamic bool
 	// TransactionStartTimeout is how long the session is willing to
@@ -51,9 +51,9 @@ type SessionOptions struct {
 }
 
 // New connects to the WFP API.
-func New(opts *SessionOptions) (*Session, error) {
+func New(opts *Options) (*Session, error) {
 	if opts == nil {
-		opts = &SessionOptions{}
+		opts = &Options{}
 	}
 
 	var a arena
@@ -94,7 +94,9 @@ func (s *Session) Close() error {
 	if s.handle == 0 {
 		return nil
 	}
-	return fwpmEngineClose0(s.handle)
+	err := fwpmEngineClose0(s.handle)
+	s.handle = 0
+	return err
 }
 
 // Layer is a point in the packet processing path where filter rules

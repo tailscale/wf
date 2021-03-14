@@ -118,7 +118,7 @@ func main() {
 }
 
 func session() (*wf.Session, error) {
-	return wf.New(&wf.SessionOptions{
+	return wf.New(&wf.Options{
 		Name:        "wfpcli",
 		Description: "WFP CLI",
 		Dynamic:     *dynamic,

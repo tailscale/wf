@@ -12,7 +12,7 @@ import (
 )
 
 // toSession0 converts opts into an arena-allocated fwpmSession0.
-func toSession0(a *arena, opts *SessionOptions) *fwpmSession0 {
+func toSession0(a *arena, opts *Options) *fwpmSession0 {
 	ret := (*fwpmSession0)(a.Alloc(unsafe.Sizeof(fwpmSession0{})))
 	*ret = fwpmSession0{
 		DisplayData: fwpmDisplayData0{
