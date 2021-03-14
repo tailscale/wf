@@ -2,6 +2,7 @@ package wf
 
 import "golang.org/x/sys/windows"
 
+// Well-known callout IDs.
 var (
 	guidCalloutEdgeTraversalALEListenV4              = windows.GUID{0x33486ab5, 0x6d5e, 0x4e65, [8]byte{0xa0, 0x0b, 0xa7, 0xaf, 0xed, 0x0b, 0xa9, 0xa1}}
 	guidCalloutEdgeTraversalALEResourceAssignmentV4  = windows.GUID{0x079b1010, 0xf1c5, 0x4fcd, [8]byte{0xae, 0x05, 0xda, 0x41, 0x10, 0x7a, 0xbd, 0x0b}}
@@ -50,156 +51,159 @@ var (
 	guidCalloutWFPTransportLayerV6SilentDrop         = windows.GUID{0x8693cc74, 0xa075, 0x4156, [8]byte{0xb4, 0x76, 0x92, 0x86, 0xee, 0xce, 0x81, 0x4e}}
 )
 
+// Well-known field IDs.
 var (
-	guidConditionALEAppID                        = windows.GUID{0xd78e1e87, 0x8644, 0x4ea5, [8]byte{0x94, 0x37, 0xd8, 0x09, 0xec, 0xef, 0xc9, 0x71}}
-	guidConditionALEEffectiveName                = windows.GUID{0xb1277b9a, 0xb781, 0x40fc, [8]byte{0x96, 0x71, 0xe5, 0xf1, 0xb9, 0x89, 0xf3, 0x4e}}
-	guidConditionALENAPContext                   = windows.GUID{0x46275a9d, 0xc03f, 0x4d77, [8]byte{0xb7, 0x84, 0x1c, 0x57, 0xf4, 0xd0, 0x27, 0x53}}
-	guidConditionALEOriginalAppID                = windows.GUID{0x0e6cd086, 0xe1fb, 0x4212, [8]byte{0x84, 0x2f, 0x8a, 0x9f, 0x99, 0x3f, 0xb3, 0xf6}}
-	guidConditionALEPackageID                    = windows.GUID{0x71bc78fa, 0xf17c, 0x4997, [8]byte{0xa6, 0x2, 0x6a, 0xbb, 0x26, 0x1f, 0x35, 0x1c}}
-	guidConditionALEPromiscuousMode              = windows.GUID{0x1c974776, 0x7182, 0x46e9, [8]byte{0xaf, 0xd3, 0xb0, 0x29, 0x10, 0xe3, 0x03, 0x34}}
-	guidConditionALEReauthReason                 = windows.GUID{0xb482d227, 0x1979, 0x4a98, [8]byte{0x80, 0x44, 0x18, 0xbb, 0xe6, 0x23, 0x75, 0x42}}
-	guidConditionALERemoteMachineID              = windows.GUID{0x1aa47f51, 0x7f93, 0x4508, [8]byte{0xa2, 0x71, 0x81, 0xab, 0xb0, 0x0c, 0x9c, 0xab}}
-	guidConditionALERemoteUserID                 = windows.GUID{0xf63073b7, 0x0189, 0x4ab0, [8]byte{0x95, 0xa4, 0x61, 0x23, 0xcb, 0xfa, 0xb8, 0x62}}
-	guidConditionALESecurityAttributeFqbnValue   = windows.GUID{0x37a57699, 0x5883, 0x4963, [8]byte{0x92, 0xb8, 0x3e, 0x70, 0x46, 0x88, 0xb0, 0xad}}
-	guidConditionALESioFirewallSystemPort        = windows.GUID{0xb9f4e088, 0xcb98, 0x4efb, [8]byte{0xa2, 0xc7, 0xad, 0x07, 0x33, 0x26, 0x43, 0xdb}}
-	guidConditionALEUserID                       = windows.GUID{0xaf043a0a, 0xb34d, 0x4f86, [8]byte{0x97, 0x9c, 0xc9, 0x03, 0x71, 0xaf, 0x6e, 0x66}}
-	guidConditionArrivalInterfaceIndex           = windows.GUID{0xcc088db3, 0x1792, 0x4a71, [8]byte{0xb0, 0xf9, 0x03, 0x7d, 0x21, 0xcd, 0x82, 0x8b}}
-	guidConditionArrivalInterfaceProfileID       = windows.GUID{0xcdfe6aab, 0xc083, 0x4142, [8]byte{0x86, 0x79, 0xc0, 0x8f, 0x95, 0x32, 0x9c, 0x61}}
-	guidConditionArrivalInterfaceType            = windows.GUID{0x89f990de, 0xe798, 0x4e6d, [8]byte{0xab, 0x76, 0x7c, 0x95, 0x58, 0x29, 0x2e, 0x6f}}
-	guidConditionArrivalTunnelType               = windows.GUID{0x511166dc, 0x7a8c, 0x4aa7, [8]byte{0xb5, 0x33, 0x95, 0xab, 0x59, 0xfb, 0x03, 0x40}}
-	guidConditionAuthenticationType              = windows.GUID{0xeb458cd5, 0xda7b, 0x4ef9, [8]byte{0x8d, 0x43, 0x7b, 0x0a, 0x84, 0x03, 0x32, 0xf2}}
-	guidConditionBitmapIPLocalAddress            = windows.GUID{0x16ebc3df, 0x957a, 0x452e, [8]byte{0xa1, 0xfc, 0x3d, 0x2f, 0xf6, 0xa7, 0x30, 0xba}}
-	guidConditionBitmapIPLocalPort               = windows.GUID{0x9f90a920, 0xc3b5, 0x4569, [8]byte{0xba, 0x31, 0x8b, 0xd3, 0x91, 0xd, 0xc6, 0x56}}
-	guidConditionBitmapIPRemoteAddress           = windows.GUID{0x33f00e25, 0x8eec, 0x4531, [8]byte{0xa0, 0x5, 0x41, 0xb9, 0x11, 0xf6, 0x24, 0x52}}
-	guidConditionBitmapIPRemotePort              = windows.GUID{0x2663d549, 0xaaf2, 0x46a2, [8]byte{0x86, 0x66, 0x1e, 0x76, 0x67, 0xf8, 0x69, 0x85}}
-	guidConditionBitmapIndexKey                  = windows.GUID{0xf36514c, 0x3226, 0x4a81, [8]byte{0xa2, 0x14, 0x2d, 0x51, 0x8b, 0x4, 0xd0, 0x8a}}
-	guidConditionClientCertKeyLength             = windows.GUID{0xa3ec00c7, 0x05f4, 0x4df7, [8]byte{0x91, 0xf2, 0x5f, 0x60, 0xd9, 0x1f, 0xf4, 0x43}}
-	guidConditionClientCertOid                   = windows.GUID{0xc491ad5e, 0xf882, 0x4283, [8]byte{0xb9, 0x16, 0x43, 0x6b, 0x10, 0x3f, 0xf4, 0xad}}
-	guidConditionClientToken                     = windows.GUID{0xc228fc1e, 0x403a, 0x4478, [8]byte{0xbe, 0x05, 0xc9, 0xba, 0xa4, 0xc0, 0x5a, 0xce}}
-	guidConditionCompartmentID                   = windows.GUID{0x35a791ab, 0x4ac, 0x4ff2, [8]byte{0xa6, 0xbb, 0xda, 0x6c, 0xfa, 0xc7, 0x18, 0x6}}
-	guidConditionCurrentProfileID                = windows.GUID{0xab3033c9, 0xc0e3, 0x4759, [8]byte{0x93, 0x7d, 0x57, 0x58, 0xc6, 0x5d, 0x4a, 0xe3}}
-	guidConditionDCOMAppID                       = windows.GUID{0xff2e7b4d, 0x3112, 0x4770, [8]byte{0xb6, 0x36, 0x4d, 0x24, 0xae, 0x3a, 0x6a, 0xf2}}
-	guidConditionDestinationInterfaceIndex       = windows.GUID{0x35cf6522, 0x4139, 0x45ee, [8]byte{0xa0, 0xd5, 0x67, 0xb8, 0x09, 0x49, 0xd8, 0x79}}
-	guidConditionDestinationSubInterfaceIndex    = windows.GUID{0x2b7d4399, 0xd4c7, 0x4738, [8]byte{0xa2, 0xf5, 0xe9, 0x94, 0xb4, 0x3d, 0xa3, 0x88}}
-	guidConditionDirection                       = windows.GUID{0x8784c146, 0xca97, 0x44d6, [8]byte{0x9f, 0xd1, 0x19, 0xfb, 0x18, 0x40, 0xcb, 0xf7}}
-	guidConditionEmbeddedLocalAddressType        = windows.GUID{0x4672a468, 0x8a0a, 0x4202, [8]byte{0xab, 0xb4, 0x84, 0x9e, 0x92, 0xe6, 0x68, 0x09}}
-	guidConditionEmbeddedLocalPort               = windows.GUID{0xbfca394d, 0xacdb, 0x484e, [8]byte{0xb8, 0xe6, 0x2a, 0xff, 0x79, 0x75, 0x73, 0x45}}
-	guidConditionEmbeddedProtocol                = windows.GUID{0x07784107, 0xa29e, 0x4c7b, [8]byte{0x9e, 0xc7, 0x29, 0xc4, 0x4a, 0xfa, 0xfd, 0xbc}}
-	guidConditionEmbeddedRemoteAddress           = windows.GUID{0x77ee4b39, 0x3273, 0x4671, [8]byte{0xb6, 0x3b, 0xab, 0x6f, 0xeb, 0x66, 0xee, 0xb6}}
-	guidConditionEmbeddedRemotePort              = windows.GUID{0xcae4d6a1, 0x2968, 0x40ed, [8]byte{0xa4, 0xce, 0x54, 0x71, 0x60, 0xdd, 0xa8, 0x8d}}
-	guidConditionEtherType                       = windows.GUID{0xfd08948d, 0xa219, 0x4d52, [8]byte{0xbb, 0x98, 0x1a, 0x55, 0x40, 0xee, 0x7b, 0x4e}}
-	guidConditionFlags                           = windows.GUID{0x632ce23b, 0x5167, 0x435c, [8]byte{0x86, 0xd7, 0xe9, 0x03, 0x68, 0x4a, 0xa8, 0x0c}}
-	guidConditionIPArrivalInterface              = windows.GUID{0x618a9b6d, 0x386b, 0x4136, [8]byte{0xad, 0x6e, 0xb5, 0x15, 0x87, 0xcf, 0xb1, 0xcd}}
-	guidConditionIPDestinationAddress            = windows.GUID{0x2d79133b, 0xb390, 0x45c6, [8]byte{0x86, 0x99, 0xac, 0xac, 0xea, 0xaf, 0xed, 0x33}}
-	guidConditionIPDestinationAddressType        = windows.GUID{0x1ec1b7c9, 0x4eea, 0x4f5e, [8]byte{0xb9, 0xef, 0x76, 0xbe, 0xaa, 0xaf, 0x17, 0xee}}
-	guidConditionIPDestinationPort               = windows.GUID{0xce6def45, 0x60fb, 0x4a7b, [8]byte{0xa3, 0x04, 0xaf, 0x30, 0xa1, 0x17, 0x00, 0x0e}}
-	guidConditionIPForwardInterface              = windows.GUID{0x1076b8a5, 0x6323, 0x4c5e, [8]byte{0x98, 0x10, 0xe8, 0xd3, 0xfc, 0x9e, 0x61, 0x36}}
-	guidConditionIPLocalAddress                  = windows.GUID{0xd9ee00de, 0xc1ef, 0x4617, [8]byte{0xbf, 0xe3, 0xff, 0xd8, 0xf5, 0xa0, 0x89, 0x57}}
-	guidConditionIPLocalAddressType              = windows.GUID{0x6ec7f6c4, 0x376b, 0x45d7, [8]byte{0x9e, 0x9c, 0xd3, 0x37, 0xce, 0xdc, 0xd2, 0x37}}
-	guidConditionIPLocalAddressV4                = windows.GUID{0x03a629cb, 0x6e52, 0x49f8, [8]byte{0x9c, 0x41, 0x57, 0x09, 0x63, 0x3c, 0x09, 0xcf}}
-	guidConditionIPLocalAddressV6                = windows.GUID{0x2381be84, 0x7524, 0x45b3, [8]byte{0xa0, 0x5b, 0x1e, 0x63, 0x7d, 0x9c, 0x7a, 0x6a}}
-	guidConditionIPLocalInterface                = windows.GUID{0x4cd62a49, 0x59c3, 0x4969, [8]byte{0xb7, 0xf3, 0xbd, 0xa5, 0xd3, 0x28, 0x90, 0xa4}}
-	guidConditionIPLocalPort                     = windows.GUID{0x0c1ba1af, 0x5765, 0x453f, [8]byte{0xaf, 0x22, 0xa8, 0xf7, 0x91, 0xac, 0x77, 0x5b}}
-	guidConditionIPNexthopAddress                = windows.GUID{0xeabe448a, 0xa711, 0x4d64, [8]byte{0x85, 0xb7, 0x3f, 0x76, 0xb6, 0x52, 0x99, 0xc7}}
-	guidConditionIPNexthopInterface              = windows.GUID{0x93ae8f5b, 0x7f6f, 0x4719, [8]byte{0x98, 0xc8, 0x14, 0xe9, 0x74, 0x29, 0xef, 0x04}}
-	guidConditionIPPhysicalArrivalInterface      = windows.GUID{0xda50d5c8, 0xfa0d, 0x4c89, [8]byte{0xb0, 0x32, 0x6e, 0x62, 0x13, 0x6d, 0x1e, 0x96}}
-	guidConditionIPPhysicalNexthopInterface      = windows.GUID{0xf09bd5ce, 0x5150, 0x48be, [8]byte{0xb0, 0x98, 0xc2, 0x51, 0x52, 0xfb, 0x1f, 0x92}}
-	guidConditionIPProtocol                      = windows.GUID{0x3971ef2b, 0x623e, 0x4f9a, [8]byte{0x8c, 0xb1, 0x6e, 0x79, 0xb8, 0x06, 0xb9, 0xa7}}
-	guidConditionIPRemoteAddress                 = windows.GUID{0xb235ae9a, 0x1d64, 0x49b8, [8]byte{0xa4, 0x4c, 0x5f, 0xf3, 0xd9, 0x09, 0x50, 0x45}}
-	guidConditionIPRemoteAddressV4               = windows.GUID{0x1febb610, 0x3bcc, 0x45e1, [8]byte{0xbc, 0x36, 0x2e, 0x06, 0x7e, 0x2c, 0xb1, 0x86}}
-	guidConditionIPRemoteAddressV6               = windows.GUID{0x246e1d8c, 0x8bee, 0x4018, [8]byte{0x9b, 0x98, 0x31, 0xd4, 0x58, 0x2f, 0x33, 0x61}}
-	guidConditionIPRemotePort                    = windows.GUID{0xc35a604d, 0xd22b, 0x4e1a, [8]byte{0x91, 0xb4, 0x68, 0xf6, 0x74, 0xee, 0x67, 0x4b}}
-	guidConditionIPSecPolicyKey                  = windows.GUID{0xad37dee3, 0x722f, 0x45cc, [8]byte{0xa4, 0xe3, 0x06, 0x80, 0x48, 0x12, 0x44, 0x52}}
-	guidConditionIPSecSecurityRealmID            = windows.GUID{0x37a57700, 0x5884, 0x4964, [8]byte{0x92, 0xb8, 0x3e, 0x70, 0x46, 0x88, 0xb0, 0xad}}
-	guidConditionIPSourceAddress                 = windows.GUID{0xae96897e, 0x2e94, 0x4bc9, [8]byte{0xb3, 0x13, 0xb2, 0x7e, 0xe8, 0x0e, 0x57, 0x4d}}
-	guidConditionIPSourcePort                    = windows.GUID{0xa6afef91, 0x3df4, 0x4730, [8]byte{0xa2, 0x14, 0xf5, 0x42, 0x6a, 0xeb, 0xf8, 0x21}}
-	guidConditionImageName                       = windows.GUID{0xd024de4d, 0xdeaa, 0x4317, [8]byte{0x9c, 0x85, 0xe4, 0x0e, 0xf6, 0xe1, 0x40, 0xc3}}
-	guidConditionInterfaceIndex                  = windows.GUID{0x667fd755, 0xd695, 0x434a, [8]byte{0x8a, 0xf5, 0xd3, 0x83, 0x5a, 0x12, 0x59, 0xbc}}
-	guidConditionInterfaceMACAddress             = windows.GUID{0xf6e63dce, 0x1f4b, 0x4c6b, [8]byte{0xb6, 0xef, 0x11, 0x65, 0xe7, 0x1f, 0x8e, 0xe7}}
-	guidConditionInterfaceQuarantineEpoch        = windows.GUID{0xcce68d5e, 0x053b, 0x43a8, [8]byte{0x9a, 0x6f, 0x33, 0x38, 0x4c, 0x28, 0xe4, 0xf6}}
-	guidConditionInterfaceType                   = windows.GUID{0xdaf8cd14, 0xe09e, 0x4c93, [8]byte{0xa5, 0xae, 0xc5, 0xc1, 0x3b, 0x73, 0xff, 0xca}}
-	guidConditionKMAuthNAPContext                = windows.GUID{0x35d0ea0e, 0x15ca, 0x492b, [8]byte{0x90, 0x0e, 0x97, 0xfd, 0x46, 0x35, 0x2c, 0xce}}
-	guidConditionKMMode                          = windows.GUID{0xfeef4582, 0xef8f, 0x4f7b, [8]byte{0x85, 0x8b, 0x90, 0x77, 0xd1, 0x22, 0xde, 0x47}}
-	guidConditionKMType                          = windows.GUID{0xff0f5f49, 0x0ceb, 0x481b, [8]byte{0x86, 0x38, 0x14, 0x79, 0x79, 0x1f, 0x3f, 0x2c}}
-	guidConditionL2Flags                         = windows.GUID{0x7bc43cbf, 0x37ba, 0x45f1, [8]byte{0xb7, 0x4a, 0x82, 0xff, 0x51, 0x8e, 0xeb, 0x10}}
-	guidConditionLocalInterfaceProfileID         = windows.GUID{0x4ebf7562, 0x9f18, 0x4d06, [8]byte{0x99, 0x41, 0xa7, 0xa6, 0x25, 0x74, 0x4d, 0x71}}
-	guidConditionMACDestinationAddress           = windows.GUID{0x04ea2a93, 0x858c, 0x4027, [8]byte{0xb6, 0x13, 0xb4, 0x31, 0x80, 0xc7, 0x85, 0x9e}}
-	guidConditionMACDestinationAddressType       = windows.GUID{0xae052932, 0xef42, 0x4e99, [8]byte{0xb1, 0x29, 0xf3, 0xb3, 0x13, 0x9e, 0x34, 0xf7}}
-	guidConditionMACLocalAddress                 = windows.GUID{0xd999e981, 0x7948, 0x4c83, [8]byte{0xb7, 0x42, 0xc8, 0x4e, 0x3b, 0x67, 0x8f, 0x8f}}
-	guidConditionMACLocalAddressType             = windows.GUID{0xcc31355c, 0x3073, 0x4ffb, [8]byte{0xa1, 0x4f, 0x79, 0x41, 0x5c, 0xb1, 0xea, 0xd1}}
-	guidConditionMACRemoteAddress                = windows.GUID{0x408f2ed4, 0x3a70, 0x4b4d, [8]byte{0x92, 0xa6, 0x41, 0x5a, 0xc2, 0x0e, 0x2f, 0x12}}
-	guidConditionMACRemoteAddressType            = windows.GUID{0x027fedb4, 0xf1c1, 0x4030, [8]byte{0xb5, 0x64, 0xee, 0x77, 0x7f, 0xd8, 0x67, 0xea}}
-	guidConditionMACSourceAddress                = windows.GUID{0x7b795451, 0xf1f6, 0x4d05, [8]byte{0xb7, 0xcb, 0x21, 0x77, 0x9d, 0x80, 0x23, 0x36}}
-	guidConditionMACSourceAddressType            = windows.GUID{0x5c1b72e4, 0x299e, 0x4437, [8]byte{0xa2, 0x98, 0xbc, 0x3f, 0x01, 0x4b, 0x3d, 0xc2}}
-	guidConditionNdisMediaType                   = windows.GUID{0xcb31cef1, 0x791d, 0x473b, [8]byte{0x89, 0xd1, 0x61, 0xc5, 0x98, 0x43, 0x04, 0xa0}}
-	guidConditionNdisPhysicalMediaType           = windows.GUID{0x34c79823, 0xc229, 0x44f2, [8]byte{0xb8, 0x3c, 0x74, 0x02, 0x08, 0x82, 0xae, 0x77}}
-	guidConditionNdisPort                        = windows.GUID{0xdb7bb42b, 0x2dac, 0x4cd4, [8]byte{0xa5, 0x9a, 0xe0, 0xbd, 0xce, 0x1e, 0x68, 0x34}}
-	guidConditionNetEventType                    = windows.GUID{0x206e9996, 0x490e, 0x40cf, [8]byte{0xb8, 0x31, 0xb3, 0x86, 0x41, 0xeb, 0x6f, 0xcb}}
-	guidConditionNexthopInterfaceIndex           = windows.GUID{0x138e6888, 0x7ab8, 0x4d65, [8]byte{0x9e, 0xe8, 0x05, 0x91, 0xbc, 0xf6, 0xa4, 0x94}}
-	guidConditionNexthopInterfaceProfileID       = windows.GUID{0xd7ff9a56, 0xcdaa, 0x472b, [8]byte{0x84, 0xdb, 0xd2, 0x39, 0x63, 0xc1, 0xd1, 0xbf}}
-	guidConditionNexthopInterfaceType            = windows.GUID{0x97537c6c, 0xd9a3, 0x4767, [8]byte{0xa3, 0x81, 0xe9, 0x42, 0x67, 0x5c, 0xd9, 0x20}}
-	guidConditionNexthopSubInterfaceIndex        = windows.GUID{0xef8a6122, 0x0577, 0x45a7, [8]byte{0x9a, 0xaf, 0x82, 0x5f, 0xbe, 0xb4, 0xfb, 0x95}}
-	guidConditionNexthopTunnelType               = windows.GUID{0x72b1a111, 0x987b, 0x4720, [8]byte{0x99, 0xdd, 0xc7, 0xc5, 0x76, 0xfa, 0x2d, 0x4c}}
-	guidConditionOriginalICMPType                = windows.GUID{0x076dfdbe, 0xc56c, 0x4f72, [8]byte{0xae, 0x8a, 0x2c, 0xfe, 0x7e, 0x5c, 0x82, 0x86}}
-	guidConditionOriginalProfileID               = windows.GUID{0x46ea1551, 0x2255, 0x492b, [8]byte{0x80, 0x19, 0xaa, 0xbe, 0xee, 0x34, 0x9f, 0x40}}
-	guidConditionPeerName                        = windows.GUID{0x9b539082, 0xeb90, 0x4186, [8]byte{0xa6, 0xcc, 0xde, 0x5b, 0x63, 0x23, 0x50, 0x16}}
-	guidConditionPipe                            = windows.GUID{0x1bd0741d, 0xe3df, 0x4e24, [8]byte{0x86, 0x34, 0x76, 0x20, 0x46, 0xee, 0xf6, 0xeb}}
-	guidConditionProcessWithRPCIfUUID            = windows.GUID{0xe31180a8, 0xbbbd, 0x4d14, [8]byte{0xa6, 0x5e, 0x71, 0x57, 0xb0, 0x62, 0x33, 0xbb}}
-	guidConditionQMMode                          = windows.GUID{0xf64fc6d1, 0xf9cb, 0x43d2, [8]byte{0x8a, 0x5f, 0xe1, 0x3b, 0xc8, 0x94, 0xf2, 0x65}}
-	guidConditionRPCAuthLevel                    = windows.GUID{0xe5a0aed5, 0x59ac, 0x46ea, [8]byte{0xbe, 0x05, 0xa5, 0xf0, 0x5e, 0xcf, 0x44, 0x6e}}
-	guidConditionRPCAuthType                     = windows.GUID{0xdaba74ab, 0x0d67, 0x43e7, [8]byte{0x98, 0x6e, 0x75, 0xb8, 0x4f, 0x82, 0xf5, 0x94}}
-	guidConditionRPCEPFlags                      = windows.GUID{0x218b814a, 0x0a39, 0x49b8, [8]byte{0x8e, 0x71, 0xc2, 0x0c, 0x39, 0xc7, 0xdd, 0x2e}}
-	guidConditionRPCEPValue                      = windows.GUID{0xdccea0b9, 0x0886, 0x4360, [8]byte{0x9c, 0x6a, 0xab, 0x04, 0x3a, 0x24, 0xfb, 0xa9}}
-	guidConditionRPCIfFlag                       = windows.GUID{0x238a8a32, 0x3199, 0x467d, [8]byte{0x87, 0x1c, 0x27, 0x26, 0x21, 0xab, 0x38, 0x96}}
-	guidConditionRPCIfUUID                       = windows.GUID{0x7c9c7d9f, 0x0075, 0x4d35, [8]byte{0xa0, 0xd1, 0x83, 0x11, 0xc4, 0xcf, 0x6a, 0xf1}}
-	guidConditionRPCIfVersion                    = windows.GUID{0xeabfd9b7, 0x1262, 0x4a2e, [8]byte{0xad, 0xaa, 0x5f, 0x96, 0xf6, 0xfe, 0x32, 0x6d}}
-	guidConditionRPCProtocol                     = windows.GUID{0x2717bc74, 0x3a35, 0x4ce7, [8]byte{0xb7, 0xef, 0xc8, 0x38, 0xfa, 0xbd, 0xec, 0x45}}
-	guidConditionRPCProxyAuthType                = windows.GUID{0x40953fe2, 0x8565, 0x4759, [8]byte{0x84, 0x88, 0x17, 0x71, 0xb4, 0xb4, 0xb5, 0xdb}}
-	guidConditionRPCServerName                   = windows.GUID{0xb605a225, 0xc3b3, 0x48c7, [8]byte{0x98, 0x33, 0x7a, 0xef, 0xa9, 0x52, 0x75, 0x46}}
-	guidConditionRPCServerPort                   = windows.GUID{0x8090f645, 0x9ad5, 0x4e3b, [8]byte{0x9f, 0x9f, 0x80, 0x23, 0xca, 0x09, 0x79, 0x09}}
-	guidConditionReauthorizeReason               = windows.GUID{0x11205e8c, 0x11ae, 0x457a, [8]byte{0x8a, 0x44, 0x47, 0x70, 0x26, 0xdd, 0x76, 0x4a}}
-	guidConditionRemoteID                        = windows.GUID{0xf68166fd, 0x0682, 0x4c89, [8]byte{0xb8, 0xf5, 0x86, 0x43, 0x6c, 0x7e, 0xf9, 0xb7}}
-	guidConditionRemoteUserToken                 = windows.GUID{0x9bf0ee66, 0x06c9, 0x41b9, [8]byte{0x84, 0xda, 0x28, 0x8c, 0xb4, 0x3a, 0xf5, 0x1f}}
-	guidConditionReserved0                       = windows.GUID{0x678f4deb, 0x45af, 0x4882, [8]byte{0x93, 0xfe, 0x19, 0xd4, 0x72, 0x9d, 0x98, 0x34}}
-	guidConditionReserved1                       = windows.GUID{0xd818f827, 0x5c69, 0x48eb, [8]byte{0xbf, 0x80, 0xd8, 0x6b, 0x17, 0x75, 0x5f, 0x97}}
-	guidConditionReserved10                      = windows.GUID{0xb979e282, 0xd621, 0x4c8c, [8]byte{0xb1, 0x84, 0xb1, 0x05, 0xa6, 0x1c, 0x36, 0xce}}
-	guidConditionReserved11                      = windows.GUID{0x2d62ee4d, 0x023d, 0x411f, [8]byte{0x95, 0x82, 0x43, 0xac, 0xbb, 0x79, 0x59, 0x75}}
-	guidConditionReserved12                      = windows.GUID{0xa3677c32, 0x7e35, 0x4ddc, [8]byte{0x93, 0xda, 0xe8, 0xc3, 0x3f, 0xc9, 0x23, 0xc7}}
-	guidConditionReserved13                      = windows.GUID{0x335a3e90, 0x84aa, 0x42f5, [8]byte{0x9e, 0x6f, 0x59, 0x30, 0x95, 0x36, 0xa4, 0x4c}}
-	guidConditionReserved14                      = windows.GUID{0x30e44da2, 0x2f1a, 0x4116, [8]byte{0xa5, 0x59, 0xf9, 0x07, 0xde, 0x83, 0x60, 0x4a}}
-	guidConditionReserved15                      = windows.GUID{0xbab8340f, 0xafe0, 0x43d1, [8]byte{0x80, 0xd8, 0x5c, 0xa4, 0x56, 0x96, 0x2d, 0xe3}}
-	guidConditionReserved2                       = windows.GUID{0x53d4123d, 0xe15b, 0x4e84, [8]byte{0xb7, 0xa8, 0xdc, 0xe1, 0x6f, 0x7b, 0x62, 0xd9}}
-	guidConditionReserved3                       = windows.GUID{0x7f6e8ca3, 0x6606, 0x4932, [8]byte{0x97, 0xc7, 0xe1, 0xf2, 0x07, 0x10, 0xaf, 0x3b}}
-	guidConditionReserved4                       = windows.GUID{0x5f58e642, 0xb937, 0x495e, [8]byte{0xa9, 0x4b, 0xf6, 0xb0, 0x51, 0xa4, 0x92, 0x50}}
-	guidConditionReserved5                       = windows.GUID{0x9ba8f6cd, 0xf77c, 0x43e6, [8]byte{0x88, 0x47, 0x11, 0x93, 0x9d, 0xc5, 0xdb, 0x5a}}
-	guidConditionReserved6                       = windows.GUID{0xf13d84bd, 0x59d5, 0x44c4, [8]byte{0x88, 0x17, 0x5e, 0xcd, 0xae, 0x18, 0x05, 0xbd}}
-	guidConditionReserved7                       = windows.GUID{0x65a0f930, 0x45dd, 0x4983, [8]byte{0xaa, 0x33, 0xef, 0xc7, 0xb6, 0x11, 0xaf, 0x08}}
-	guidConditionReserved8                       = windows.GUID{0x4f424974, 0x0c12, 0x4816, [8]byte{0x9b, 0x47, 0x9a, 0x54, 0x7d, 0xb3, 0x9a, 0x32}}
-	guidConditionReserved9                       = windows.GUID{0xce78e10f, 0x13ff, 0x4c70, [8]byte{0x86, 0x43, 0x36, 0xad, 0x18, 0x79, 0xaf, 0xa3}}
-	guidConditionSecEncryptAlgorithm             = windows.GUID{0x0d306ef0, 0xe974, 0x4f74, [8]byte{0xb5, 0xc7, 0x59, 0x1b, 0x0d, 0xa7, 0xd5, 0x62}}
-	guidConditionSecKeySize                      = windows.GUID{0x4772183b, 0xccf8, 0x4aeb, [8]byte{0xbc, 0xe1, 0xc6, 0xc6, 0x16, 0x1c, 0x8f, 0xe4}}
-	guidConditionSourceInterfaceIndex            = windows.GUID{0x2311334d, 0xc92d, 0x45bf, [8]byte{0x94, 0x96, 0xed, 0xf4, 0x47, 0x82, 0x0e, 0x2d}}
-	guidConditionSourceSubInterfaceIndex         = windows.GUID{0x055edd9d, 0xacd2, 0x4361, [8]byte{0x8d, 0xab, 0xf9, 0x52, 0x5d, 0x97, 0x66, 0x2f}}
-	guidConditionSubInterfaceIndex               = windows.GUID{0x0cd42473, 0xd621, 0x4be3, [8]byte{0xae, 0x8c, 0x72, 0xa3, 0x48, 0xd2, 0x83, 0xe1}}
-	guidConditionTunnelType                      = windows.GUID{0x77a40437, 0x8779, 0x4868, [8]byte{0xa2, 0x61, 0xf5, 0xa9, 0x02, 0xf1, 0xc0, 0xcd}}
-	guidConditionVLANID                          = windows.GUID{0x938eab21, 0x3618, 0x4e64, [8]byte{0x9c, 0xa5, 0x21, 0x41, 0xeb, 0xda, 0x1c, 0xa2}}
-	guidConditionVSwitchDestinationInterfaceID   = windows.GUID{0x8ed48be4, 0xc926, 0x49f6, [8]byte{0xa4, 0xf6, 0xef, 0x30, 0x30, 0xe3, 0xfc, 0x16}}
-	guidConditionVSwitchDestinationInterfaceType = windows.GUID{0xfa9b3f06, 0x2f1a, 0x4c57, [8]byte{0x9e, 0x68, 0xa7, 0x09, 0x8b, 0x28, 0xdb, 0xfe}}
-	guidConditionVSwitchDestinationVmID          = windows.GUID{0x6106aace, 0x4de1, 0x4c84, [8]byte{0x96, 0x71, 0x36, 0x37, 0xf8, 0xbc, 0xf7, 0x31}}
-	guidConditionVSwitchID                       = windows.GUID{0xc4a414ba, 0x437b, 0x4de6, [8]byte{0x99, 0x46, 0xd9, 0x9c, 0x1b, 0x95, 0xb3, 0x12}}
-	guidConditionVSwitchNetworkType              = windows.GUID{0x11d48b4b, 0xe77a, 0x40b4, [8]byte{0x91, 0x55, 0x39, 0x2c, 0x90, 0x6c, 0x26, 0x08}}
-	guidConditionVSwitchSourceInterfaceID        = windows.GUID{0x7f4ef24b, 0xb2c1, 0x4938, [8]byte{0xba, 0x33, 0xa1, 0xec, 0xbe, 0xd5, 0x12, 0xba}}
-	guidConditionVSwitchSourceInterfaceType      = windows.GUID{0xe6b040a2, 0xedaf, 0x4c36, [8]byte{0x90, 0x8b, 0xf2, 0xf5, 0x8a, 0xe4, 0x38, 0x07}}
-	guidConditionVSwitchSourceVmID               = windows.GUID{0x9c2a9ec2, 0x9fc6, 0x42bc, [8]byte{0xbd, 0xd8, 0x40, 0x6d, 0x4d, 0xa0, 0xbe, 0x64}}
-	guidConditionVSwitchTenantNetworkID          = windows.GUID{0xdc04843c, 0x79e6, 0x4e44, [8]byte{0xa0, 0x25, 0x65, 0xb9, 0xbb, 0x0f, 0x9f, 0x94}}
+	FieldALEAppID                        = FieldID{0xd78e1e87, 0x8644, 0x4ea5, [8]byte{0x94, 0x37, 0xd8, 0x09, 0xec, 0xef, 0xc9, 0x71}}
+	FieldALEEffectiveName                = FieldID{0xb1277b9a, 0xb781, 0x40fc, [8]byte{0x96, 0x71, 0xe5, 0xf1, 0xb9, 0x89, 0xf3, 0x4e}}
+	FieldALENAPContext                   = FieldID{0x46275a9d, 0xc03f, 0x4d77, [8]byte{0xb7, 0x84, 0x1c, 0x57, 0xf4, 0xd0, 0x27, 0x53}}
+	FieldALEOriginalAppID                = FieldID{0x0e6cd086, 0xe1fb, 0x4212, [8]byte{0x84, 0x2f, 0x8a, 0x9f, 0x99, 0x3f, 0xb3, 0xf6}}
+	FieldALEPackageID                    = FieldID{0x71bc78fa, 0xf17c, 0x4997, [8]byte{0xa6, 0x2, 0x6a, 0xbb, 0x26, 0x1f, 0x35, 0x1c}}
+	FieldALEPromiscuousMode              = FieldID{0x1c974776, 0x7182, 0x46e9, [8]byte{0xaf, 0xd3, 0xb0, 0x29, 0x10, 0xe3, 0x03, 0x34}}
+	FieldALEReauthReason                 = FieldID{0xb482d227, 0x1979, 0x4a98, [8]byte{0x80, 0x44, 0x18, 0xbb, 0xe6, 0x23, 0x75, 0x42}}
+	FieldALERemoteMachineID              = FieldID{0x1aa47f51, 0x7f93, 0x4508, [8]byte{0xa2, 0x71, 0x81, 0xab, 0xb0, 0x0c, 0x9c, 0xab}}
+	FieldALERemoteUserID                 = FieldID{0xf63073b7, 0x0189, 0x4ab0, [8]byte{0x95, 0xa4, 0x61, 0x23, 0xcb, 0xfa, 0xb8, 0x62}}
+	FieldALESecurityAttributeFqbnValue   = FieldID{0x37a57699, 0x5883, 0x4963, [8]byte{0x92, 0xb8, 0x3e, 0x70, 0x46, 0x88, 0xb0, 0xad}}
+	FieldALESioFirewallSystemPort        = FieldID{0xb9f4e088, 0xcb98, 0x4efb, [8]byte{0xa2, 0xc7, 0xad, 0x07, 0x33, 0x26, 0x43, 0xdb}}
+	FieldALEUserID                       = FieldID{0xaf043a0a, 0xb34d, 0x4f86, [8]byte{0x97, 0x9c, 0xc9, 0x03, 0x71, 0xaf, 0x6e, 0x66}}
+	FieldArrivalInterfaceIndex           = FieldID{0xcc088db3, 0x1792, 0x4a71, [8]byte{0xb0, 0xf9, 0x03, 0x7d, 0x21, 0xcd, 0x82, 0x8b}}
+	FieldArrivalInterfaceProfileID       = FieldID{0xcdfe6aab, 0xc083, 0x4142, [8]byte{0x86, 0x79, 0xc0, 0x8f, 0x95, 0x32, 0x9c, 0x61}}
+	FieldArrivalInterfaceType            = FieldID{0x89f990de, 0xe798, 0x4e6d, [8]byte{0xab, 0x76, 0x7c, 0x95, 0x58, 0x29, 0x2e, 0x6f}}
+	FieldArrivalTunnelType               = FieldID{0x511166dc, 0x7a8c, 0x4aa7, [8]byte{0xb5, 0x33, 0x95, 0xab, 0x59, 0xfb, 0x03, 0x40}}
+	FieldAuthenticationType              = FieldID{0xeb458cd5, 0xda7b, 0x4ef9, [8]byte{0x8d, 0x43, 0x7b, 0x0a, 0x84, 0x03, 0x32, 0xf2}}
+	FieldBitmapIPLocalAddress            = FieldID{0x16ebc3df, 0x957a, 0x452e, [8]byte{0xa1, 0xfc, 0x3d, 0x2f, 0xf6, 0xa7, 0x30, 0xba}}
+	FieldBitmapIPLocalPort               = FieldID{0x9f90a920, 0xc3b5, 0x4569, [8]byte{0xba, 0x31, 0x8b, 0xd3, 0x91, 0xd, 0xc6, 0x56}}
+	FieldBitmapIPRemoteAddress           = FieldID{0x33f00e25, 0x8eec, 0x4531, [8]byte{0xa0, 0x5, 0x41, 0xb9, 0x11, 0xf6, 0x24, 0x52}}
+	FieldBitmapIPRemotePort              = FieldID{0x2663d549, 0xaaf2, 0x46a2, [8]byte{0x86, 0x66, 0x1e, 0x76, 0x67, 0xf8, 0x69, 0x85}}
+	FieldBitmapIndexKey                  = FieldID{0xf36514c, 0x3226, 0x4a81, [8]byte{0xa2, 0x14, 0x2d, 0x51, 0x8b, 0x4, 0xd0, 0x8a}}
+	FieldClientCertKeyLength             = FieldID{0xa3ec00c7, 0x05f4, 0x4df7, [8]byte{0x91, 0xf2, 0x5f, 0x60, 0xd9, 0x1f, 0xf4, 0x43}}
+	FieldClientCertOid                   = FieldID{0xc491ad5e, 0xf882, 0x4283, [8]byte{0xb9, 0x16, 0x43, 0x6b, 0x10, 0x3f, 0xf4, 0xad}}
+	FieldClientToken                     = FieldID{0xc228fc1e, 0x403a, 0x4478, [8]byte{0xbe, 0x05, 0xc9, 0xba, 0xa4, 0xc0, 0x5a, 0xce}}
+	FieldCompartmentID                   = FieldID{0x35a791ab, 0x4ac, 0x4ff2, [8]byte{0xa6, 0xbb, 0xda, 0x6c, 0xfa, 0xc7, 0x18, 0x6}}
+	FieldCurrentProfileID                = FieldID{0xab3033c9, 0xc0e3, 0x4759, [8]byte{0x93, 0x7d, 0x57, 0x58, 0xc6, 0x5d, 0x4a, 0xe3}}
+	FieldDCOMAppID                       = FieldID{0xff2e7b4d, 0x3112, 0x4770, [8]byte{0xb6, 0x36, 0x4d, 0x24, 0xae, 0x3a, 0x6a, 0xf2}}
+	FieldDestinationInterfaceIndex       = FieldID{0x35cf6522, 0x4139, 0x45ee, [8]byte{0xa0, 0xd5, 0x67, 0xb8, 0x09, 0x49, 0xd8, 0x79}}
+	FieldDestinationSubInterfaceIndex    = FieldID{0x2b7d4399, 0xd4c7, 0x4738, [8]byte{0xa2, 0xf5, 0xe9, 0x94, 0xb4, 0x3d, 0xa3, 0x88}}
+	FieldDirection                       = FieldID{0x8784c146, 0xca97, 0x44d6, [8]byte{0x9f, 0xd1, 0x19, 0xfb, 0x18, 0x40, 0xcb, 0xf7}}
+	FieldEmbeddedLocalAddressType        = FieldID{0x4672a468, 0x8a0a, 0x4202, [8]byte{0xab, 0xb4, 0x84, 0x9e, 0x92, 0xe6, 0x68, 0x09}}
+	FieldEmbeddedLocalPort               = FieldID{0xbfca394d, 0xacdb, 0x484e, [8]byte{0xb8, 0xe6, 0x2a, 0xff, 0x79, 0x75, 0x73, 0x45}}
+	FieldEmbeddedProtocol                = FieldID{0x07784107, 0xa29e, 0x4c7b, [8]byte{0x9e, 0xc7, 0x29, 0xc4, 0x4a, 0xfa, 0xfd, 0xbc}}
+	FieldEmbeddedRemoteAddress           = FieldID{0x77ee4b39, 0x3273, 0x4671, [8]byte{0xb6, 0x3b, 0xab, 0x6f, 0xeb, 0x66, 0xee, 0xb6}}
+	FieldEmbeddedRemotePort              = FieldID{0xcae4d6a1, 0x2968, 0x40ed, [8]byte{0xa4, 0xce, 0x54, 0x71, 0x60, 0xdd, 0xa8, 0x8d}}
+	FieldEtherType                       = FieldID{0xfd08948d, 0xa219, 0x4d52, [8]byte{0xbb, 0x98, 0x1a, 0x55, 0x40, 0xee, 0x7b, 0x4e}}
+	FieldFlags                           = FieldID{0x632ce23b, 0x5167, 0x435c, [8]byte{0x86, 0xd7, 0xe9, 0x03, 0x68, 0x4a, 0xa8, 0x0c}}
+	FieldIPArrivalInterface              = FieldID{0x618a9b6d, 0x386b, 0x4136, [8]byte{0xad, 0x6e, 0xb5, 0x15, 0x87, 0xcf, 0xb1, 0xcd}}
+	FieldIPDestinationAddress            = FieldID{0x2d79133b, 0xb390, 0x45c6, [8]byte{0x86, 0x99, 0xac, 0xac, 0xea, 0xaf, 0xed, 0x33}}
+	FieldIPDestinationAddressType        = FieldID{0x1ec1b7c9, 0x4eea, 0x4f5e, [8]byte{0xb9, 0xef, 0x76, 0xbe, 0xaa, 0xaf, 0x17, 0xee}}
+	FieldIPDestinationPort               = FieldID{0xce6def45, 0x60fb, 0x4a7b, [8]byte{0xa3, 0x04, 0xaf, 0x30, 0xa1, 0x17, 0x00, 0x0e}}
+	FieldIPForwardInterface              = FieldID{0x1076b8a5, 0x6323, 0x4c5e, [8]byte{0x98, 0x10, 0xe8, 0xd3, 0xfc, 0x9e, 0x61, 0x36}}
+	FieldIPLocalAddress                  = FieldID{0xd9ee00de, 0xc1ef, 0x4617, [8]byte{0xbf, 0xe3, 0xff, 0xd8, 0xf5, 0xa0, 0x89, 0x57}}
+	FieldIPLocalAddressType              = FieldID{0x6ec7f6c4, 0x376b, 0x45d7, [8]byte{0x9e, 0x9c, 0xd3, 0x37, 0xce, 0xdc, 0xd2, 0x37}}
+	FieldIPLocalAddressV4                = FieldID{0x03a629cb, 0x6e52, 0x49f8, [8]byte{0x9c, 0x41, 0x57, 0x09, 0x63, 0x3c, 0x09, 0xcf}}
+	FieldIPLocalAddressV6                = FieldID{0x2381be84, 0x7524, 0x45b3, [8]byte{0xa0, 0x5b, 0x1e, 0x63, 0x7d, 0x9c, 0x7a, 0x6a}}
+	FieldIPLocalInterface                = FieldID{0x4cd62a49, 0x59c3, 0x4969, [8]byte{0xb7, 0xf3, 0xbd, 0xa5, 0xd3, 0x28, 0x90, 0xa4}}
+	FieldIPLocalPort                     = FieldID{0x0c1ba1af, 0x5765, 0x453f, [8]byte{0xaf, 0x22, 0xa8, 0xf7, 0x91, 0xac, 0x77, 0x5b}}
+	FieldIPNexthopAddress                = FieldID{0xeabe448a, 0xa711, 0x4d64, [8]byte{0x85, 0xb7, 0x3f, 0x76, 0xb6, 0x52, 0x99, 0xc7}}
+	FieldIPNexthopInterface              = FieldID{0x93ae8f5b, 0x7f6f, 0x4719, [8]byte{0x98, 0xc8, 0x14, 0xe9, 0x74, 0x29, 0xef, 0x04}}
+	FieldIPPhysicalArrivalInterface      = FieldID{0xda50d5c8, 0xfa0d, 0x4c89, [8]byte{0xb0, 0x32, 0x6e, 0x62, 0x13, 0x6d, 0x1e, 0x96}}
+	FieldIPPhysicalNexthopInterface      = FieldID{0xf09bd5ce, 0x5150, 0x48be, [8]byte{0xb0, 0x98, 0xc2, 0x51, 0x52, 0xfb, 0x1f, 0x92}}
+	FieldIPProtocol                      = FieldID{0x3971ef2b, 0x623e, 0x4f9a, [8]byte{0x8c, 0xb1, 0x6e, 0x79, 0xb8, 0x06, 0xb9, 0xa7}}
+	FieldIPRemoteAddress                 = FieldID{0xb235ae9a, 0x1d64, 0x49b8, [8]byte{0xa4, 0x4c, 0x5f, 0xf3, 0xd9, 0x09, 0x50, 0x45}}
+	FieldIPRemoteAddressV4               = FieldID{0x1febb610, 0x3bcc, 0x45e1, [8]byte{0xbc, 0x36, 0x2e, 0x06, 0x7e, 0x2c, 0xb1, 0x86}}
+	FieldIPRemoteAddressV6               = FieldID{0x246e1d8c, 0x8bee, 0x4018, [8]byte{0x9b, 0x98, 0x31, 0xd4, 0x58, 0x2f, 0x33, 0x61}}
+	FieldIPRemotePort                    = FieldID{0xc35a604d, 0xd22b, 0x4e1a, [8]byte{0x91, 0xb4, 0x68, 0xf6, 0x74, 0xee, 0x67, 0x4b}}
+	FieldIPSecPolicyKey                  = FieldID{0xad37dee3, 0x722f, 0x45cc, [8]byte{0xa4, 0xe3, 0x06, 0x80, 0x48, 0x12, 0x44, 0x52}}
+	FieldIPSecSecurityRealmID            = FieldID{0x37a57700, 0x5884, 0x4964, [8]byte{0x92, 0xb8, 0x3e, 0x70, 0x46, 0x88, 0xb0, 0xad}}
+	FieldIPSourceAddress                 = FieldID{0xae96897e, 0x2e94, 0x4bc9, [8]byte{0xb3, 0x13, 0xb2, 0x7e, 0xe8, 0x0e, 0x57, 0x4d}}
+	FieldIPSourcePort                    = FieldID{0xa6afef91, 0x3df4, 0x4730, [8]byte{0xa2, 0x14, 0xf5, 0x42, 0x6a, 0xeb, 0xf8, 0x21}}
+	FieldImageName                       = FieldID{0xd024de4d, 0xdeaa, 0x4317, [8]byte{0x9c, 0x85, 0xe4, 0x0e, 0xf6, 0xe1, 0x40, 0xc3}}
+	FieldInterfaceIndex                  = FieldID{0x667fd755, 0xd695, 0x434a, [8]byte{0x8a, 0xf5, 0xd3, 0x83, 0x5a, 0x12, 0x59, 0xbc}}
+	FieldInterfaceMACAddress             = FieldID{0xf6e63dce, 0x1f4b, 0x4c6b, [8]byte{0xb6, 0xef, 0x11, 0x65, 0xe7, 0x1f, 0x8e, 0xe7}}
+	FieldInterfaceQuarantineEpoch        = FieldID{0xcce68d5e, 0x053b, 0x43a8, [8]byte{0x9a, 0x6f, 0x33, 0x38, 0x4c, 0x28, 0xe4, 0xf6}}
+	FieldInterfaceType                   = FieldID{0xdaf8cd14, 0xe09e, 0x4c93, [8]byte{0xa5, 0xae, 0xc5, 0xc1, 0x3b, 0x73, 0xff, 0xca}}
+	FieldKMAuthNAPContext                = FieldID{0x35d0ea0e, 0x15ca, 0x492b, [8]byte{0x90, 0x0e, 0x97, 0xfd, 0x46, 0x35, 0x2c, 0xce}}
+	FieldKMMode                          = FieldID{0xfeef4582, 0xef8f, 0x4f7b, [8]byte{0x85, 0x8b, 0x90, 0x77, 0xd1, 0x22, 0xde, 0x47}}
+	FieldKMType                          = FieldID{0xff0f5f49, 0x0ceb, 0x481b, [8]byte{0x86, 0x38, 0x14, 0x79, 0x79, 0x1f, 0x3f, 0x2c}}
+	FieldL2Flags                         = FieldID{0x7bc43cbf, 0x37ba, 0x45f1, [8]byte{0xb7, 0x4a, 0x82, 0xff, 0x51, 0x8e, 0xeb, 0x10}}
+	FieldLocalInterfaceProfileID         = FieldID{0x4ebf7562, 0x9f18, 0x4d06, [8]byte{0x99, 0x41, 0xa7, 0xa6, 0x25, 0x74, 0x4d, 0x71}}
+	FieldMACDestinationAddress           = FieldID{0x04ea2a93, 0x858c, 0x4027, [8]byte{0xb6, 0x13, 0xb4, 0x31, 0x80, 0xc7, 0x85, 0x9e}}
+	FieldMACDestinationAddressType       = FieldID{0xae052932, 0xef42, 0x4e99, [8]byte{0xb1, 0x29, 0xf3, 0xb3, 0x13, 0x9e, 0x34, 0xf7}}
+	FieldMACLocalAddress                 = FieldID{0xd999e981, 0x7948, 0x4c83, [8]byte{0xb7, 0x42, 0xc8, 0x4e, 0x3b, 0x67, 0x8f, 0x8f}}
+	FieldMACLocalAddressType             = FieldID{0xcc31355c, 0x3073, 0x4ffb, [8]byte{0xa1, 0x4f, 0x79, 0x41, 0x5c, 0xb1, 0xea, 0xd1}}
+	FieldMACRemoteAddress                = FieldID{0x408f2ed4, 0x3a70, 0x4b4d, [8]byte{0x92, 0xa6, 0x41, 0x5a, 0xc2, 0x0e, 0x2f, 0x12}}
+	FieldMACRemoteAddressType            = FieldID{0x027fedb4, 0xf1c1, 0x4030, [8]byte{0xb5, 0x64, 0xee, 0x77, 0x7f, 0xd8, 0x67, 0xea}}
+	FieldMACSourceAddress                = FieldID{0x7b795451, 0xf1f6, 0x4d05, [8]byte{0xb7, 0xcb, 0x21, 0x77, 0x9d, 0x80, 0x23, 0x36}}
+	FieldMACSourceAddressType            = FieldID{0x5c1b72e4, 0x299e, 0x4437, [8]byte{0xa2, 0x98, 0xbc, 0x3f, 0x01, 0x4b, 0x3d, 0xc2}}
+	FieldNdisMediaType                   = FieldID{0xcb31cef1, 0x791d, 0x473b, [8]byte{0x89, 0xd1, 0x61, 0xc5, 0x98, 0x43, 0x04, 0xa0}}
+	FieldNdisPhysicalMediaType           = FieldID{0x34c79823, 0xc229, 0x44f2, [8]byte{0xb8, 0x3c, 0x74, 0x02, 0x08, 0x82, 0xae, 0x77}}
+	FieldNdisPort                        = FieldID{0xdb7bb42b, 0x2dac, 0x4cd4, [8]byte{0xa5, 0x9a, 0xe0, 0xbd, 0xce, 0x1e, 0x68, 0x34}}
+	FieldNetEventType                    = FieldID{0x206e9996, 0x490e, 0x40cf, [8]byte{0xb8, 0x31, 0xb3, 0x86, 0x41, 0xeb, 0x6f, 0xcb}}
+	FieldNexthopInterfaceIndex           = FieldID{0x138e6888, 0x7ab8, 0x4d65, [8]byte{0x9e, 0xe8, 0x05, 0x91, 0xbc, 0xf6, 0xa4, 0x94}}
+	FieldNexthopInterfaceProfileID       = FieldID{0xd7ff9a56, 0xcdaa, 0x472b, [8]byte{0x84, 0xdb, 0xd2, 0x39, 0x63, 0xc1, 0xd1, 0xbf}}
+	FieldNexthopInterfaceType            = FieldID{0x97537c6c, 0xd9a3, 0x4767, [8]byte{0xa3, 0x81, 0xe9, 0x42, 0x67, 0x5c, 0xd9, 0x20}}
+	FieldNexthopSubInterfaceIndex        = FieldID{0xef8a6122, 0x0577, 0x45a7, [8]byte{0x9a, 0xaf, 0x82, 0x5f, 0xbe, 0xb4, 0xfb, 0x95}}
+	FieldNexthopTunnelType               = FieldID{0x72b1a111, 0x987b, 0x4720, [8]byte{0x99, 0xdd, 0xc7, 0xc5, 0x76, 0xfa, 0x2d, 0x4c}}
+	FieldOriginalICMPType                = FieldID{0x076dfdbe, 0xc56c, 0x4f72, [8]byte{0xae, 0x8a, 0x2c, 0xfe, 0x7e, 0x5c, 0x82, 0x86}}
+	FieldOriginalProfileID               = FieldID{0x46ea1551, 0x2255, 0x492b, [8]byte{0x80, 0x19, 0xaa, 0xbe, 0xee, 0x34, 0x9f, 0x40}}
+	FieldPeerName                        = FieldID{0x9b539082, 0xeb90, 0x4186, [8]byte{0xa6, 0xcc, 0xde, 0x5b, 0x63, 0x23, 0x50, 0x16}}
+	FieldPipe                            = FieldID{0x1bd0741d, 0xe3df, 0x4e24, [8]byte{0x86, 0x34, 0x76, 0x20, 0x46, 0xee, 0xf6, 0xeb}}
+	FieldProcessWithRPCIfUUID            = FieldID{0xe31180a8, 0xbbbd, 0x4d14, [8]byte{0xa6, 0x5e, 0x71, 0x57, 0xb0, 0x62, 0x33, 0xbb}}
+	FieldQMMode                          = FieldID{0xf64fc6d1, 0xf9cb, 0x43d2, [8]byte{0x8a, 0x5f, 0xe1, 0x3b, 0xc8, 0x94, 0xf2, 0x65}}
+	FieldRPCAuthLevel                    = FieldID{0xe5a0aed5, 0x59ac, 0x46ea, [8]byte{0xbe, 0x05, 0xa5, 0xf0, 0x5e, 0xcf, 0x44, 0x6e}}
+	FieldRPCAuthType                     = FieldID{0xdaba74ab, 0x0d67, 0x43e7, [8]byte{0x98, 0x6e, 0x75, 0xb8, 0x4f, 0x82, 0xf5, 0x94}}
+	FieldRPCEPFlags                      = FieldID{0x218b814a, 0x0a39, 0x49b8, [8]byte{0x8e, 0x71, 0xc2, 0x0c, 0x39, 0xc7, 0xdd, 0x2e}}
+	FieldRPCEPValue                      = FieldID{0xdccea0b9, 0x0886, 0x4360, [8]byte{0x9c, 0x6a, 0xab, 0x04, 0x3a, 0x24, 0xfb, 0xa9}}
+	FieldRPCIfFlag                       = FieldID{0x238a8a32, 0x3199, 0x467d, [8]byte{0x87, 0x1c, 0x27, 0x26, 0x21, 0xab, 0x38, 0x96}}
+	FieldRPCIfUUID                       = FieldID{0x7c9c7d9f, 0x0075, 0x4d35, [8]byte{0xa0, 0xd1, 0x83, 0x11, 0xc4, 0xcf, 0x6a, 0xf1}}
+	FieldRPCIfVersion                    = FieldID{0xeabfd9b7, 0x1262, 0x4a2e, [8]byte{0xad, 0xaa, 0x5f, 0x96, 0xf6, 0xfe, 0x32, 0x6d}}
+	FieldRPCProtocol                     = FieldID{0x2717bc74, 0x3a35, 0x4ce7, [8]byte{0xb7, 0xef, 0xc8, 0x38, 0xfa, 0xbd, 0xec, 0x45}}
+	FieldRPCProxyAuthType                = FieldID{0x40953fe2, 0x8565, 0x4759, [8]byte{0x84, 0x88, 0x17, 0x71, 0xb4, 0xb4, 0xb5, 0xdb}}
+	FieldRPCServerName                   = FieldID{0xb605a225, 0xc3b3, 0x48c7, [8]byte{0x98, 0x33, 0x7a, 0xef, 0xa9, 0x52, 0x75, 0x46}}
+	FieldRPCServerPort                   = FieldID{0x8090f645, 0x9ad5, 0x4e3b, [8]byte{0x9f, 0x9f, 0x80, 0x23, 0xca, 0x09, 0x79, 0x09}}
+	FieldReauthorizeReason               = FieldID{0x11205e8c, 0x11ae, 0x457a, [8]byte{0x8a, 0x44, 0x47, 0x70, 0x26, 0xdd, 0x76, 0x4a}}
+	FieldRemoteID                        = FieldID{0xf68166fd, 0x0682, 0x4c89, [8]byte{0xb8, 0xf5, 0x86, 0x43, 0x6c, 0x7e, 0xf9, 0xb7}}
+	FieldRemoteUserToken                 = FieldID{0x9bf0ee66, 0x06c9, 0x41b9, [8]byte{0x84, 0xda, 0x28, 0x8c, 0xb4, 0x3a, 0xf5, 0x1f}}
+	FieldReserved0                       = FieldID{0x678f4deb, 0x45af, 0x4882, [8]byte{0x93, 0xfe, 0x19, 0xd4, 0x72, 0x9d, 0x98, 0x34}}
+	FieldReserved1                       = FieldID{0xd818f827, 0x5c69, 0x48eb, [8]byte{0xbf, 0x80, 0xd8, 0x6b, 0x17, 0x75, 0x5f, 0x97}}
+	FieldReserved10                      = FieldID{0xb979e282, 0xd621, 0x4c8c, [8]byte{0xb1, 0x84, 0xb1, 0x05, 0xa6, 0x1c, 0x36, 0xce}}
+	FieldReserved11                      = FieldID{0x2d62ee4d, 0x023d, 0x411f, [8]byte{0x95, 0x82, 0x43, 0xac, 0xbb, 0x79, 0x59, 0x75}}
+	FieldReserved12                      = FieldID{0xa3677c32, 0x7e35, 0x4ddc, [8]byte{0x93, 0xda, 0xe8, 0xc3, 0x3f, 0xc9, 0x23, 0xc7}}
+	FieldReserved13                      = FieldID{0x335a3e90, 0x84aa, 0x42f5, [8]byte{0x9e, 0x6f, 0x59, 0x30, 0x95, 0x36, 0xa4, 0x4c}}
+	FieldReserved14                      = FieldID{0x30e44da2, 0x2f1a, 0x4116, [8]byte{0xa5, 0x59, 0xf9, 0x07, 0xde, 0x83, 0x60, 0x4a}}
+	FieldReserved15                      = FieldID{0xbab8340f, 0xafe0, 0x43d1, [8]byte{0x80, 0xd8, 0x5c, 0xa4, 0x56, 0x96, 0x2d, 0xe3}}
+	FieldReserved2                       = FieldID{0x53d4123d, 0xe15b, 0x4e84, [8]byte{0xb7, 0xa8, 0xdc, 0xe1, 0x6f, 0x7b, 0x62, 0xd9}}
+	FieldReserved3                       = FieldID{0x7f6e8ca3, 0x6606, 0x4932, [8]byte{0x97, 0xc7, 0xe1, 0xf2, 0x07, 0x10, 0xaf, 0x3b}}
+	FieldReserved4                       = FieldID{0x5f58e642, 0xb937, 0x495e, [8]byte{0xa9, 0x4b, 0xf6, 0xb0, 0x51, 0xa4, 0x92, 0x50}}
+	FieldReserved5                       = FieldID{0x9ba8f6cd, 0xf77c, 0x43e6, [8]byte{0x88, 0x47, 0x11, 0x93, 0x9d, 0xc5, 0xdb, 0x5a}}
+	FieldReserved6                       = FieldID{0xf13d84bd, 0x59d5, 0x44c4, [8]byte{0x88, 0x17, 0x5e, 0xcd, 0xae, 0x18, 0x05, 0xbd}}
+	FieldReserved7                       = FieldID{0x65a0f930, 0x45dd, 0x4983, [8]byte{0xaa, 0x33, 0xef, 0xc7, 0xb6, 0x11, 0xaf, 0x08}}
+	FieldReserved8                       = FieldID{0x4f424974, 0x0c12, 0x4816, [8]byte{0x9b, 0x47, 0x9a, 0x54, 0x7d, 0xb3, 0x9a, 0x32}}
+	FieldReserved9                       = FieldID{0xce78e10f, 0x13ff, 0x4c70, [8]byte{0x86, 0x43, 0x36, 0xad, 0x18, 0x79, 0xaf, 0xa3}}
+	FieldSecEncryptAlgorithm             = FieldID{0x0d306ef0, 0xe974, 0x4f74, [8]byte{0xb5, 0xc7, 0x59, 0x1b, 0x0d, 0xa7, 0xd5, 0x62}}
+	FieldSecKeySize                      = FieldID{0x4772183b, 0xccf8, 0x4aeb, [8]byte{0xbc, 0xe1, 0xc6, 0xc6, 0x16, 0x1c, 0x8f, 0xe4}}
+	FieldSourceInterfaceIndex            = FieldID{0x2311334d, 0xc92d, 0x45bf, [8]byte{0x94, 0x96, 0xed, 0xf4, 0x47, 0x82, 0x0e, 0x2d}}
+	FieldSourceSubInterfaceIndex         = FieldID{0x055edd9d, 0xacd2, 0x4361, [8]byte{0x8d, 0xab, 0xf9, 0x52, 0x5d, 0x97, 0x66, 0x2f}}
+	FieldSubInterfaceIndex               = FieldID{0x0cd42473, 0xd621, 0x4be3, [8]byte{0xae, 0x8c, 0x72, 0xa3, 0x48, 0xd2, 0x83, 0xe1}}
+	FieldTunnelType                      = FieldID{0x77a40437, 0x8779, 0x4868, [8]byte{0xa2, 0x61, 0xf5, 0xa9, 0x02, 0xf1, 0xc0, 0xcd}}
+	FieldVLANID                          = FieldID{0x938eab21, 0x3618, 0x4e64, [8]byte{0x9c, 0xa5, 0x21, 0x41, 0xeb, 0xda, 0x1c, 0xa2}}
+	FieldVSwitchDestinationInterfaceID   = FieldID{0x8ed48be4, 0xc926, 0x49f6, [8]byte{0xa4, 0xf6, 0xef, 0x30, 0x30, 0xe3, 0xfc, 0x16}}
+	FieldVSwitchDestinationInterfaceType = FieldID{0xfa9b3f06, 0x2f1a, 0x4c57, [8]byte{0x9e, 0x68, 0xa7, 0x09, 0x8b, 0x28, 0xdb, 0xfe}}
+	FieldVSwitchDestinationVmID          = FieldID{0x6106aace, 0x4de1, 0x4c84, [8]byte{0x96, 0x71, 0x36, 0x37, 0xf8, 0xbc, 0xf7, 0x31}}
+	FieldVSwitchID                       = FieldID{0xc4a414ba, 0x437b, 0x4de6, [8]byte{0x99, 0x46, 0xd9, 0x9c, 0x1b, 0x95, 0xb3, 0x12}}
+	FieldVSwitchNetworkType              = FieldID{0x11d48b4b, 0xe77a, 0x40b4, [8]byte{0x91, 0x55, 0x39, 0x2c, 0x90, 0x6c, 0x26, 0x08}}
+	FieldVSwitchSourceInterfaceID        = FieldID{0x7f4ef24b, 0xb2c1, 0x4938, [8]byte{0xba, 0x33, 0xa1, 0xec, 0xbe, 0xd5, 0x12, 0xba}}
+	FieldVSwitchSourceInterfaceType      = FieldID{0xe6b040a2, 0xedaf, 0x4c36, [8]byte{0x90, 0x8b, 0xf2, 0xf5, 0x8a, 0xe4, 0x38, 0x07}}
+	FieldVSwitchSourceVmID               = FieldID{0x9c2a9ec2, 0x9fc6, 0x42bc, [8]byte{0xbd, 0xd8, 0x40, 0x6d, 0x4d, 0xa0, 0xbe, 0x64}}
+	FieldVSwitchTenantNetworkID          = FieldID{0xdc04843c, 0x79e6, 0x4e44, [8]byte{0xa0, 0x25, 0x65, 0xb9, 0xbb, 0x0f, 0x9f, 0x94}}
 )
 
+// Well-known keying IDs.
 var (
 	guidKeyingModuleAuthIP = windows.GUID{0x11e3dae0, 0xdd26, 0x4590, [8]byte{0x85, 0x7d, 0xab, 0x4b, 0x28, 0xd1, 0xa0, 0x95}}
 	guidKeyingModuleIKE    = windows.GUID{0xa9bbf787, 0x82a8, 0x45bb, [8]byte{0xa4, 0x00, 0x5d, 0x7e, 0x59, 0x52, 0xc7, 0xa9}}
 	guidKeyingModuleIKEv2  = windows.GUID{0x041792cc, 0x8f07, 0x419d, [8]byte{0xa3, 0x94, 0x71, 0x69, 0x68, 0xcb, 0x16, 0x47}}
 )
 
+// Well-known layer IDs.
 var (
 	LayerALEAuthConnectV4               = LayerID{0xc38d57d1, 0x05a7, 0x4c33, [8]byte{0x90, 0x4f, 0x7f, 0xbc, 0xee, 0xe6, 0x0e, 0x82}}
 	LayerALEAuthConnectV4Discard        = LayerID{0xd632a801, 0xf5ba, 0x4ad6, [8]byte{0x96, 0xe3, 0x60, 0x70, 0x17, 0xd9, 0x83, 0x6a}}
@@ -298,6 +302,7 @@ var (
 	LayerStreamV6Discard                = LayerID{0x10a59fc7, 0xb628, 0x4c41, [8]byte{0x9e, 0xb8, 0xcf, 0x37, 0xd5, 0x51, 0x03, 0xcf}}
 )
 
+// Well-known provider IDs.
 var (
 	guidProviderContextSecureSocketAuthIP = windows.GUID{0xb25ea800, 0x0d02, 0x46ed, [8]byte{0x92, 0xbd, 0x7f, 0xa8, 0x4b, 0xb7, 0x3e, 0x9d}}
 	guidProviderContextSecureSocketIPSec  = windows.GUID{0x8c2d4144, 0xf8e0, 0x42c0, [8]byte{0x94, 0xce, 0x7c, 0xcf, 0xc6, 0x3b, 0x2f, 0x9b}}
@@ -307,6 +312,7 @@ var (
 	guidProviderTCPTemplates              = windows.GUID{0x76cfcd30, 0x3394, 0x432d, [8]byte{0xbe, 0xd3, 0x44, 0x1a, 0xe5, 0x0e, 0x63, 0xc3}}
 )
 
+// Well-known sublayer IDs.
 var (
 	guidSublayerIPSecDosp                  = windows.GUID{0xe076d572, 0x5d3d, 0x48ef, [8]byte{0x80, 0x2b, 0x90, 0x9e, 0xdd, 0xb0, 0x98, 0xbd}}
 	guidSublayerIPSecForwardOutboundTunnel = windows.GUID{0xa5082e73, 0x8f71, 0x4559, [8]byte{0x8a, 0x9a, 0x10, 0x1c, 0xea, 0x04, 0xef, 0x87}}
@@ -323,306 +329,306 @@ var (
 )
 
 var guidNames = map[windows.GUID]string{
-	guidCalloutEdgeTraversalALEListenV4:               "CALLOUT_EDGE_TRAVERSAL_ALE_LISTEN_V4",
-	guidCalloutEdgeTraversalALEResourceAssignmentV4:   "CALLOUT_EDGE_TRAVERSAL_ALE_RESOURCE_ASSIGNMENT_V4",
-	guidCalloutHttpTemplateSslHandshake:               "CALLOUT_HTTP_TEMPLATE_SSL_HANDSHAKE",
-	guidCalloutIPSecALEConnectV4:                      "CALLOUT_IPSEC_ALE_CONNECT_V4",
-	guidCalloutIPSecALEConnectV6:                      "CALLOUT_IPSEC_ALE_CONNECT_V6",
-	guidCalloutIPSecDospForwardV4:                     "CALLOUT_IPSEC_DOSP_FORWARD_V4",
-	guidCalloutIPSecDospForwardV6:                     "CALLOUT_IPSEC_DOSP_FORWARD_V6",
-	guidCalloutIPSecForwardInboundTunnelV4:            "CALLOUT_IPSEC_FORWARD_INBOUND_TUNNEL_V4",
-	guidCalloutIPSecForwardInboundTunnelV6:            "CALLOUT_IPSEC_FORWARD_INBOUND_TUNNEL_V6",
-	guidCalloutIPSecForwardOutboundTunnelV4:           "CALLOUT_IPSEC_FORWARD_OUTBOUND_TUNNEL_V4",
-	guidCalloutIPSecForwardOutboundTunnelV6:           "CALLOUT_IPSEC_FORWARD_OUTBOUND_TUNNEL_V6",
-	guidCalloutIPSecInboundInitiateSecureV4:           "CALLOUT_IPSEC_INBOUND_INITIATE_SECURE_V4",
-	guidCalloutIPSecInboundInitiateSecureV6:           "CALLOUT_IPSEC_INBOUND_INITIATE_SECURE_V6",
-	guidCalloutIPSecInboundTransportV4:                "CALLOUT_IPSEC_INBOUND_TRANSPORT_V4",
-	guidCalloutIPSecInboundTransportV6:                "CALLOUT_IPSEC_INBOUND_TRANSPORT_V6",
-	guidCalloutIPSecInboundTunnelALEAcceptV4:          "CALLOUT_IPSEC_INBOUND_TUNNEL_ALE_ACCEPT_V4",
-	guidCalloutIPSecInboundTunnelALEAcceptV6:          "CALLOUT_IPSEC_INBOUND_TUNNEL_ALE_ACCEPT_V6",
-	guidCalloutIPSecInboundTunnelV4:                   "CALLOUT_IPSEC_INBOUND_TUNNEL_V4",
-	guidCalloutIPSecInboundTunnelV6:                   "CALLOUT_IPSEC_INBOUND_TUNNEL_V6",
-	guidCalloutIPSecOutboundTransportV4:               "CALLOUT_IPSEC_OUTBOUND_TRANSPORT_V4",
-	guidCalloutIPSecOutboundTransportV6:               "CALLOUT_IPSEC_OUTBOUND_TRANSPORT_V6",
-	guidCalloutIPSecOutboundTunnelV4:                  "CALLOUT_IPSEC_OUTBOUND_TUNNEL_V4",
-	guidCalloutIPSecOutboundTunnelV6:                  "CALLOUT_IPSEC_OUTBOUND_TUNNEL_V6",
-	guidCalloutPolicySilentModeAuthConnectLayerV4:     "CALLOUT_POLICY_SILENT_MODE_AUTH_CONNECT_LAYER_V4",
-	guidCalloutPolicySilentModeAuthConnectLayerV6:     "CALLOUT_POLICY_SILENT_MODE_AUTH_CONNECT_LAYER_V6",
-	guidCalloutPolicySilentModeAuthRecvAcceptLayerV4:  "CALLOUT_POLICY_SILENT_MODE_AUTH_RECV_ACCEPT_LAYER_V4",
-	guidCalloutPolicySilentModeAuthRecvAcceptLayerV6:  "CALLOUT_POLICY_SILENT_MODE_AUTH_RECV_ACCEPT_LAYER_V6",
-	guidCalloutReservedAuthConnectLayerV4:             "CALLOUT_RESERVED_AUTH_CONNECT_LAYER_V4",
-	guidCalloutReservedAuthConnectLayerV6:             "CALLOUT_RESERVED_AUTH_CONNECT_LAYER_V6",
-	guidCalloutSetOptionsAuthConnectLayerV4:           "CALLOUT_SET_OPTIONS_AUTH_CONNECT_LAYER_V4",
-	guidCalloutSetOptionsAuthConnectLayerV6:           "CALLOUT_SET_OPTIONS_AUTH_CONNECT_LAYER_V6",
-	guidCalloutSetOptionsAuthRecvAcceptLayerV4:        "CALLOUT_SET_OPTIONS_AUTH_RECV_ACCEPT_LAYER_V4",
-	guidCalloutSetOptionsAuthRecvAcceptLayerV6:        "CALLOUT_SET_OPTIONS_AUTH_RECV_ACCEPT_LAYER_V6",
-	guidCalloutTCPChimneyAcceptLayerV4:                "CALLOUT_TCP_CHIMNEY_ACCEPT_LAYER_V4",
-	guidCalloutTCPChimneyAcceptLayerV6:                "CALLOUT_TCP_CHIMNEY_ACCEPT_LAYER_V6",
-	guidCalloutTCPChimneyConnectLayerV4:               "CALLOUT_TCP_CHIMNEY_CONNECT_LAYER_V4",
-	guidCalloutTCPChimneyConnectLayerV6:               "CALLOUT_TCP_CHIMNEY_CONNECT_LAYER_V6",
-	guidCalloutTCPTemplatesAcceptLayerV4:              "CALLOUT_TCP_TEMPLATES_ACCEPT_LAYER_V4",
-	guidCalloutTCPTemplatesAcceptLayerV6:              "CALLOUT_TCP_TEMPLATES_ACCEPT_LAYER_V6",
-	guidCalloutTCPTemplatesConnectLayerV4:             "CALLOUT_TCP_TEMPLATES_CONNECT_LAYER_V4",
-	guidCalloutTCPTemplatesConnectLayerV6:             "CALLOUT_TCP_TEMPLATES_CONNECT_LAYER_V6",
-	guidCalloutTeredoALEListenV6:                      "CALLOUT_TEREDO_ALE_LISTEN_V6",
-	guidCalloutTeredoALEResourceAssignmentV6:          "CALLOUT_TEREDO_ALE_RESOURCE_ASSIGNMENT_V6",
-	guidCalloutWFPTransportLayerV4SilentDrop:          "CALLOUT_WFP_TRANSPORT_LAYER_V4_SILENT_DROP",
-	guidCalloutWFPTransportLayerV6SilentDrop:          "CALLOUT_WFP_TRANSPORT_LAYER_V6_SILENT_DROP",
-	guidConditionALEAppID:                             "CONDITION_ALE_APP_ID",
-	guidConditionALEEffectiveName:                     "CONDITION_ALE_EFFECTIVE_NAME",
-	guidConditionALENAPContext:                        "CONDITION_ALE_NAP_CONTEXT",
-	guidConditionALEOriginalAppID:                     "CONDITION_ALE_ORIGINAL_APP_ID",
-	guidConditionALEPackageID:                         "CONDITION_ALE_PACKAGE_ID",
-	guidConditionALEPromiscuousMode:                   "CONDITION_ALE_PROMISCUOUS_MODE",
-	guidConditionALEReauthReason:                      "CONDITION_ALE_REAUTH_REASON",
-	guidConditionALERemoteMachineID:                   "CONDITION_ALE_REMOTE_MACHINE_ID",
-	guidConditionALERemoteUserID:                      "CONDITION_ALE_REMOTE_USER_ID",
-	guidConditionALESecurityAttributeFqbnValue:        "CONDITION_ALE_SECURITY_ATTRIBUTE_FQBN_VALUE",
-	guidConditionALESioFirewallSystemPort:             "CONDITION_ALE_SIO_FIREWALL_SYSTEM_PORT",
-	guidConditionALEUserID:                            "CONDITION_ALE_USER_ID",
-	guidConditionArrivalInterfaceIndex:                "CONDITION_ARRIVAL_INTERFACE_INDEX",
-	guidConditionArrivalInterfaceProfileID:            "CONDITION_ARRIVAL_INTERFACE_PROFILE_ID",
-	guidConditionArrivalInterfaceType:                 "CONDITION_ARRIVAL_INTERFACE_TYPE",
-	guidConditionArrivalTunnelType:                    "CONDITION_ARRIVAL_TUNNEL_TYPE",
-	guidConditionAuthenticationType:                   "CONDITION_AUTHENTICATION_TYPE",
-	guidConditionBitmapIndexKey:                       "CONDITION_BITMAP_INDEX_KEY",
-	guidConditionBitmapIPLocalAddress:                 "CONDITION_BITMAP_IP_LOCAL_ADDRESS",
-	guidConditionBitmapIPLocalPort:                    "CONDITION_BITMAP_IP_LOCAL_PORT",
-	guidConditionBitmapIPRemoteAddress:                "CONDITION_BITMAP_IP_REMOTE_ADDRESS",
-	guidConditionBitmapIPRemotePort:                   "CONDITION_BITMAP_IP_REMOTE_PORT",
-	guidConditionClientCertKeyLength:                  "CONDITION_CLIENT_CERT_KEY_LENGTH",
-	guidConditionClientCertOid:                        "CONDITION_CLIENT_CERT_OID",
-	guidConditionClientToken:                          "CONDITION_CLIENT_TOKEN",
-	guidConditionCompartmentID:                        "CONDITION_COMPARTMENT_ID",
-	guidConditionCurrentProfileID:                     "CONDITION_CURRENT_PROFILE_ID",
-	guidConditionDCOMAppID:                            "CONDITION_DCOM_APP_ID",
-	guidConditionDestinationInterfaceIndex:            "CONDITION_DESTINATION_INTERFACE_INDEX",
-	guidConditionDestinationSubInterfaceIndex:         "CONDITION_DESTINATION_SUB_INTERFACE_INDEX",
-	guidConditionDirection:                            "CONDITION_DIRECTION",
-	guidConditionEmbeddedLocalAddressType:             "CONDITION_EMBEDDED_LOCAL_ADDRESS_TYPE",
-	guidConditionEmbeddedLocalPort:                    "CONDITION_EMBEDDED_LOCAL_PORT",
-	guidConditionEmbeddedProtocol:                     "CONDITION_EMBEDDED_PROTOCOL",
-	guidConditionEmbeddedRemoteAddress:                "CONDITION_EMBEDDED_REMOTE_ADDRESS",
-	guidConditionEmbeddedRemotePort:                   "CONDITION_EMBEDDED_REMOTE_PORT",
-	guidConditionEtherType:                            "CONDITION_ETHER_TYPE",
-	guidConditionFlags:                                "CONDITION_FLAGS",
-	guidConditionImageName:                            "CONDITION_IMAGE_NAME",
-	guidConditionInterfaceIndex:                       "CONDITION_INTERFACE_INDEX",
-	guidConditionInterfaceMACAddress:                  "CONDITION_INTERFACE_MAC_ADDRESS",
-	guidConditionInterfaceQuarantineEpoch:             "CONDITION_INTERFACE_QUARANTINE_EPOCH",
-	guidConditionInterfaceType:                        "CONDITION_INTERFACE_TYPE",
-	guidConditionIPSecPolicyKey:                       "CONDITION_IPSEC_POLICY_KEY",
-	guidConditionIPSecSecurityRealmID:                 "CONDITION_IPSEC_SECURITY_REALM_ID",
-	guidConditionIPArrivalInterface:                   "CONDITION_IP_ARRIVAL_INTERFACE",
-	guidConditionIPDestinationAddress:                 "CONDITION_IP_DESTINATION_ADDRESS",
-	guidConditionIPDestinationAddressType:             "CONDITION_IP_DESTINATION_ADDRESS_TYPE",
-	guidConditionIPDestinationPort:                    "CONDITION_IP_DESTINATION_PORT",
-	guidConditionIPForwardInterface:                   "CONDITION_IP_FORWARD_INTERFACE",
-	guidConditionIPLocalAddress:                       "CONDITION_IP_LOCAL_ADDRESS",
-	guidConditionIPLocalAddressType:                   "CONDITION_IP_LOCAL_ADDRESS_TYPE",
-	guidConditionIPLocalAddressV4:                     "CONDITION_IP_LOCAL_ADDRESS_V4",
-	guidConditionIPLocalAddressV6:                     "CONDITION_IP_LOCAL_ADDRESS_V6",
-	guidConditionIPLocalInterface:                     "CONDITION_IP_LOCAL_INTERFACE",
-	guidConditionIPLocalPort:                          "CONDITION_IP_LOCAL_PORT",
-	guidConditionIPNexthopAddress:                     "CONDITION_IP_NEXTHOP_ADDRESS",
-	guidConditionIPNexthopInterface:                   "CONDITION_IP_NEXTHOP_INTERFACE",
-	guidConditionIPPhysicalArrivalInterface:           "CONDITION_IP_PHYSICAL_ARRIVAL_INTERFACE",
-	guidConditionIPPhysicalNexthopInterface:           "CONDITION_IP_PHYSICAL_NEXTHOP_INTERFACE",
-	guidConditionIPProtocol:                           "CONDITION_IP_PROTOCOL",
-	guidConditionIPRemoteAddress:                      "CONDITION_IP_REMOTE_ADDRESS",
-	guidConditionIPRemoteAddressV4:                    "CONDITION_IP_REMOTE_ADDRESS_V4",
-	guidConditionIPRemoteAddressV6:                    "CONDITION_IP_REMOTE_ADDRESS_V6",
-	guidConditionIPRemotePort:                         "CONDITION_IP_REMOTE_PORT",
-	guidConditionIPSourceAddress:                      "CONDITION_IP_SOURCE_ADDRESS",
-	guidConditionIPSourcePort:                         "CONDITION_IP_SOURCE_PORT",
-	guidConditionKMAuthNAPContext:                     "CONDITION_KM_AUTH_NAP_CONTEXT",
-	guidConditionKMMode:                               "CONDITION_KM_MODE",
-	guidConditionKMType:                               "CONDITION_KM_TYPE",
-	guidConditionL2Flags:                              "CONDITION_L2_FLAGS",
-	guidConditionLocalInterfaceProfileID:              "CONDITION_LOCAL_INTERFACE_PROFILE_ID",
-	guidConditionMACDestinationAddress:                "CONDITION_MAC_DESTINATION_ADDRESS",
-	guidConditionMACDestinationAddressType:            "CONDITION_MAC_DESTINATION_ADDRESS_TYPE",
-	guidConditionMACLocalAddress:                      "CONDITION_MAC_LOCAL_ADDRESS",
-	guidConditionMACLocalAddressType:                  "CONDITION_MAC_LOCAL_ADDRESS_TYPE",
-	guidConditionMACRemoteAddress:                     "CONDITION_MAC_REMOTE_ADDRESS",
-	guidConditionMACRemoteAddressType:                 "CONDITION_MAC_REMOTE_ADDRESS_TYPE",
-	guidConditionMACSourceAddress:                     "CONDITION_MAC_SOURCE_ADDRESS",
-	guidConditionMACSourceAddressType:                 "CONDITION_MAC_SOURCE_ADDRESS_TYPE",
-	guidConditionNdisMediaType:                        "CONDITION_NDIS_MEDIA_TYPE",
-	guidConditionNdisPhysicalMediaType:                "CONDITION_NDIS_PHYSICAL_MEDIA_TYPE",
-	guidConditionNdisPort:                             "CONDITION_NDIS_PORT",
-	guidConditionNetEventType:                         "CONDITION_NET_EVENT_TYPE",
-	guidConditionNexthopInterfaceIndex:                "CONDITION_NEXTHOP_INTERFACE_INDEX",
-	guidConditionNexthopInterfaceProfileID:            "CONDITION_NEXTHOP_INTERFACE_PROFILE_ID",
-	guidConditionNexthopInterfaceType:                 "CONDITION_NEXTHOP_INTERFACE_TYPE",
-	guidConditionNexthopSubInterfaceIndex:             "CONDITION_NEXTHOP_SUB_INTERFACE_INDEX",
-	guidConditionNexthopTunnelType:                    "CONDITION_NEXTHOP_TUNNEL_TYPE",
-	guidConditionOriginalICMPType:                     "CONDITION_ORIGINAL_ICMP_TYPE",
-	guidConditionOriginalProfileID:                    "CONDITION_ORIGINAL_PROFILE_ID",
-	guidConditionPeerName:                             "CONDITION_PEER_NAME",
-	guidConditionPipe:                                 "CONDITION_PIPE",
-	guidConditionProcessWithRPCIfUUID:                 "CONDITION_PROCESS_WITH_RPC_IF_UUID",
-	guidConditionQMMode:                               "CONDITION_QM_MODE",
-	guidConditionReauthorizeReason:                    "CONDITION_REAUTHORIZE_REASON",
-	guidConditionRemoteID:                             "CONDITION_REMOTE_ID",
-	guidConditionRemoteUserToken:                      "CONDITION_REMOTE_USER_TOKEN",
-	guidConditionReserved0:                            "CONDITION_RESERVED0",
-	guidConditionReserved1:                            "CONDITION_RESERVED1",
-	guidConditionReserved10:                           "CONDITION_RESERVED10",
-	guidConditionReserved11:                           "CONDITION_RESERVED11",
-	guidConditionReserved12:                           "CONDITION_RESERVED12",
-	guidConditionReserved13:                           "CONDITION_RESERVED13",
-	guidConditionReserved14:                           "CONDITION_RESERVED14",
-	guidConditionReserved15:                           "CONDITION_RESERVED15",
-	guidConditionReserved2:                            "CONDITION_RESERVED2",
-	guidConditionReserved3:                            "CONDITION_RESERVED3",
-	guidConditionReserved4:                            "CONDITION_RESERVED4",
-	guidConditionReserved5:                            "CONDITION_RESERVED5",
-	guidConditionReserved6:                            "CONDITION_RESERVED6",
-	guidConditionReserved7:                            "CONDITION_RESERVED7",
-	guidConditionReserved8:                            "CONDITION_RESERVED8",
-	guidConditionReserved9:                            "CONDITION_RESERVED9",
-	guidConditionRPCAuthLevel:                         "CONDITION_RPC_AUTH_LEVEL",
-	guidConditionRPCAuthType:                          "CONDITION_RPC_AUTH_TYPE",
-	guidConditionRPCEPFlags:                           "CONDITION_RPC_EP_FLAGS",
-	guidConditionRPCEPValue:                           "CONDITION_RPC_EP_VALUE",
-	guidConditionRPCIfFlag:                            "CONDITION_RPC_IF_FLAG",
-	guidConditionRPCIfUUID:                            "CONDITION_RPC_IF_UUID",
-	guidConditionRPCIfVersion:                         "CONDITION_RPC_IF_VERSION",
-	guidConditionRPCProtocol:                          "CONDITION_RPC_PROTOCOL",
-	guidConditionRPCProxyAuthType:                     "CONDITION_RPC_PROXY_AUTH_TYPE",
-	guidConditionRPCServerName:                        "CONDITION_RPC_SERVER_NAME",
-	guidConditionRPCServerPort:                        "CONDITION_RPC_SERVER_PORT",
-	guidConditionSecEncryptAlgorithm:                  "CONDITION_SEC_ENCRYPT_ALGORITHM",
-	guidConditionSecKeySize:                           "CONDITION_SEC_KEY_SIZE",
-	guidConditionSourceInterfaceIndex:                 "CONDITION_SOURCE_INTERFACE_INDEX",
-	guidConditionSourceSubInterfaceIndex:              "CONDITION_SOURCE_SUB_INTERFACE_INDEX",
-	guidConditionSubInterfaceIndex:                    "CONDITION_SUB_INTERFACE_INDEX",
-	guidConditionTunnelType:                           "CONDITION_TUNNEL_TYPE",
-	guidConditionVLANID:                               "CONDITION_VLAN_ID",
-	guidConditionVSwitchDestinationInterfaceID:        "CONDITION_VSWITCH_DESTINATION_INTERFACE_ID",
-	guidConditionVSwitchDestinationInterfaceType:      "CONDITION_VSWITCH_DESTINATION_INTERFACE_TYPE",
-	guidConditionVSwitchDestinationVmID:               "CONDITION_VSWITCH_DESTINATION_VM_ID",
-	guidConditionVSwitchID:                            "CONDITION_VSWITCH_ID",
-	guidConditionVSwitchNetworkType:                   "CONDITION_VSWITCH_NETWORK_TYPE",
-	guidConditionVSwitchSourceInterfaceID:             "CONDITION_VSWITCH_SOURCE_INTERFACE_ID",
-	guidConditionVSwitchSourceInterfaceType:           "CONDITION_VSWITCH_SOURCE_INTERFACE_TYPE",
-	guidConditionVSwitchSourceVmID:                    "CONDITION_VSWITCH_SOURCE_VM_ID",
-	guidConditionVSwitchTenantNetworkID:               "CONDITION_VSWITCH_TENANT_NETWORK_ID",
-	guidKeyingModuleAuthIP:                            "KEYING_MODULE_AUTHIP",
-	guidKeyingModuleIKE:                               "KEYING_MODULE_IKE",
-	guidKeyingModuleIKEv2:                             "KEYING_MODULE_IKEV2",
-	windows.GUID(LayerALEAuthConnectV4):               "ALE_AUTH_CONNECT_V4",
-	windows.GUID(LayerALEAuthConnectV4Discard):        "ALE_AUTH_CONNECT_V4_DISCARD",
-	windows.GUID(LayerALEAuthConnectV6):               "ALE_AUTH_CONNECT_V6",
-	windows.GUID(LayerALEAuthConnectV6Discard):        "ALE_AUTH_CONNECT_V6_DISCARD",
-	windows.GUID(LayerALEAuthListenV4):                "ALE_AUTH_LISTEN_V4",
-	windows.GUID(LayerALEAuthListenV4Discard):         "ALE_AUTH_LISTEN_V4_DISCARD",
-	windows.GUID(LayerALEAuthListenV6):                "ALE_AUTH_LISTEN_V6",
-	windows.GUID(LayerALEAuthListenV6Discard):         "ALE_AUTH_LISTEN_V6_DISCARD",
-	windows.GUID(LayerALEAuthRecvAcceptV4):            "ALE_AUTH_RECV_ACCEPT_V4",
-	windows.GUID(LayerALEAuthRecvAcceptV4Discard):     "ALE_AUTH_RECV_ACCEPT_V4_DISCARD",
-	windows.GUID(LayerALEAuthRecvAcceptV6):            "ALE_AUTH_RECV_ACCEPT_V6",
-	windows.GUID(LayerALEAuthRecvAcceptV6Discard):     "ALE_AUTH_RECV_ACCEPT_V6_DISCARD",
-	windows.GUID(LayerALEBindRedirectV4):              "ALE_BIND_REDIRECT_V4",
-	windows.GUID(LayerALEBindRedirectV6):              "ALE_BIND_REDIRECT_V6",
-	windows.GUID(LayerALEConnectRedirectV4):           "ALE_CONNECT_REDIRECT_V4",
-	windows.GUID(LayerALEConnectRedirectV6):           "ALE_CONNECT_REDIRECT_V6",
-	windows.GUID(LayerALEEndpointClosureV4):           "ALE_ENDPOINT_CLOSURE_V4",
-	windows.GUID(LayerALEEndpointClosureV6):           "ALE_ENDPOINT_CLOSURE_V6",
-	windows.GUID(LayerALEFlowEstablishedV4):           "ALE_FLOW_ESTABLISHED_V4",
-	windows.GUID(LayerALEFlowEstablishedV4Discard):    "ALE_FLOW_ESTABLISHED_V4_DISCARD",
-	windows.GUID(LayerALEFlowEstablishedV6):           "ALE_FLOW_ESTABLISHED_V6",
-	windows.GUID(LayerALEFlowEstablishedV6Discard):    "ALE_FLOW_ESTABLISHED_V6_DISCARD",
-	windows.GUID(LayerALEResourceAssignmentV4):        "ALE_RESOURCE_ASSIGNMENT_V4",
-	windows.GUID(LayerALEResourceAssignmentV4Discard): "ALE_RESOURCE_ASSIGNMENT_V4_DISCARD",
-	windows.GUID(LayerALEResourceAssignmentV6):        "ALE_RESOURCE_ASSIGNMENT_V6",
-	windows.GUID(LayerALEResourceAssignmentV6Discard): "ALE_RESOURCE_ASSIGNMENT_V6_DISCARD",
-	windows.GUID(LayerALEResourceReleaseV4):           "ALE_RESOURCE_RELEASE_V4",
-	windows.GUID(LayerALEResourceReleaseV6):           "ALE_RESOURCE_RELEASE_V6",
-	windows.GUID(LayerDatagramDataV4):                 "DATAGRAM_DATA_V4",
-	windows.GUID(LayerDatagramDataV4Discard):          "DATAGRAM_DATA_V4_DISCARD",
-	windows.GUID(LayerDatagramDataV6):                 "DATAGRAM_DATA_V6",
-	windows.GUID(LayerDatagramDataV6Discard):          "DATAGRAM_DATA_V6_DISCARD",
-	windows.GUID(LayerEgressVSwitchEthernet):          "EGRESS_VSWITCH_ETHERNET",
-	windows.GUID(LayerEgressVSwitchTransportV4):       "EGRESS_VSWITCH_TRANSPORT_V4",
-	windows.GUID(LayerEgressVSwitchTransportV6):       "EGRESS_VSWITCH_TRANSPORT_V6",
-	windows.GUID(LayerIKEExtV4):                       "IKEEXT_V4",
-	windows.GUID(LayerIKEExtV6):                       "IKEEXT_V6",
-	windows.GUID(LayerInboundICMPErrorV4):             "INBOUND_ICMP_ERROR_V4",
-	windows.GUID(LayerInboundICMPErrorV4Discard):      "INBOUND_ICMP_ERROR_V4_DISCARD",
-	windows.GUID(LayerInboundICMPErrorV6):             "INBOUND_ICMP_ERROR_V6",
-	windows.GUID(LayerInboundICMPErrorV6Discard):      "INBOUND_ICMP_ERROR_V6_DISCARD",
-	windows.GUID(LayerInboundIPPacketV4):              "INBOUND_IPPACKET_V4",
-	windows.GUID(LayerInboundIPPacketV4Discard):       "INBOUND_IPPACKET_V4_DISCARD",
-	windows.GUID(LayerInboundIPPacketV6):              "INBOUND_IPPACKET_V6",
-	windows.GUID(LayerInboundIPPacketV6Discard):       "INBOUND_IPPACKET_V6_DISCARD",
-	windows.GUID(LayerInboundMACFrameEthernet):        "INBOUND_MAC_FRAME_ETHERNET",
-	windows.GUID(LayerInboundMACFrameNative):          "INBOUND_MAC_FRAME_NATIVE",
-	windows.GUID(LayerInboundMACFrameNativeFast):      "INBOUND_MAC_FRAME_NATIVE_FAST",
-	windows.GUID(LayerInboundReserved2):               "INBOUND_RESERVED2",
-	windows.GUID(LayerInboundTransportFast):           "INBOUND_TRANSPORT_FAST",
-	windows.GUID(LayerInboundTransportV4):             "INBOUND_TRANSPORT_V4",
-	windows.GUID(LayerInboundTransportV4Discard):      "INBOUND_TRANSPORT_V4_DISCARD",
-	windows.GUID(LayerInboundTransportV6):             "INBOUND_TRANSPORT_V6",
-	windows.GUID(LayerInboundTransportV6Discard):      "INBOUND_TRANSPORT_V6_DISCARD",
-	windows.GUID(LayerIngressVSwitchEthernet):         "INGRESS_VSWITCH_ETHERNET",
-	windows.GUID(LayerIngressVSwitchTransportV4):      "INGRESS_VSWITCH_TRANSPORT_V4",
-	windows.GUID(LayerIngressVSwitchTransportV6):      "INGRESS_VSWITCH_TRANSPORT_V6",
-	windows.GUID(LayerIPForwardV4):                    "IPFORWARD_V4",
-	windows.GUID(LayerIPForwardV4Discard):             "IPFORWARD_V4_DISCARD",
-	windows.GUID(LayerIPForwardV6):                    "IPFORWARD_V6",
-	windows.GUID(LayerIPForwardV6Discard):             "IPFORWARD_V6_DISCARD",
-	windows.GUID(LayerIPSecKMDemuxV4):                 "IPSEC_KM_DEMUX_V4",
-	windows.GUID(LayerIPSecKMDemuxV6):                 "IPSEC_KM_DEMUX_V6",
-	windows.GUID(LayerIPSecV4):                        "IPSEC_V4",
-	windows.GUID(LayerIPSecV6):                        "IPSEC_V6",
-	windows.GUID(LayerKMAuthorization):                "KM_AUTHORIZATION",
-	windows.GUID(LayerNameResolutionCacheV4):          "NAME_RESOLUTION_CACHE_V4",
-	windows.GUID(LayerNameResolutionCacheV6):          "NAME_RESOLUTION_CACHE_V6",
-	windows.GUID(LayerOutboundICMPErrorV4):            "OUTBOUND_ICMP_ERROR_V4",
-	windows.GUID(LayerOutboundICMPErrorV4Discard):     "OUTBOUND_ICMP_ERROR_V4_DISCARD",
-	windows.GUID(LayerOutboundICMPErrorV6):            "OUTBOUND_ICMP_ERROR_V6",
-	windows.GUID(LayerOutboundICMPErrorV6Discard):     "OUTBOUND_ICMP_ERROR_V6_DISCARD",
-	windows.GUID(LayerOutboundIPPacketV4):             "OUTBOUND_IPPACKET_V4",
-	windows.GUID(LayerOutboundIPPacketV4Discard):      "OUTBOUND_IPPACKET_V4_DISCARD",
-	windows.GUID(LayerOutboundIPPacketV6):             "OUTBOUND_IPPACKET_V6",
-	windows.GUID(LayerOutboundIPPacketV6Discard):      "OUTBOUND_IPPACKET_V6_DISCARD",
-	windows.GUID(LayerOutboundMACFrameEthernet):       "OUTBOUND_MAC_FRAME_ETHERNET",
-	windows.GUID(LayerOutboundMACFrameNative):         "OUTBOUND_MAC_FRAME_NATIVE",
-	windows.GUID(LayerOutboundMACFrameNativeFast):     "OUTBOUND_MAC_FRAME_NATIVE_FAST",
-	windows.GUID(LayerOutboundTransportFast):          "OUTBOUND_TRANSPORT_FAST",
-	windows.GUID(LayerOutboundTransportV4):            "OUTBOUND_TRANSPORT_V4",
-	windows.GUID(LayerOutboundTransportV4Discard):     "OUTBOUND_TRANSPORT_V4_DISCARD",
-	windows.GUID(LayerOutboundTransportV6):            "OUTBOUND_TRANSPORT_V6",
-	windows.GUID(LayerOutboundTransportV6Discard):     "OUTBOUND_TRANSPORT_V6_DISCARD",
-	windows.GUID(LayerRPCEPMap):                       "RPC_EPMAP",
-	windows.GUID(LayerRPCEPAdd):                       "RPC_EP_ADD",
-	windows.GUID(LayerRPCProxyConn):                   "RPC_PROXY_CONN",
-	windows.GUID(LayerRPCProxyIf):                     "RPC_PROXY_IF",
-	windows.GUID(LayerRPCUM):                          "RPC_UM",
-	windows.GUID(LayerStreamPacketV4):                 "STREAM_PACKET_V4",
-	windows.GUID(LayerStreamPacketV6):                 "STREAM_PACKET_V6",
-	windows.GUID(LayerStreamV4):                       "STREAM_V4",
-	windows.GUID(LayerStreamV4Discard):                "STREAM_V4_DISCARD",
-	windows.GUID(LayerStreamV6):                       "STREAM_V6",
-	windows.GUID(LayerStreamV6Discard):                "STREAM_V6_DISCARD",
-	guidProviderContextSecureSocketAuthIP:             "PROVIDER_CONTEXT_SECURE_SOCKET_AUTHIP",
-	guidProviderContextSecureSocketIPSec:              "PROVIDER_CONTEXT_SECURE_SOCKET_IPSEC",
-	guidProviderIKEExt:                                "PROVIDER_IKEEXT",
-	guidProviderIPSecDospConfig:                       "PROVIDER_IPSEC_DOSP_CONFIG",
-	guidProviderTCPChimneyOffload:                     "PROVIDER_TCP_CHIMNEY_OFFLOAD",
-	guidProviderTCPTemplates:                          "PROVIDER_TCP_TEMPLATES",
-	guidSublayerInspection:                            "SUBLAYER_INSPECTION",
-	guidSublayerIPSecDosp:                             "SUBLAYER_IPSEC_DOSP",
-	guidSublayerIPSecForwardOutboundTunnel:            "SUBLAYER_IPSEC_FORWARD_OUTBOUND_TUNNEL",
-	guidSublayerIPSecSecurityRealm:                    "SUBLAYER_IPSEC_SECURITY_REALM",
-	guidSublayerIPSecTunnel:                           "SUBLAYER_IPSEC_TUNNEL",
-	guidSublayerLIPS:                                  "SUBLAYER_LIPS",
-	guidSublayerRPCAudit:                              "SUBLAYER_RPC_AUDIT",
-	guidSublayerSecureSocket:                          "SUBLAYER_SECURE_SOCKET",
-	guidSublayerTCPChimneyOffload:                     "SUBLAYER_TCP_CHIMNEY_OFFLOAD",
-	guidSublayerTCPTemplates:                          "SUBLAYER_TCP_TEMPLATES",
-	guidSublayerTeredo:                                "SUBLAYER_TEREDO",
-	guidSublayerUniversal:                             "SUBLAYER_UNIVERSAL",
+	guidCalloutEdgeTraversalALEListenV4:                "CALLOUT_EDGE_TRAVERSAL_ALE_LISTEN_V4",
+	guidCalloutEdgeTraversalALEResourceAssignmentV4:    "CALLOUT_EDGE_TRAVERSAL_ALE_RESOURCE_ASSIGNMENT_V4",
+	guidCalloutHttpTemplateSslHandshake:                "CALLOUT_HTTP_TEMPLATE_SSL_HANDSHAKE",
+	guidCalloutIPSecALEConnectV4:                       "CALLOUT_IPSEC_ALE_CONNECT_V4",
+	guidCalloutIPSecALEConnectV6:                       "CALLOUT_IPSEC_ALE_CONNECT_V6",
+	guidCalloutIPSecDospForwardV4:                      "CALLOUT_IPSEC_DOSP_FORWARD_V4",
+	guidCalloutIPSecDospForwardV6:                      "CALLOUT_IPSEC_DOSP_FORWARD_V6",
+	guidCalloutIPSecForwardInboundTunnelV4:             "CALLOUT_IPSEC_FORWARD_INBOUND_TUNNEL_V4",
+	guidCalloutIPSecForwardInboundTunnelV6:             "CALLOUT_IPSEC_FORWARD_INBOUND_TUNNEL_V6",
+	guidCalloutIPSecForwardOutboundTunnelV4:            "CALLOUT_IPSEC_FORWARD_OUTBOUND_TUNNEL_V4",
+	guidCalloutIPSecForwardOutboundTunnelV6:            "CALLOUT_IPSEC_FORWARD_OUTBOUND_TUNNEL_V6",
+	guidCalloutIPSecInboundInitiateSecureV4:            "CALLOUT_IPSEC_INBOUND_INITIATE_SECURE_V4",
+	guidCalloutIPSecInboundInitiateSecureV6:            "CALLOUT_IPSEC_INBOUND_INITIATE_SECURE_V6",
+	guidCalloutIPSecInboundTransportV4:                 "CALLOUT_IPSEC_INBOUND_TRANSPORT_V4",
+	guidCalloutIPSecInboundTransportV6:                 "CALLOUT_IPSEC_INBOUND_TRANSPORT_V6",
+	guidCalloutIPSecInboundTunnelALEAcceptV4:           "CALLOUT_IPSEC_INBOUND_TUNNEL_ALE_ACCEPT_V4",
+	guidCalloutIPSecInboundTunnelALEAcceptV6:           "CALLOUT_IPSEC_INBOUND_TUNNEL_ALE_ACCEPT_V6",
+	guidCalloutIPSecInboundTunnelV4:                    "CALLOUT_IPSEC_INBOUND_TUNNEL_V4",
+	guidCalloutIPSecInboundTunnelV6:                    "CALLOUT_IPSEC_INBOUND_TUNNEL_V6",
+	guidCalloutIPSecOutboundTransportV4:                "CALLOUT_IPSEC_OUTBOUND_TRANSPORT_V4",
+	guidCalloutIPSecOutboundTransportV6:                "CALLOUT_IPSEC_OUTBOUND_TRANSPORT_V6",
+	guidCalloutIPSecOutboundTunnelV4:                   "CALLOUT_IPSEC_OUTBOUND_TUNNEL_V4",
+	guidCalloutIPSecOutboundTunnelV6:                   "CALLOUT_IPSEC_OUTBOUND_TUNNEL_V6",
+	guidCalloutPolicySilentModeAuthConnectLayerV4:      "CALLOUT_POLICY_SILENT_MODE_AUTH_CONNECT_LAYER_V4",
+	guidCalloutPolicySilentModeAuthConnectLayerV6:      "CALLOUT_POLICY_SILENT_MODE_AUTH_CONNECT_LAYER_V6",
+	guidCalloutPolicySilentModeAuthRecvAcceptLayerV4:   "CALLOUT_POLICY_SILENT_MODE_AUTH_RECV_ACCEPT_LAYER_V4",
+	guidCalloutPolicySilentModeAuthRecvAcceptLayerV6:   "CALLOUT_POLICY_SILENT_MODE_AUTH_RECV_ACCEPT_LAYER_V6",
+	guidCalloutReservedAuthConnectLayerV4:              "CALLOUT_RESERVED_AUTH_CONNECT_LAYER_V4",
+	guidCalloutReservedAuthConnectLayerV6:              "CALLOUT_RESERVED_AUTH_CONNECT_LAYER_V6",
+	guidCalloutSetOptionsAuthConnectLayerV4:            "CALLOUT_SET_OPTIONS_AUTH_CONNECT_LAYER_V4",
+	guidCalloutSetOptionsAuthConnectLayerV6:            "CALLOUT_SET_OPTIONS_AUTH_CONNECT_LAYER_V6",
+	guidCalloutSetOptionsAuthRecvAcceptLayerV4:         "CALLOUT_SET_OPTIONS_AUTH_RECV_ACCEPT_LAYER_V4",
+	guidCalloutSetOptionsAuthRecvAcceptLayerV6:         "CALLOUT_SET_OPTIONS_AUTH_RECV_ACCEPT_LAYER_V6",
+	guidCalloutTCPChimneyAcceptLayerV4:                 "CALLOUT_TCP_CHIMNEY_ACCEPT_LAYER_V4",
+	guidCalloutTCPChimneyAcceptLayerV6:                 "CALLOUT_TCP_CHIMNEY_ACCEPT_LAYER_V6",
+	guidCalloutTCPChimneyConnectLayerV4:                "CALLOUT_TCP_CHIMNEY_CONNECT_LAYER_V4",
+	guidCalloutTCPChimneyConnectLayerV6:                "CALLOUT_TCP_CHIMNEY_CONNECT_LAYER_V6",
+	guidCalloutTCPTemplatesAcceptLayerV4:               "CALLOUT_TCP_TEMPLATES_ACCEPT_LAYER_V4",
+	guidCalloutTCPTemplatesAcceptLayerV6:               "CALLOUT_TCP_TEMPLATES_ACCEPT_LAYER_V6",
+	guidCalloutTCPTemplatesConnectLayerV4:              "CALLOUT_TCP_TEMPLATES_CONNECT_LAYER_V4",
+	guidCalloutTCPTemplatesConnectLayerV6:              "CALLOUT_TCP_TEMPLATES_CONNECT_LAYER_V6",
+	guidCalloutTeredoALEListenV6:                       "CALLOUT_TEREDO_ALE_LISTEN_V6",
+	guidCalloutTeredoALEResourceAssignmentV6:           "CALLOUT_TEREDO_ALE_RESOURCE_ASSIGNMENT_V6",
+	guidCalloutWFPTransportLayerV4SilentDrop:           "CALLOUT_WFP_TRANSPORT_LAYER_V4_SILENT_DROP",
+	guidCalloutWFPTransportLayerV6SilentDrop:           "CALLOUT_WFP_TRANSPORT_LAYER_V6_SILENT_DROP",
+	windows.GUID(FieldALEAppID):                        "ALE_APP_ID",
+	windows.GUID(FieldALEEffectiveName):                "ALE_EFFECTIVE_NAME",
+	windows.GUID(FieldALENAPContext):                   "ALE_NAP_CONTEXT",
+	windows.GUID(FieldALEOriginalAppID):                "ALE_ORIGINAL_APP_ID",
+	windows.GUID(FieldALEPackageID):                    "ALE_PACKAGE_ID",
+	windows.GUID(FieldALEPromiscuousMode):              "ALE_PROMISCUOUS_MODE",
+	windows.GUID(FieldALEReauthReason):                 "ALE_REAUTH_REASON",
+	windows.GUID(FieldALERemoteMachineID):              "ALE_REMOTE_MACHINE_ID",
+	windows.GUID(FieldALERemoteUserID):                 "ALE_REMOTE_USER_ID",
+	windows.GUID(FieldALESecurityAttributeFqbnValue):   "ALE_SECURITY_ATTRIBUTE_FQBN_VALUE",
+	windows.GUID(FieldALESioFirewallSystemPort):        "ALE_SIO_FIREWALL_SYSTEM_PORT",
+	windows.GUID(FieldALEUserID):                       "ALE_USER_ID",
+	windows.GUID(FieldArrivalInterfaceIndex):           "ARRIVAL_INTERFACE_INDEX",
+	windows.GUID(FieldArrivalInterfaceProfileID):       "ARRIVAL_INTERFACE_PROFILE_ID",
+	windows.GUID(FieldArrivalInterfaceType):            "ARRIVAL_INTERFACE_TYPE",
+	windows.GUID(FieldArrivalTunnelType):               "ARRIVAL_TUNNEL_TYPE",
+	windows.GUID(FieldAuthenticationType):              "AUTHENTICATION_TYPE",
+	windows.GUID(FieldBitmapIndexKey):                  "BITMAP_INDEX_KEY",
+	windows.GUID(FieldBitmapIPLocalAddress):            "BITMAP_IP_LOCAL_ADDRESS",
+	windows.GUID(FieldBitmapIPLocalPort):               "BITMAP_IP_LOCAL_PORT",
+	windows.GUID(FieldBitmapIPRemoteAddress):           "BITMAP_IP_REMOTE_ADDRESS",
+	windows.GUID(FieldBitmapIPRemotePort):              "BITMAP_IP_REMOTE_PORT",
+	windows.GUID(FieldClientCertKeyLength):             "CLIENT_CERT_KEY_LENGTH",
+	windows.GUID(FieldClientCertOid):                   "CLIENT_CERT_OID",
+	windows.GUID(FieldClientToken):                     "CLIENT_TOKEN",
+	windows.GUID(FieldCompartmentID):                   "COMPARTMENT_ID",
+	windows.GUID(FieldCurrentProfileID):                "CURRENT_PROFILE_ID",
+	windows.GUID(FieldDCOMAppID):                       "DCOM_APP_ID",
+	windows.GUID(FieldDestinationInterfaceIndex):       "DESTINATION_INTERFACE_INDEX",
+	windows.GUID(FieldDestinationSubInterfaceIndex):    "DESTINATION_SUB_INTERFACE_INDEX",
+	windows.GUID(FieldDirection):                       "DIRECTION",
+	windows.GUID(FieldEmbeddedLocalAddressType):        "EMBEDDED_LOCAL_ADDRESS_TYPE",
+	windows.GUID(FieldEmbeddedLocalPort):               "EMBEDDED_LOCAL_PORT",
+	windows.GUID(FieldEmbeddedProtocol):                "EMBEDDED_PROTOCOL",
+	windows.GUID(FieldEmbeddedRemoteAddress):           "EMBEDDED_REMOTE_ADDRESS",
+	windows.GUID(FieldEmbeddedRemotePort):              "EMBEDDED_REMOTE_PORT",
+	windows.GUID(FieldEtherType):                       "ETHER_TYPE",
+	windows.GUID(FieldFlags):                           "FLAGS",
+	windows.GUID(FieldImageName):                       "IMAGE_NAME",
+	windows.GUID(FieldInterfaceIndex):                  "INTERFACE_INDEX",
+	windows.GUID(FieldInterfaceMACAddress):             "INTERFACE_MAC_ADDRESS",
+	windows.GUID(FieldInterfaceQuarantineEpoch):        "INTERFACE_QUARANTINE_EPOCH",
+	windows.GUID(FieldInterfaceType):                   "INTERFACE_TYPE",
+	windows.GUID(FieldIPSecPolicyKey):                  "IPSEC_POLICY_KEY",
+	windows.GUID(FieldIPSecSecurityRealmID):            "IPSEC_SECURITY_REALM_ID",
+	windows.GUID(FieldIPArrivalInterface):              "IP_ARRIVAL_INTERFACE",
+	windows.GUID(FieldIPDestinationAddress):            "IP_DESTINATION_ADDRESS",
+	windows.GUID(FieldIPDestinationAddressType):        "IP_DESTINATION_ADDRESS_TYPE",
+	windows.GUID(FieldIPDestinationPort):               "IP_DESTINATION_PORT",
+	windows.GUID(FieldIPForwardInterface):              "IP_FORWARD_INTERFACE",
+	windows.GUID(FieldIPLocalAddress):                  "IP_LOCAL_ADDRESS",
+	windows.GUID(FieldIPLocalAddressType):              "IP_LOCAL_ADDRESS_TYPE",
+	windows.GUID(FieldIPLocalAddressV4):                "IP_LOCAL_ADDRESS_V4",
+	windows.GUID(FieldIPLocalAddressV6):                "IP_LOCAL_ADDRESS_V6",
+	windows.GUID(FieldIPLocalInterface):                "IP_LOCAL_INTERFACE",
+	windows.GUID(FieldIPLocalPort):                     "IP_LOCAL_PORT",
+	windows.GUID(FieldIPNexthopAddress):                "IP_NEXTHOP_ADDRESS",
+	windows.GUID(FieldIPNexthopInterface):              "IP_NEXTHOP_INTERFACE",
+	windows.GUID(FieldIPPhysicalArrivalInterface):      "IP_PHYSICAL_ARRIVAL_INTERFACE",
+	windows.GUID(FieldIPPhysicalNexthopInterface):      "IP_PHYSICAL_NEXTHOP_INTERFACE",
+	windows.GUID(FieldIPProtocol):                      "IP_PROTOCOL",
+	windows.GUID(FieldIPRemoteAddress):                 "IP_REMOTE_ADDRESS",
+	windows.GUID(FieldIPRemoteAddressV4):               "IP_REMOTE_ADDRESS_V4",
+	windows.GUID(FieldIPRemoteAddressV6):               "IP_REMOTE_ADDRESS_V6",
+	windows.GUID(FieldIPRemotePort):                    "IP_REMOTE_PORT",
+	windows.GUID(FieldIPSourceAddress):                 "IP_SOURCE_ADDRESS",
+	windows.GUID(FieldIPSourcePort):                    "IP_SOURCE_PORT",
+	windows.GUID(FieldKMAuthNAPContext):                "KM_AUTH_NAP_CONTEXT",
+	windows.GUID(FieldKMMode):                          "KM_MODE",
+	windows.GUID(FieldKMType):                          "KM_TYPE",
+	windows.GUID(FieldL2Flags):                         "L2_FLAGS",
+	windows.GUID(FieldLocalInterfaceProfileID):         "LOCAL_INTERFACE_PROFILE_ID",
+	windows.GUID(FieldMACDestinationAddress):           "MAC_DESTINATION_ADDRESS",
+	windows.GUID(FieldMACDestinationAddressType):       "MAC_DESTINATION_ADDRESS_TYPE",
+	windows.GUID(FieldMACLocalAddress):                 "MAC_LOCAL_ADDRESS",
+	windows.GUID(FieldMACLocalAddressType):             "MAC_LOCAL_ADDRESS_TYPE",
+	windows.GUID(FieldMACRemoteAddress):                "MAC_REMOTE_ADDRESS",
+	windows.GUID(FieldMACRemoteAddressType):            "MAC_REMOTE_ADDRESS_TYPE",
+	windows.GUID(FieldMACSourceAddress):                "MAC_SOURCE_ADDRESS",
+	windows.GUID(FieldMACSourceAddressType):            "MAC_SOURCE_ADDRESS_TYPE",
+	windows.GUID(FieldNdisMediaType):                   "NDIS_MEDIA_TYPE",
+	windows.GUID(FieldNdisPhysicalMediaType):           "NDIS_PHYSICAL_MEDIA_TYPE",
+	windows.GUID(FieldNdisPort):                        "NDIS_PORT",
+	windows.GUID(FieldNetEventType):                    "NET_EVENT_TYPE",
+	windows.GUID(FieldNexthopInterfaceIndex):           "NEXTHOP_INTERFACE_INDEX",
+	windows.GUID(FieldNexthopInterfaceProfileID):       "NEXTHOP_INTERFACE_PROFILE_ID",
+	windows.GUID(FieldNexthopInterfaceType):            "NEXTHOP_INTERFACE_TYPE",
+	windows.GUID(FieldNexthopSubInterfaceIndex):        "NEXTHOP_SUB_INTERFACE_INDEX",
+	windows.GUID(FieldNexthopTunnelType):               "NEXTHOP_TUNNEL_TYPE",
+	windows.GUID(FieldOriginalICMPType):                "ORIGINAL_ICMP_TYPE",
+	windows.GUID(FieldOriginalProfileID):               "ORIGINAL_PROFILE_ID",
+	windows.GUID(FieldPeerName):                        "PEER_NAME",
+	windows.GUID(FieldPipe):                            "PIPE",
+	windows.GUID(FieldProcessWithRPCIfUUID):            "PROCESS_WITH_RPC_IF_UUID",
+	windows.GUID(FieldQMMode):                          "QM_MODE",
+	windows.GUID(FieldReauthorizeReason):               "REAUTHORIZE_REASON",
+	windows.GUID(FieldRemoteID):                        "REMOTE_ID",
+	windows.GUID(FieldRemoteUserToken):                 "REMOTE_USER_TOKEN",
+	windows.GUID(FieldReserved0):                       "RESERVED0",
+	windows.GUID(FieldReserved1):                       "RESERVED1",
+	windows.GUID(FieldReserved10):                      "RESERVED10",
+	windows.GUID(FieldReserved11):                      "RESERVED11",
+	windows.GUID(FieldReserved12):                      "RESERVED12",
+	windows.GUID(FieldReserved13):                      "RESERVED13",
+	windows.GUID(FieldReserved14):                      "RESERVED14",
+	windows.GUID(FieldReserved15):                      "RESERVED15",
+	windows.GUID(FieldReserved2):                       "RESERVED2",
+	windows.GUID(FieldReserved3):                       "RESERVED3",
+	windows.GUID(FieldReserved4):                       "RESERVED4",
+	windows.GUID(FieldReserved5):                       "RESERVED5",
+	windows.GUID(FieldReserved6):                       "RESERVED6",
+	windows.GUID(FieldReserved7):                       "RESERVED7",
+	windows.GUID(FieldReserved8):                       "RESERVED8",
+	windows.GUID(FieldReserved9):                       "RESERVED9",
+	windows.GUID(FieldRPCAuthLevel):                    "RPC_AUTH_LEVEL",
+	windows.GUID(FieldRPCAuthType):                     "RPC_AUTH_TYPE",
+	windows.GUID(FieldRPCEPFlags):                      "RPC_EP_FLAGS",
+	windows.GUID(FieldRPCEPValue):                      "RPC_EP_VALUE",
+	windows.GUID(FieldRPCIfFlag):                       "RPC_IF_FLAG",
+	windows.GUID(FieldRPCIfUUID):                       "RPC_IF_UUID",
+	windows.GUID(FieldRPCIfVersion):                    "RPC_IF_VERSION",
+	windows.GUID(FieldRPCProtocol):                     "RPC_PROTOCOL",
+	windows.GUID(FieldRPCProxyAuthType):                "RPC_PROXY_AUTH_TYPE",
+	windows.GUID(FieldRPCServerName):                   "RPC_SERVER_NAME",
+	windows.GUID(FieldRPCServerPort):                   "RPC_SERVER_PORT",
+	windows.GUID(FieldSecEncryptAlgorithm):             "SEC_ENCRYPT_ALGORITHM",
+	windows.GUID(FieldSecKeySize):                      "SEC_KEY_SIZE",
+	windows.GUID(FieldSourceInterfaceIndex):            "SOURCE_INTERFACE_INDEX",
+	windows.GUID(FieldSourceSubInterfaceIndex):         "SOURCE_SUB_INTERFACE_INDEX",
+	windows.GUID(FieldSubInterfaceIndex):               "SUB_INTERFACE_INDEX",
+	windows.GUID(FieldTunnelType):                      "TUNNEL_TYPE",
+	windows.GUID(FieldVLANID):                          "VLAN_ID",
+	windows.GUID(FieldVSwitchDestinationInterfaceID):   "VSWITCH_DESTINATION_INTERFACE_ID",
+	windows.GUID(FieldVSwitchDestinationInterfaceType): "VSWITCH_DESTINATION_INTERFACE_TYPE",
+	windows.GUID(FieldVSwitchDestinationVmID):          "VSWITCH_DESTINATION_VM_ID",
+	windows.GUID(FieldVSwitchID):                       "VSWITCH_ID",
+	windows.GUID(FieldVSwitchNetworkType):              "VSWITCH_NETWORK_TYPE",
+	windows.GUID(FieldVSwitchSourceInterfaceID):        "VSWITCH_SOURCE_INTERFACE_ID",
+	windows.GUID(FieldVSwitchSourceInterfaceType):      "VSWITCH_SOURCE_INTERFACE_TYPE",
+	windows.GUID(FieldVSwitchSourceVmID):               "VSWITCH_SOURCE_VM_ID",
+	windows.GUID(FieldVSwitchTenantNetworkID):          "VSWITCH_TENANT_NETWORK_ID",
+	guidKeyingModuleAuthIP:                             "KEYING_MODULE_AUTHIP",
+	guidKeyingModuleIKE:                                "KEYING_MODULE_IKE",
+	guidKeyingModuleIKEv2:                              "KEYING_MODULE_IKEV2",
+	windows.GUID(LayerALEAuthConnectV4):                "ALE_AUTH_CONNECT_V4",
+	windows.GUID(LayerALEAuthConnectV4Discard):         "ALE_AUTH_CONNECT_V4_DISCARD",
+	windows.GUID(LayerALEAuthConnectV6):                "ALE_AUTH_CONNECT_V6",
+	windows.GUID(LayerALEAuthConnectV6Discard):         "ALE_AUTH_CONNECT_V6_DISCARD",
+	windows.GUID(LayerALEAuthListenV4):                 "ALE_AUTH_LISTEN_V4",
+	windows.GUID(LayerALEAuthListenV4Discard):          "ALE_AUTH_LISTEN_V4_DISCARD",
+	windows.GUID(LayerALEAuthListenV6):                 "ALE_AUTH_LISTEN_V6",
+	windows.GUID(LayerALEAuthListenV6Discard):          "ALE_AUTH_LISTEN_V6_DISCARD",
+	windows.GUID(LayerALEAuthRecvAcceptV4):             "ALE_AUTH_RECV_ACCEPT_V4",
+	windows.GUID(LayerALEAuthRecvAcceptV4Discard):      "ALE_AUTH_RECV_ACCEPT_V4_DISCARD",
+	windows.GUID(LayerALEAuthRecvAcceptV6):             "ALE_AUTH_RECV_ACCEPT_V6",
+	windows.GUID(LayerALEAuthRecvAcceptV6Discard):      "ALE_AUTH_RECV_ACCEPT_V6_DISCARD",
+	windows.GUID(LayerALEBindRedirectV4):               "ALE_BIND_REDIRECT_V4",
+	windows.GUID(LayerALEBindRedirectV6):               "ALE_BIND_REDIRECT_V6",
+	windows.GUID(LayerALEConnectRedirectV4):            "ALE_CONNECT_REDIRECT_V4",
+	windows.GUID(LayerALEConnectRedirectV6):            "ALE_CONNECT_REDIRECT_V6",
+	windows.GUID(LayerALEEndpointClosureV4):            "ALE_ENDPOINT_CLOSURE_V4",
+	windows.GUID(LayerALEEndpointClosureV6):            "ALE_ENDPOINT_CLOSURE_V6",
+	windows.GUID(LayerALEFlowEstablishedV4):            "ALE_FLOW_ESTABLISHED_V4",
+	windows.GUID(LayerALEFlowEstablishedV4Discard):     "ALE_FLOW_ESTABLISHED_V4_DISCARD",
+	windows.GUID(LayerALEFlowEstablishedV6):            "ALE_FLOW_ESTABLISHED_V6",
+	windows.GUID(LayerALEFlowEstablishedV6Discard):     "ALE_FLOW_ESTABLISHED_V6_DISCARD",
+	windows.GUID(LayerALEResourceAssignmentV4):         "ALE_RESOURCE_ASSIGNMENT_V4",
+	windows.GUID(LayerALEResourceAssignmentV4Discard):  "ALE_RESOURCE_ASSIGNMENT_V4_DISCARD",
+	windows.GUID(LayerALEResourceAssignmentV6):         "ALE_RESOURCE_ASSIGNMENT_V6",
+	windows.GUID(LayerALEResourceAssignmentV6Discard):  "ALE_RESOURCE_ASSIGNMENT_V6_DISCARD",
+	windows.GUID(LayerALEResourceReleaseV4):            "ALE_RESOURCE_RELEASE_V4",
+	windows.GUID(LayerALEResourceReleaseV6):            "ALE_RESOURCE_RELEASE_V6",
+	windows.GUID(LayerDatagramDataV4):                  "DATAGRAM_DATA_V4",
+	windows.GUID(LayerDatagramDataV4Discard):           "DATAGRAM_DATA_V4_DISCARD",
+	windows.GUID(LayerDatagramDataV6):                  "DATAGRAM_DATA_V6",
+	windows.GUID(LayerDatagramDataV6Discard):           "DATAGRAM_DATA_V6_DISCARD",
+	windows.GUID(LayerEgressVSwitchEthernet):           "EGRESS_VSWITCH_ETHERNET",
+	windows.GUID(LayerEgressVSwitchTransportV4):        "EGRESS_VSWITCH_TRANSPORT_V4",
+	windows.GUID(LayerEgressVSwitchTransportV6):        "EGRESS_VSWITCH_TRANSPORT_V6",
+	windows.GUID(LayerIKEExtV4):                        "IKEEXT_V4",
+	windows.GUID(LayerIKEExtV6):                        "IKEEXT_V6",
+	windows.GUID(LayerInboundICMPErrorV4):              "INBOUND_ICMP_ERROR_V4",
+	windows.GUID(LayerInboundICMPErrorV4Discard):       "INBOUND_ICMP_ERROR_V4_DISCARD",
+	windows.GUID(LayerInboundICMPErrorV6):              "INBOUND_ICMP_ERROR_V6",
+	windows.GUID(LayerInboundICMPErrorV6Discard):       "INBOUND_ICMP_ERROR_V6_DISCARD",
+	windows.GUID(LayerInboundIPPacketV4):               "INBOUND_IPPACKET_V4",
+	windows.GUID(LayerInboundIPPacketV4Discard):        "INBOUND_IPPACKET_V4_DISCARD",
+	windows.GUID(LayerInboundIPPacketV6):               "INBOUND_IPPACKET_V6",
+	windows.GUID(LayerInboundIPPacketV6Discard):        "INBOUND_IPPACKET_V6_DISCARD",
+	windows.GUID(LayerInboundMACFrameEthernet):         "INBOUND_MAC_FRAME_ETHERNET",
+	windows.GUID(LayerInboundMACFrameNative):           "INBOUND_MAC_FRAME_NATIVE",
+	windows.GUID(LayerInboundMACFrameNativeFast):       "INBOUND_MAC_FRAME_NATIVE_FAST",
+	windows.GUID(LayerInboundReserved2):                "INBOUND_RESERVED2",
+	windows.GUID(LayerInboundTransportFast):            "INBOUND_TRANSPORT_FAST",
+	windows.GUID(LayerInboundTransportV4):              "INBOUND_TRANSPORT_V4",
+	windows.GUID(LayerInboundTransportV4Discard):       "INBOUND_TRANSPORT_V4_DISCARD",
+	windows.GUID(LayerInboundTransportV6):              "INBOUND_TRANSPORT_V6",
+	windows.GUID(LayerInboundTransportV6Discard):       "INBOUND_TRANSPORT_V6_DISCARD",
+	windows.GUID(LayerIngressVSwitchEthernet):          "INGRESS_VSWITCH_ETHERNET",
+	windows.GUID(LayerIngressVSwitchTransportV4):       "INGRESS_VSWITCH_TRANSPORT_V4",
+	windows.GUID(LayerIngressVSwitchTransportV6):       "INGRESS_VSWITCH_TRANSPORT_V6",
+	windows.GUID(LayerIPForwardV4):                     "IPFORWARD_V4",
+	windows.GUID(LayerIPForwardV4Discard):              "IPFORWARD_V4_DISCARD",
+	windows.GUID(LayerIPForwardV6):                     "IPFORWARD_V6",
+	windows.GUID(LayerIPForwardV6Discard):              "IPFORWARD_V6_DISCARD",
+	windows.GUID(LayerIPSecKMDemuxV4):                  "IPSEC_KM_DEMUX_V4",
+	windows.GUID(LayerIPSecKMDemuxV6):                  "IPSEC_KM_DEMUX_V6",
+	windows.GUID(LayerIPSecV4):                         "IPSEC_V4",
+	windows.GUID(LayerIPSecV6):                         "IPSEC_V6",
+	windows.GUID(LayerKMAuthorization):                 "KM_AUTHORIZATION",
+	windows.GUID(LayerNameResolutionCacheV4):           "NAME_RESOLUTION_CACHE_V4",
+	windows.GUID(LayerNameResolutionCacheV6):           "NAME_RESOLUTION_CACHE_V6",
+	windows.GUID(LayerOutboundICMPErrorV4):             "OUTBOUND_ICMP_ERROR_V4",
+	windows.GUID(LayerOutboundICMPErrorV4Discard):      "OUTBOUND_ICMP_ERROR_V4_DISCARD",
+	windows.GUID(LayerOutboundICMPErrorV6):             "OUTBOUND_ICMP_ERROR_V6",
+	windows.GUID(LayerOutboundICMPErrorV6Discard):      "OUTBOUND_ICMP_ERROR_V6_DISCARD",
+	windows.GUID(LayerOutboundIPPacketV4):              "OUTBOUND_IPPACKET_V4",
+	windows.GUID(LayerOutboundIPPacketV4Discard):       "OUTBOUND_IPPACKET_V4_DISCARD",
+	windows.GUID(LayerOutboundIPPacketV6):              "OUTBOUND_IPPACKET_V6",
+	windows.GUID(LayerOutboundIPPacketV6Discard):       "OUTBOUND_IPPACKET_V6_DISCARD",
+	windows.GUID(LayerOutboundMACFrameEthernet):        "OUTBOUND_MAC_FRAME_ETHERNET",
+	windows.GUID(LayerOutboundMACFrameNative):          "OUTBOUND_MAC_FRAME_NATIVE",
+	windows.GUID(LayerOutboundMACFrameNativeFast):      "OUTBOUND_MAC_FRAME_NATIVE_FAST",
+	windows.GUID(LayerOutboundTransportFast):           "OUTBOUND_TRANSPORT_FAST",
+	windows.GUID(LayerOutboundTransportV4):             "OUTBOUND_TRANSPORT_V4",
+	windows.GUID(LayerOutboundTransportV4Discard):      "OUTBOUND_TRANSPORT_V4_DISCARD",
+	windows.GUID(LayerOutboundTransportV6):             "OUTBOUND_TRANSPORT_V6",
+	windows.GUID(LayerOutboundTransportV6Discard):      "OUTBOUND_TRANSPORT_V6_DISCARD",
+	windows.GUID(LayerRPCEPMap):                        "RPC_EPMAP",
+	windows.GUID(LayerRPCEPAdd):                        "RPC_EP_ADD",
+	windows.GUID(LayerRPCProxyConn):                    "RPC_PROXY_CONN",
+	windows.GUID(LayerRPCProxyIf):                      "RPC_PROXY_IF",
+	windows.GUID(LayerRPCUM):                           "RPC_UM",
+	windows.GUID(LayerStreamPacketV4):                  "STREAM_PACKET_V4",
+	windows.GUID(LayerStreamPacketV6):                  "STREAM_PACKET_V6",
+	windows.GUID(LayerStreamV4):                        "STREAM_V4",
+	windows.GUID(LayerStreamV4Discard):                 "STREAM_V4_DISCARD",
+	windows.GUID(LayerStreamV6):                        "STREAM_V6",
+	windows.GUID(LayerStreamV6Discard):                 "STREAM_V6_DISCARD",
+	guidProviderContextSecureSocketAuthIP:              "PROVIDER_CONTEXT_SECURE_SOCKET_AUTHIP",
+	guidProviderContextSecureSocketIPSec:               "PROVIDER_CONTEXT_SECURE_SOCKET_IPSEC",
+	guidProviderIKEExt:                                 "PROVIDER_IKEEXT",
+	guidProviderIPSecDospConfig:                        "PROVIDER_IPSEC_DOSP_CONFIG",
+	guidProviderTCPChimneyOffload:                      "PROVIDER_TCP_CHIMNEY_OFFLOAD",
+	guidProviderTCPTemplates:                           "PROVIDER_TCP_TEMPLATES",
+	guidSublayerInspection:                             "SUBLAYER_INSPECTION",
+	guidSublayerIPSecDosp:                              "SUBLAYER_IPSEC_DOSP",
+	guidSublayerIPSecForwardOutboundTunnel:             "SUBLAYER_IPSEC_FORWARD_OUTBOUND_TUNNEL",
+	guidSublayerIPSecSecurityRealm:                     "SUBLAYER_IPSEC_SECURITY_REALM",
+	guidSublayerIPSecTunnel:                            "SUBLAYER_IPSEC_TUNNEL",
+	guidSublayerLIPS:                                   "SUBLAYER_LIPS",
+	guidSublayerRPCAudit:                               "SUBLAYER_RPC_AUDIT",
+	guidSublayerSecureSocket:                           "SUBLAYER_SECURE_SOCKET",
+	guidSublayerTCPChimneyOffload:                      "SUBLAYER_TCP_CHIMNEY_OFFLOAD",
+	guidSublayerTCPTemplates:                           "SUBLAYER_TCP_TEMPLATES",
+	guidSublayerTeredo:                                 "SUBLAYER_TEREDO",
+	guidSublayerUniversal:                              "SUBLAYER_UNIVERSAL",
 }
