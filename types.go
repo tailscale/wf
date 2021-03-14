@@ -119,7 +119,7 @@ type fwpmSublayer0 struct {
 	SublayerKey  SublayerID
 	DisplayData  fwpmDisplayData0
 	Flags        fwpmSublayerFlags
-	ProviderKey  *ProviderID
+	ProviderKey  *windows.GUID
 	ProviderData fwpByteBlob
 	Weight       uint16
 }
@@ -169,7 +169,7 @@ type fwpmFilter0 struct {
 	FilterKey           RuleID
 	DisplayData         fwpmDisplayData0
 	Flags               fwpmFilterFlags
-	ProviderKey         *ProviderID
+	ProviderKey         *windows.GUID
 	ProviderData        fwpByteBlob
 	LayerKey            LayerID
 	SublayerKey         SublayerID

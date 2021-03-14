@@ -234,7 +234,7 @@ type Sublayer struct {
 	Persistent bool
 	// Provider optionally identifies the Provider that manages this
 	// sublayer.
-	Provider *ProviderID
+	Provider ProviderID
 	// ProviderData is optional opaque data that can be held on behalf
 	// of the Provider.
 	ProviderData []byte
@@ -243,9 +243,9 @@ type Sublayer struct {
 	Weight uint16
 }
 
-// Sublayers returns available Sublayers. If provider is non-nil, only
+// Sublayers returns available Sublayers. If provider is non-zero, only
 // Sublayers registered to that Provider are returned.
-func (s *Session) Sublayers(provider *SublayerID) ([]*Sublayer, error) {
+func (s *Session) Sublayers(provider ProviderID) ([]*Sublayer, error) {
 	var a arena
 	defer a.Dispose()
 
@@ -555,7 +555,7 @@ type Rule struct {
 
 	// Provider optionally identifies the Provider that manages this
 	// rule.
-	Provider *ProviderID
+	Provider ProviderID
 	// ProviderData is optional opaque data that can be held on behalf
 	// of the Provider.
 	ProviderData []byte

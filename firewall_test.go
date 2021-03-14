@@ -209,7 +209,7 @@ func TestSublayers(t *testing.T) {
 		t.Fatalf("add sublayer failed: %v", err)
 	}
 
-	sublayers, err := s.Sublayers(nil)
+	sublayers, err := s.Sublayers(ProviderID{})
 	if err != nil {
 		t.Fatalf("get sublayers failed: %v", err)
 	}
@@ -233,7 +233,7 @@ func TestSublayers(t *testing.T) {
 		t.Fatalf("delete sublayer failed: %v", err)
 	}
 
-	sublayers, err = s.Sublayers(nil)
+	sublayers, err = s.Sublayers(ProviderID{})
 	if err != nil {
 		t.Fatalf("get sublayers failed: %v", err)
 	}

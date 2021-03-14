@@ -34,9 +34,9 @@ func toSession0(a *arena, opts *Options) *fwpmSession0 {
 // toSublayerEnumTemplate0 returns an arena-allocated
 // fwpmSublayerEnumTemplate0 that filters on the given provider, or
 // all if provider is nil.
-func toSublayerEnumTemplate0(a *arena, provider *SublayerID) *fwpmSublayerEnumTemplate0 {
+func toSublayerEnumTemplate0(a *arena, provider ProviderID) *fwpmSublayerEnumTemplate0 {
 	ret := (*fwpmSublayerEnumTemplate0)(a.Alloc(unsafe.Sizeof(fwpmSublayerEnumTemplate0{})))
-	ret.ProviderKey = toGUID(a, (*windows.GUID)(provider))
+	ret.ProviderKey = toGUID(a, windows.GUID(provider))
 	return ret
 }
 
@@ -49,7 +49,7 @@ func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
 			Name:        toUint16(a, sl.Name),
 			Description: toUint16(a, sl.Description),
 		},
-		ProviderKey: (*ProviderID)(toGUID(a, (*windows.GUID)(sl.Provider))),
+		ProviderKey: toGUID(a, windows.GUID(sl.Provider)),
 		ProviderData: fwpByteBlob{
 			Size: uint32(len(sl.ProviderData)),
 			Data: toBytes(a, sl.ProviderData),
@@ -102,7 +102,7 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 			Name:        toUint16(a, r.Name),
 			Description: toUint16(a, r.Description),
 		},
-		ProviderKey: (*ProviderID)(toGUID(a, (*windows.GUID)(r.Provider))),
+		ProviderKey: toGUID(a, windows.GUID(r.Provider)),
 		ProviderData: fwpByteBlob{
 			Size: uint32(len(r.ProviderData)), // todo: overflow?
 			Data: toBytes(a, r.ProviderData),
@@ -423,12 +423,12 @@ func toBytesFromString(a *arena, s string) (*byte, int) {
 }
 
 // toGUID returns an arena-allocated copy of guid.
-func toGUID(a *arena, guid *windows.GUID) *windows.GUID {
-	if guid == nil {
+func toGUID(a *arena, guid windows.GUID) *windows.GUID {
+	if guid == (windows.GUID{}) {
 		return nil
 	}
-	ret := (*windows.GUID)(a.Alloc(unsafe.Sizeof(windows.GUID{})))
-	*ret = *guid
+	ret := (*windows.GUID)(a.Alloc(unsafe.Sizeof(guid)))
+	*ret = guid
 	return ret
 }
 

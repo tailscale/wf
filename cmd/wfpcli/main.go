@@ -265,7 +265,7 @@ func listSublayers(_ context.Context, _ []string) error {
 	}
 	defer sess.Close()
 
-	sublayers, err := sess.Sublayers(nil)
+	sublayers, err := sess.Sublayers(wf.ProviderID{})
 	if err != nil {
 		return fmt.Errorf("listing WFP sublayers: %w", err)
 	}
@@ -278,8 +278,8 @@ func listSublayers(_ context.Context, _ []string) error {
 			fmt.Printf("  Description: %q\n", sublayer.Description)
 		}
 		fmt.Printf("  Persistent: %v\n", sublayer.Persistent)
-		if sublayer.Provider != nil {
-			fmt.Printf("  Provider: %s\n", *sublayer.Provider)
+		if !sublayer.Provider.IsZero() {
+			fmt.Printf("  Provider: %s\n", sublayer.Provider)
 		}
 		if len(sublayer.ProviderData) > 0 {
 			fmt.Printf("  Provider data: %v\n", sublayer.ProviderData)
@@ -310,7 +310,7 @@ func addSublayer(_ context.Context, _ []string) error {
 		if err != nil {
 			return fmt.Errorf("Parsing provider GUID: %w", err)
 		}
-		sl.Provider = (*wf.ProviderID)(&guid)
+		sl.Provider = wf.ProviderID(guid)
 	}
 
 	if err := sess.AddSublayer(sl); err != nil {
@@ -382,7 +382,7 @@ func listRules(context.Context, []string) error {
 		}
 		fmt.Printf("  Persistent: %v\n", rule.Persistent)
 		fmt.Printf("  Boot-time: %v\n", rule.BootTime)
-		if rule.Provider != nil {
+		if !rule.Provider.IsZero() {
 			fmt.Printf("  Provider: %s\n", rule.Provider)
 		}
 		if rule.Disabled {

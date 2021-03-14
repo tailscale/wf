@@ -165,8 +165,7 @@ func fromSublayer0(array **fwpmSublayer0, num uint32) []*Sublayer {
 		if sublayer.ProviderKey != nil {
 			// Make a copy of the GUID, to ensure we're not aliasing C
 			// memory.
-			p := *sublayer.ProviderKey
-			s.Provider = &p
+			s.Provider = ProviderID(*sublayer.ProviderKey)
 		}
 		ret = append(ret, s)
 	}
@@ -268,13 +267,11 @@ func fromFilter0(array **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rul
 			Action:       rule.Action.Type,
 			Persistent:   (rule.Flags & fwpmFilterFlagsPersistent) != 0,
 			BootTime:     (rule.Flags & fwpmFilterFlagsBootTime) != 0,
-			Provider:     rule.ProviderKey,
 			ProviderData: fromByteBlob(&rule.ProviderData),
 			Disabled:     (rule.Flags & fwpmFilterFlagsDisabled) != 0,
 		}
 		if rule.ProviderKey != nil {
-			r.Provider = &ProviderID{}
-			*r.Provider = *rule.ProviderKey
+			r.Provider = ProviderID(*rule.ProviderKey)
 		}
 		if rule.EffectiveWeight.Type == dataTypeUint64 {
 			r.Weight = **(**uint64)(unsafe.Pointer(&rule.EffectiveWeight.Value))
