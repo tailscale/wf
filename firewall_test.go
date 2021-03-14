@@ -107,13 +107,13 @@ func TestLayers(t *testing.T) {
 	// should definitely have.
 	wantLayers := map[windows.GUID]*Layer{
 		guidLayerALEAuthRecvAcceptV4: {
-			Key:                guidLayerALEAuthRecvAcceptV4,
-			KernelID:           44,
-			Name:               "ALE Receive/Accept v4 Layer",
-			InKernel:           true,
-			ClassifyMostly:     true,
-			Buffered:           false,
-			DefaultSublayerKey: guidSublayerUniversal,
+			ID:              guidLayerALEAuthRecvAcceptV4,
+			KernelID:        44,
+			Name:            "ALE Receive/Accept v4 Layer",
+			InKernel:        true,
+			ClassifyMostly:  true,
+			Buffered:        false,
+			DefaultSublayer: guidSublayerUniversal,
 			Fields: []*Field{
 				{guidConditionALEAppID, stringT},
 				{guidConditionALENapContext, u32T},
@@ -157,13 +157,13 @@ func TestLayers(t *testing.T) {
 			},
 		},
 		guidLayerStreamV4Discard: {
-			Key:                guidLayerStreamV4Discard,
-			KernelID:           21,
-			Name:               "Stream v4 Discard Layer",
-			InKernel:           true,
-			ClassifyMostly:     true,
-			Buffered:           true,
-			DefaultSublayerKey: guidSublayerUniversal,
+			ID:              guidLayerStreamV4Discard,
+			KernelID:        21,
+			Name:            "Stream v4 Discard Layer",
+			InKernel:        true,
+			ClassifyMostly:  true,
+			Buffered:        true,
+			DefaultSublayer: guidSublayerUniversal,
 			Fields: []*Field{
 				{guidConditionCompartmentID, u32T},
 				{guidConditionDirection, u32T},
@@ -180,15 +180,15 @@ func TestLayers(t *testing.T) {
 	for guid, want := range wantLayers {
 		found := false
 		for _, got := range layers {
-			if got.Key != guid {
+			if got.ID != guid {
 				continue
 			}
 			found = true
 			sort.Slice(got.Fields, func(i, j int) bool {
-				return GUIDName(got.Fields[i].Key) < GUIDName(got.Fields[j].Key)
+				return GUIDName(got.Fields[i].ID) < GUIDName(got.Fields[j].ID)
 			})
 			fieldCmp := func(a, b *Field) bool {
-				return a.Key == b.Key && a.Type == b.Type
+				return a.ID == b.ID && a.Type == b.Type
 			}
 			if diff := cmp.Diff(got, want, cmp.Comparer(fieldCmp)); diff != "" {
 				t.Errorf("unexpected layer def (-got+want):\n%s", diff)
@@ -218,7 +218,7 @@ func TestSublayers(t *testing.T) {
 	}
 
 	sl := &Sublayer{
-		Key:          guid,
+		ID:           guid,
 		Name:         "test sublayer",
 		Description:  "a test sublayer",
 		ProviderData: []byte("byte blob"),
@@ -235,7 +235,7 @@ func TestSublayers(t *testing.T) {
 
 	found := false
 	for _, got := range sublayers {
-		if got.Key != sl.Key {
+		if got.ID != sl.ID {
 			continue
 		}
 		found = true
@@ -248,7 +248,7 @@ func TestSublayers(t *testing.T) {
 		t.Fatal("sublayer added but not found")
 	}
 
-	if err := s.DeleteSublayer(sl.Key); err != nil {
+	if err := s.DeleteSublayer(sl.ID); err != nil {
 		t.Fatalf("delete sublayer failed: %v", err)
 	}
 
@@ -257,7 +257,7 @@ func TestSublayers(t *testing.T) {
 		t.Fatalf("get sublayers failed: %v", err)
 	}
 	for _, got := range sublayers {
-		if got.Key == sl.Key {
+		if got.ID == sl.ID {
 			t.Fatalf("deleted sublayer but it's still there: %#v", got)
 		}
 	}
@@ -280,7 +280,7 @@ func TestProviders(t *testing.T) {
 	}
 
 	p := &Provider{
-		Key:         guid,
+		ID:          guid,
 		Name:        "test provider",
 		Description: "a test provider",
 		Data:        []byte("byte blob"),
@@ -296,7 +296,7 @@ func TestProviders(t *testing.T) {
 
 	found := false
 	for _, got := range providers {
-		if got.Key != p.Key {
+		if got.ID != p.ID {
 			continue
 		}
 		found = true
@@ -309,7 +309,7 @@ func TestProviders(t *testing.T) {
 		t.Fatal("provider added but not found")
 	}
 
-	if err := s.DeleteProvider(p.Key); err != nil {
+	if err := s.DeleteProvider(p.ID); err != nil {
 		t.Fatalf("delete provider failed: %v", err)
 	}
 
@@ -318,7 +318,7 @@ func TestProviders(t *testing.T) {
 		t.Fatalf("get providers failed: %v", err)
 	}
 	for _, got := range providers {
-		if got.Key == p.Key {
+		if got.ID == p.ID {
 			t.Fatalf("deleted provider but it's still there: %#v", got)
 		}
 	}

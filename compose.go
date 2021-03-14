@@ -40,7 +40,7 @@ func toSublayerEnumTemplate0(a *arena, provider *windows.GUID) *fwpmSublayerEnum
 func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
 	ret := (*fwpmSublayer0)(a.Alloc(unsafe.Sizeof(fwpmSublayer0{})))
 	*ret = fwpmSublayer0{
-		SublayerKey: sl.Key,
+		SublayerKey: sl.ID,
 		DisplayData: fwpmDisplayData0{
 			Name:        toUint16(a, sl.Name),
 			Description: toUint16(a, sl.Description),
@@ -60,7 +60,7 @@ func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
 func toProvider0(a *arena, p *Provider) *fwpmProvider0 {
 	ret := (*fwpmProvider0)(a.Alloc(unsafe.Sizeof(fwpmProvider0{})))
 	*ret = fwpmProvider0{
-		ProviderKey: p.Key,
+		ProviderKey: p.ID,
 		DisplayData: fwpmDisplayData0{
 			Name:        toUint16(a, p.Name),
 			Description: toUint16(a, p.Description),
@@ -93,7 +93,7 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 
 	ret := (*fwpmFilter0)(a.Alloc(unsafe.Sizeof(fwpmFilter0{})))
 	*ret = fwpmFilter0{
-		FilterKey: r.Key,
+		FilterKey: r.ID,
 		DisplayData: fwpmDisplayData0{
 			Name:        toUint16(a, r.Name),
 			Description: toUint16(a, r.Description),
@@ -145,13 +145,13 @@ func toCondition0(a *arena, ms []*Match, ft fieldTypes) (array *fwpmFilterCondit
 	for i, m := range ms {
 		c := &conds[i]
 
-		typ, val, err := toValue0(a, m.Value, ft[m.Key])
+		typ, val, err := toValue0(a, m.Value, ft[m.Field])
 		if err != nil {
 			return nil, fmt.Errorf("invalid match %v: %w", m, err)
 		}
 
 		*c = fwpmFilterCondition0{
-			FieldKey:  m.Key,
+			FieldKey:  m.Field,
 			MatchType: m.Op,
 			Value: fwpConditionValue0{
 				Type:  typ,

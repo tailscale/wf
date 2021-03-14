@@ -153,8 +153,8 @@ func listProviders(_ context.Context, _ []string) error {
 	}
 
 	for _, provider := range providers {
-		fmt.Printf("%s\n", displayName(provider.Key, provider.Name))
-		fmt.Printf("  GUID: %s\n", provider.Key)
+		fmt.Printf("%s\n", displayName(provider.ID, provider.Name))
+		fmt.Printf("  GUID: %s\n", provider.ID)
 		fmt.Printf("  Name: %q\n", provider.Name)
 		if provider.Description != "" {
 			fmt.Printf("  Description: %q\n", provider.Description)
@@ -181,7 +181,7 @@ func addProvider(context.Context, []string) error {
 	defer sess.Close()
 
 	p := &wf.Provider{
-		Key:         mustGUID(),
+		ID:          mustGUID(),
 		Name:        *providerName,
 		Description: *providerDescription,
 		Persistent:  *providerPersistent,
@@ -192,7 +192,7 @@ func addProvider(context.Context, []string) error {
 		return fmt.Errorf("adding provider: %w", err)
 	}
 
-	fmt.Printf("Created provider %s\n", p.Key)
+	fmt.Printf("Created provider %s\n", p.ID)
 
 	return nil
 }
@@ -236,16 +236,16 @@ func listLayers(_ context.Context, _ []string) error {
 	}
 
 	for _, layer := range layers {
-		fmt.Printf("%s\n", displayName(layer.Key, layer.Name))
-		fmt.Printf("  GUID: %s\n", layer.Key)
+		fmt.Printf("%s\n", displayName(layer.ID, layer.Name))
+		fmt.Printf("  GUID: %s\n", layer.ID)
 		fmt.Printf("  LUID: %d\n", layer.KernelID)
 		fmt.Printf("  Name: %q\n", layer.Name)
 		if layer.Description != "" {
 			fmt.Printf("  Description: %q\n", layer.Description)
 		}
 		for _, field := range layer.Fields {
-			fmt.Printf("  Field: %s\n", wf.GUIDName(field.Key))
-			fmt.Printf("    GUID: %s\n", field.Key)
+			fmt.Printf("  Field: %s\n", wf.GUIDName(field.ID))
+			fmt.Printf("    GUID: %s\n", field.ID)
 			fmt.Printf("    Type: %s\n", field.Type)
 		}
 		fmt.Printf("\n")
@@ -267,8 +267,8 @@ func listSublayers(_ context.Context, _ []string) error {
 	}
 
 	for _, sublayer := range sublayers {
-		fmt.Printf("%s\n", displayName(sublayer.Key, sublayer.Name))
-		fmt.Printf("  GUID: %s\n", sublayer.Key)
+		fmt.Printf("%s\n", displayName(sublayer.ID, sublayer.Name))
+		fmt.Printf("  GUID: %s\n", sublayer.ID)
 		fmt.Printf("  Name: %q\n", sublayer.Name)
 		if sublayer.Description != "" {
 			fmt.Printf("  Description: %q\n", sublayer.Description)
@@ -295,7 +295,7 @@ func addSublayer(_ context.Context, _ []string) error {
 	defer sess.Close()
 
 	sl := &wf.Sublayer{
-		Key:         mustGUID(),
+		ID:          mustGUID(),
 		Name:        *sublayerName,
 		Description: *sublayerDescription,
 		Persistent:  *sublayerPersistent,
@@ -313,7 +313,7 @@ func addSublayer(_ context.Context, _ []string) error {
 		return fmt.Errorf("creating sublayer: %w", err)
 	}
 
-	fmt.Printf("Created sublayer %s\n", sl.Key)
+	fmt.Printf("Created sublayer %s\n", sl.ID)
 	return nil
 }
 
@@ -356,12 +356,12 @@ func listRules(context.Context, []string) error {
 	}
 
 	sort.Slice(rules, func(i, j int) bool {
-		return rules[i].Key.String() < rules[j].Key.String()
+		return rules[i].ID.String() < rules[j].ID.String()
 	})
 
 	for _, rule := range rules {
-		fmt.Printf("%s\n", displayName(rule.Key, rule.Name))
-		fmt.Printf("  GUID: %s\n", rule.Key)
+		fmt.Printf("%s\n", displayName(rule.ID, rule.Name))
+		fmt.Printf("  GUID: %s\n", rule.ID)
 		fmt.Printf("  Name: %q\n", rule.Name)
 		if rule.Description != "" {
 			fmt.Printf("  Description: %q\n", rule.Description)
@@ -450,14 +450,14 @@ func test(context.Context, []string) error {
 	defer sess.Close()
 
 	r := &wf.Rule{
-		Key:      mustGUID(),
+		ID:       mustGUID(),
 		Layer:    guidLayerALEAuthRecvAcceptV4,
 		Sublayer: guidSublayerUniversal,
 		Weight:   1,
 		Action:   wf.ActionBlock,
 		Conditions: []*wf.Match{
 			&wf.Match{
-				Key:   guidConditionIPLocalAddress,
+				Field: guidConditionIPLocalAddress,
 				Op:    wf.MatchTypeEqual,
 				Value: uint8(42),
 			},

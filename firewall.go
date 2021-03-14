@@ -81,9 +81,9 @@ func New(opts *Options) (*Session, error) {
 	for _, layer := range layers {
 		fields := fieldTypes{}
 		for _, field := range layer.Fields {
-			fields[field.Key] = field.Type
+			fields[field.ID] = field.Type
 		}
-		ret.layerTypes[layer.Key] = fields
+		ret.layerTypes[layer.ID] = fields
 	}
 
 	return ret, nil
@@ -102,8 +102,8 @@ func (s *Session) Close() error {
 // Layer is a point in the packet processing path where filter rules
 // can be applied.
 type Layer struct {
-	// Key is the unique identifier for this layer.
-	Key windows.GUID
+	// ID is the unique identifier for this layer.
+	ID windows.GUID
 	// KernelID is the kernel ID for this layer.
 	KernelID uint16
 	// Name is a short descriptive name.
@@ -120,9 +120,9 @@ type Layer struct {
 	// Buffered reports whether this layer is buffered (unknown what
 	// that actually means).
 	Buffered bool
-	// DefaultSublayerKey is the unique identifier for the default
-	// sublayer into which filter rules are added.
-	DefaultSublayerKey windows.GUID
+	// DefaultSublayer is the ID for the default sublayer into which
+	// filter rules are added.
+	DefaultSublayer windows.GUID
 	// Fields describes the fields that are available in this layer to
 	// be matched against.
 	Fields []*Field
@@ -131,8 +131,8 @@ type Layer struct {
 // Field is a piece of information that a layer makes available to
 // filter rules for matching.
 type Field struct {
-	// Key is the unique identifier for the field.
-	Key windows.GUID
+	// ID is the unique identifier for the field.
+	ID windows.GUID
 	// Type is the type of the field.
 	Type reflect.Type
 }
@@ -196,8 +196,8 @@ func (s *Session) getLayerPage(enum windows.Handle) ([]*Layer, error) {
 
 // A Sublayer is a container for filtering rules.
 type Sublayer struct {
-	// Key is the unique identifier for this sublayer.
-	Key windows.GUID
+	// ID is the unique identifier for this sublayer.
+	ID windows.GUID
 	// Name is a short descriptive name.
 	Name string
 	// Description is a longer description of the Sublayer.
@@ -266,8 +266,8 @@ func (s *Session) AddSublayer(sl *Sublayer) error {
 	// the WFP API accepts zero GUIDs and interprets it as "give me a
 	// random GUID". However, we can't get that GUID back out, so it
 	// would be pointless to make such a request. Stop it here.
-	if sl.Key == (windows.GUID{}) {
-		return errors.New("Sublayer.Key cannot be zero")
+	if sl.ID == (windows.GUID{}) {
+		return errors.New("Sublayer.ID cannot be zero")
 	}
 
 	var a arena
@@ -288,8 +288,8 @@ func (s *Session) DeleteSublayer(id windows.GUID) error {
 
 // A Provider is an entity that owns sublayers and filtering rules.
 type Provider struct {
-	// Key is the unique identifier for this provider.
-	Key windows.GUID
+	// ID is the unique identifier for this provider.
+	ID windows.GUID
 	// Name is a short descriptive name.
 	Name string
 	// Description is a longer description of the provider.
@@ -351,8 +351,8 @@ func (s *Session) getProviderPage(enum windows.Handle) ([]*Provider, error) {
 
 // AddProvider creates a new provider.
 func (s *Session) AddProvider(p *Provider) error {
-	if p.Key == (windows.GUID{}) {
-		return errors.New("Provider.Key cannot be zero")
+	if p.ID == (windows.GUID{}) {
+		return errors.New("Provider.ID cannot be zero")
 	}
 
 	var a arena
@@ -415,13 +415,13 @@ func (m MatchType) String() string {
 
 // Match is a matching test that gets run against a layer's field.
 type Match struct {
-	Key   windows.GUID
+	Field windows.GUID
 	Op    MatchType
 	Value interface{}
 }
 
 func (m Match) String() string {
-	return fmt.Sprintf("%s %s %v (%T)", GUIDName(m.Key), m.Op, m.Value, m.Value)
+	return fmt.Sprintf("%s %s %v (%T)", GUIDName(m.Field), m.Op, m.Value, m.Value)
 }
 
 // Action is an action the filtering engine can execute.
@@ -446,8 +446,8 @@ const (
 // A Rule is an action to take on packets that match a set of
 // conditions.
 type Rule struct {
-	// Key is the unique identifier for this rule.
-	Key windows.GUID
+	// ID is the unique identifier for this rule.
+	ID windows.GUID
 	// KernelID is the kernel ID for this rule.
 	KernelID uint64
 	// Name is a short descriptive name.
@@ -540,8 +540,8 @@ func (s *Session) getRulePage(enum windows.Handle) ([]*Rule, error) {
 }
 
 func (s *Session) AddRule(r *Rule) error {
-	if r.Key == (windows.GUID{}) {
-		return errors.New("Provider.Key cannot be zero")
+	if r.ID == (windows.GUID{}) {
+		return errors.New("Provider.ID cannot be zero")
 	}
 
 	var a arena
