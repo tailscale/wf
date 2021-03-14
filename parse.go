@@ -92,9 +92,6 @@ func fromLayer0(array **fwpmLayer0, num uint32) ([]*Layer, error) {
 			ID:              layer.LayerKey,
 			Name:            windows.UTF16PtrToString(layer.DisplayData.Name),
 			Description:     windows.UTF16PtrToString(layer.DisplayData.Description),
-			InKernel:        (layer.Flags & fwpmLayerFlagsKernel) != 0,
-			ClassifyMostly:  (layer.Flags & fwpmLayerFlagsClassifyMostly) != 0,
-			Buffered:        (layer.Flags & fwpmLayerFlagsBuffered) != 0,
 			DefaultSublayer: layer.DefaultSublayerKey,
 			KernelID:        layer.LayerID,
 		}
