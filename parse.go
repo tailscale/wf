@@ -89,14 +89,14 @@ func fromLayer0(array **fwpmLayer0, num uint32) ([]*Layer, error) {
 
 	for _, layer := range layers {
 		l := &Layer{
-			Key:                layer.LayerKey,
-			Name:               windows.UTF16PtrToString(layer.DisplayData.Name),
-			Description:        windows.UTF16PtrToString(layer.DisplayData.Description),
-			InKernel:           (layer.Flags & fwpmLayerFlagsKernel) != 0,
-			ClassifyMostly:     (layer.Flags & fwpmLayerFlagsClassifyMostly) != 0,
-			Buffered:           (layer.Flags & fwpmLayerFlagsBuffered) != 0,
-			DefaultSublayerKey: layer.DefaultSublayerKey,
-			KernelID:           layer.LayerID,
+			ID:              layer.LayerKey,
+			Name:            windows.UTF16PtrToString(layer.DisplayData.Name),
+			Description:     windows.UTF16PtrToString(layer.DisplayData.Description),
+			InKernel:        (layer.Flags & fwpmLayerFlagsKernel) != 0,
+			ClassifyMostly:  (layer.Flags & fwpmLayerFlagsClassifyMostly) != 0,
+			Buffered:        (layer.Flags & fwpmLayerFlagsBuffered) != 0,
+			DefaultSublayer: layer.DefaultSublayerKey,
+			KernelID:        layer.LayerID,
 		}
 
 		var fields []fwpmField0
@@ -112,7 +112,7 @@ func fromLayer0(array **fwpmLayer0, num uint32) ([]*Layer, error) {
 				return nil, fmt.Errorf("finding type of field %s: %w", GUIDName(*field.FieldKey), err)
 			}
 			l.Fields = append(l.Fields, &Field{
-				Key:  *field.FieldKey,
+				ID:   *field.FieldKey,
 				Type: typ,
 			})
 		}
@@ -135,7 +135,7 @@ func fromSublayer0(array **fwpmSublayer0, num uint32) []*Sublayer {
 
 	for _, sublayer := range sublayers {
 		s := &Sublayer{
-			Key:          sublayer.SublayerKey,
+			ID:           sublayer.SublayerKey,
 			Name:         windows.UTF16PtrToString(sublayer.DisplayData.Name),
 			Description:  windows.UTF16PtrToString(sublayer.DisplayData.Description),
 			Persistent:   (sublayer.Flags & fwpmSublayerFlagsPersistent) != 0,
@@ -167,7 +167,7 @@ func fromProvider0(array **fwpmProvider0, num uint32) []*Provider {
 
 	for _, provider := range providers {
 		p := &Provider{
-			Key:         provider.ProviderKey,
+			ID:          provider.ProviderKey,
 			Name:        windows.UTF16PtrToString(provider.DisplayData.Name),
 			Description: windows.UTF16PtrToString(provider.DisplayData.Description),
 			Persistent:  (provider.Flags & fwpmProviderFlagsPersistent) != 0,
@@ -239,7 +239,7 @@ func fromFilter0(array **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rul
 
 	for _, rule := range rules {
 		r := &Rule{
-			Key:          rule.FilterKey,
+			ID:           rule.FilterKey,
 			KernelID:     rule.FilterID,
 			Name:         windows.UTF16PtrToString(rule.DisplayData.Name),
 			Description:  windows.UTF16PtrToString(rule.DisplayData.Description),
@@ -301,7 +301,7 @@ func fromCondition0(condArray *fwpmFilterCondition0, num uint32, fieldTypes fiel
 			return nil, fmt.Errorf("getting value for match [%s %s]: %w", GUIDName(cond.FieldKey), cond.MatchType, err)
 		}
 		m := &Match{
-			Key:   cond.FieldKey,
+			Field: cond.FieldKey,
 			Op:    cond.MatchType,
 			Value: v,
 		}
