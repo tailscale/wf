@@ -104,6 +104,7 @@ func (id LayerID) String() string {
 	return windows.GUID(id).String()
 }
 
+// IsZero reports whether id is nil or the zero GUID.
 func (id *LayerID) IsZero() bool {
 	return id == nil || *id == LayerID{}
 }
@@ -137,6 +138,7 @@ func (id FieldID) String() string {
 	return windows.GUID(id).String()
 }
 
+// IsZero reports whether id is nil or the zero GUID.
 func (id *FieldID) IsZero() bool {
 	return id == nil || *id == FieldID{}
 }
@@ -214,6 +216,7 @@ func (id SublayerID) String() string {
 	return windows.GUID(id).String()
 }
 
+// IsZero reports whether id is nil or the zero GUID.
 func (id *SublayerID) IsZero() bool {
 	return id == nil || *id == SublayerID{}
 }
@@ -339,6 +342,7 @@ func (id ProviderID) String() string {
 	return windows.GUID(id).String()
 }
 
+// IsZero reports whether id is nil or the zero GUID.
 func (id *ProviderID) IsZero() bool {
 	return id == nil || *id == ProviderID{}
 }
@@ -510,6 +514,7 @@ func (id RuleID) String() string {
 	return windows.GUID(id).String()
 }
 
+// IsZero reports whether id is nil or the zero GUID.
 func (id *RuleID) IsZero() bool {
 	return id == nil || *id == RuleID{}
 }
@@ -524,6 +529,7 @@ func (id CalloutID) String() string {
 	return windows.GUID(id).String()
 }
 
+// IsZero reports whether id is nil or the zero GUID.
 func (id *CalloutID) IsZero() bool {
 	return id == nil || *id == CalloutID{}
 }
