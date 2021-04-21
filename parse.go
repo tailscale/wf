@@ -282,6 +282,7 @@ func fromFilter0(array **fwpmFilter0, num uint32, layerTypes layerTypes) ([]*Rul
 		if r.Action == ActionCalloutTerminating || r.Action == ActionCalloutUnknown {
 			r.PermitIfMissing = (rule.Flags & fwpmFilterFlagsPermitIfCalloutUnregistered) != 0
 		}
+		r.HardAction = (rule.Flags & fwpmFilterFlagsClearActionRight) != 0
 
 		ft := layerTypes[r.Layer]
 		if ft == nil {

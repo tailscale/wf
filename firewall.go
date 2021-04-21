@@ -109,6 +109,54 @@ func (id *LayerID) IsZero() bool {
 	return id == nil || *id == LayerID{}
 }
 
+// ConditionFlag represents special conditions that can be tested.
+type ConditionFlag uint32 // do not change type, used in C calls
+
+const (
+	ConditionFlagIsLoopback             ConditionFlag = 0x00000001
+	ConditionFlagIsIPSecSecured         ConditionFlag = 0x00000002
+	ConditionFlagIsReauthorize          ConditionFlag = 0x00000004
+	ConditionFlagIsWildcardBind         ConditionFlag = 0x00000008
+	ConditionFlagIsRawEndpoint          ConditionFlag = 0x00000010
+	ConditionFlagIsFragmant             ConditionFlag = 0x00000020
+	ConditionFlagIsFragmantGroup        ConditionFlag = 0x00000040
+	ConditionFlagIsIPSecNATTReclassify  ConditionFlag = 0x00000080
+	ConditionFlagIsRequiresALEClassify  ConditionFlag = 0x00000100
+	ConditionFlagIsImplicitBind         ConditionFlag = 0x00000200
+	ConditionFlagIsReassembled          ConditionFlag = 0x00000400
+	ConditionFlagIsNameAppSpecified     ConditionFlag = 0x00004000
+	ConditionFlagIsPromiscuous          ConditionFlag = 0x00008000
+	ConditionFlagIsAuthFW               ConditionFlag = 0x00010000
+	ConditionFlagIsReclassify           ConditionFlag = 0x00020000
+	ConditionFlagIsOutboundPassThru     ConditionFlag = 0x00040000
+	ConditionFlagIsInboundPassThru      ConditionFlag = 0x00080000
+	ConditionFlagIsConnectionRedirected ConditionFlag = 0x00100000
+)
+
+// IPProto represents the protocol being used.
+type IPProto uint8 // do not change type, used in C calls
+
+// From: https://docs.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-socket
+const (
+	IPProtoICMP   IPProto = 1
+	IPProtoICMPV6 IPProto = 58
+	IPProtoTCP    IPProto = 6
+	IPProtoUDP    IPProto = 17
+)
+
+// AppID returns the application ID associated with the provided file.
+func AppID(file string) (string, error) {
+	var a arena
+	defer a.Dispose()
+	fileBytes, _ := toBytesFromString(&a, file)
+	var appID *fwpByteBlob
+	if err := fwpmGetAppIdFromFileName0(fileBytes, &appID); err != nil {
+		return "", err
+	}
+	defer fwpmFreeMemory0((*struct{})(unsafe.Pointer(&appID)))
+	return fromByteBlobToString(appID)
+}
+
 // Layer is a point in the packet processing path where filter rules
 // can be applied.
 type Layer struct {
@@ -566,6 +614,9 @@ type Rule struct {
 	// ActionPermit, rather than an ActionBlock. Only relevant if
 	// Action is ActionCalloutTerminating or ActionCalloutUnknown.
 	PermitIfMissing bool
+	// HardAction, if set, indicates that the action type is hard and cannot
+	// be overridden except by a Veto.
+	HardAction bool
 
 	// Persistent indicates whether the rule is preserved across
 	// restarts of the filtering engine.
@@ -588,7 +639,7 @@ type Rule struct {
 	Disabled bool
 }
 
-// TODO: figure out what currently unexposed flags do: ClearActionRight, Indexed
+// TODO: figure out what currently unexposed flags do: Indexed
 // TODO: figure out what ProviderContextKey is about. MSDN doesn't explain what contexts are.
 
 func (s *Session) Rules() ([]*Rule, error) { // TODO: support filter settings
@@ -641,8 +692,7 @@ func (s *Session) AddRule(r *Rule) error {
 	if err != nil {
 		return err
 	}
-
-	if err := fwpmFilterAdd0(s.handle, f, nil, nil); err != nil {
+	if err := fwpmFilterAdd0(s.handle, f, nil, &f.FilterID); err != nil {
 		return err
 	}
 

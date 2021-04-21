@@ -15,3 +15,5 @@ package wf
 //go:generate stringer -output=zfilterflags_strings.go -type=fwpmFilterFlags -trimprefix=fwpmFilterFlags
 //go:generate stringer -output=zproviderflags_strings.go -type=fwpmProviderFlags -trimprefix=fwpmProviderFlags
 //go:generate stringer -output=zdatatype_strings.go -type=dataType -trimprefix=dataType
+//go:generate stringer -output=zconditionflag_strings.go -type=ConditionFlag -trimprefix=ConditionFlag
+//go:generate stringer -output=zipproto_strings.go -type=IPProto -trimprefix=IPProto
