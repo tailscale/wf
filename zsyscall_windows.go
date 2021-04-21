@@ -48,6 +48,7 @@ var (
 	procFwpmFilterDestroyEnumHandle0   = modfwpuclnt.NewProc("FwpmFilterDestroyEnumHandle0")
 	procFwpmFilterEnum0                = modfwpuclnt.NewProc("FwpmFilterEnum0")
 	procFwpmFreeMemory0                = modfwpuclnt.NewProc("FwpmFreeMemory0")
+	procFwpmGetAppIdFromFileName0      = modfwpuclnt.NewProc("FwpmGetAppIdFromFileName0")
 	procFwpmLayerCreateEnumHandle0     = modfwpuclnt.NewProc("FwpmLayerCreateEnumHandle0")
 	procFwpmLayerDestroyEnumHandle0    = modfwpuclnt.NewProc("FwpmLayerDestroyEnumHandle0")
 	procFwpmLayerEnum0                 = modfwpuclnt.NewProc("FwpmLayerEnum0")
@@ -127,6 +128,14 @@ func fwpmFilterEnum0(engineHandle windows.Handle, enumHandle windows.Handle, num
 
 func fwpmFreeMemory0(p *struct{}) {
 	syscall.Syscall(procFwpmFreeMemory0.Addr(), 1, uintptr(unsafe.Pointer(p)), 0, 0)
+	return
+}
+
+func fwpmGetAppIdFromFileName0(path *byte, appId **fwpByteBlob) (ret error) {
+	r0, _, _ := syscall.Syscall(procFwpmGetAppIdFromFileName0.Addr(), 2, uintptr(unsafe.Pointer(path)), uintptr(unsafe.Pointer(appId)), 0)
+	if r0 != 0 {
+		ret = syscall.Errno(r0)
+	}
 	return
 }
 

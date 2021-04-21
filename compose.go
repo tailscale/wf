@@ -122,6 +122,9 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 		},
 	}
 
+	if r.HardAction {
+		ret.Flags |= fwpmFilterFlagsClearActionRight
+	}
 	if r.PermitIfMissing {
 		ret.Flags |= fwpmFilterFlagsPermitIfCalloutUnregistered
 	}
@@ -139,6 +142,9 @@ func toFilter0(a *arena, r *Rule, lt layerTypes) (*fwpmFilter0, error) {
 // fwpmFilterCondition0 array, using lt as necessary to correctly cast
 // values.
 func toCondition0(a *arena, ms []*Match, ft fieldTypes) (array *fwpmFilterCondition0, err error) {
+	if len(ms) == 0 {
+		return nil, nil
+	}
 	array = (*fwpmFilterCondition0)(a.Alloc(uintptr(len(ms)) * unsafe.Sizeof(fwpmFilterCondition0{})))
 
 	var conds []fwpmFilterCondition0
@@ -178,11 +184,14 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 	switch ftype {
 	case typeUint8:
 		typ = dataTypeUint8
-		u, ok := v.(uint8)
-		if !ok {
+		switch u := v.(type) {
+		case uint8:
+			*(*uint8)(unsafe.Pointer(&val)) = u
+		case IPProto:
+			*(*uint8)(unsafe.Pointer(&val)) = uint8(u)
+		default:
 			return mapErr()
 		}
-		*(*uint8)(unsafe.Pointer(&val)) = u
 	case typeUint16:
 		typ = dataTypeUint16
 		u, ok := v.(uint16)
@@ -192,11 +201,14 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		*(*uint16)(unsafe.Pointer(&val)) = u
 	case typeUint32:
 		typ = dataTypeUint32
-		u, ok := v.(uint32)
-		if !ok {
+		switch u := v.(type) {
+		case uint32:
+			*(*uint32)(unsafe.Pointer(&val)) = u
+		case ConditionFlag:
+			*(*uint32)(unsafe.Pointer(&val)) = uint32(u)
+		default:
 			return mapErr()
 		}
-		*(*uint32)(unsafe.Pointer(&val)) = u
 	case typeUint64:
 		typ = dataTypeUint64
 		u, ok := v.(uint64)
@@ -232,6 +244,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			Data: bb,
 		}
 		typ = dataTypeByteBlob
+		val = uintptr(p)
 	case typeSID:
 		typ = dataTypeSID
 		s, ok := v.(*windows.SID)

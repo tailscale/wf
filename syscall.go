@@ -38,3 +38,4 @@ package wf
 //sys fwpmTransactionAbort0(engineHandle windows.Handle) (ret error) [failretval!=0] = fwpuclnt.FwpmTransactionAbort0
 
 //sys fwpmFreeMemory0(p *struct{}) = fwpuclnt.FwpmFreeMemory0
+//sys fwpmGetAppIdFromFileName0(path *byte, appId **fwpByteBlob) (ret error) [failretval!=0] = fwpuclnt.FwpmGetAppIdFromFileName0
