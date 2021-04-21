@@ -5,6 +5,7 @@
 package wf
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"net"
@@ -469,8 +470,8 @@ func toSecurityDescriptor(a *arena, s *windows.SECURITY_DESCRIPTOR) (*windows.SE
 	return (*windows.SECURITY_DESCRIPTOR)(p), nil
 }
 
-// u32FromIPv4 returns ip as a native-endian uint32.
+// u32FromIPv4 returns ip as a big-endian uint32.
 func u32FromIPv4(ip netaddr.IP) uint32 {
 	b4 := ip.As4()
-	return *(*uint32)(unsafe.Pointer(&b4[0]))
+	return binary.BigEndian.Uint32(b4[:])
 }
