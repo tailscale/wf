@@ -286,7 +286,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 				val = uintptr(unsafe.Pointer(toBytes(a, b16[:])))
 			}
 		case netaddr.IPPrefix:
-			if m.IP.Is4() {
+			if m.IP().Is4() {
 				typ = dataTypeV4AddrMask
 				val = uintptr(unsafe.Pointer(toFwpV4AddrAndMask(a, m)))
 			} else {
@@ -443,8 +443,8 @@ func toGUID(a *arena, guid windows.GUID) *windows.GUID {
 // fwpV4AddrAndMask.
 func toFwpV4AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV4AddrAndMask {
 	ret := (*fwpV4AddrAndMask)(a.Alloc(unsafe.Sizeof(fwpV4AddrAndMask{})))
-	ret.Addr = u32FromIPv4(pfx.Masked().IP)
-	ret.Mask = (^uint32(0)) << (32 - pfx.Bits)
+	ret.Addr = u32FromIPv4(pfx.Masked().IP())
+	ret.Mask = (^uint32(0)) << (32 - pfx.Bits())
 	return ret
 }
 
@@ -452,8 +452,8 @@ func toFwpV4AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV4AddrAndMask {
 // fwpV6AddrAndMask.
 func toFwpV6AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV6AddrAndMask {
 	ret := (*fwpV6AddrAndMask)(a.Alloc(unsafe.Sizeof(fwpV6AddrAndMask{})))
-	ret.Addr = pfx.IP.As16()
-	ret.PrefixLength = pfx.Bits
+	ret.Addr = pfx.IP().As16()
+	ret.PrefixLength = pfx.Bits()
 	return ret
 }
 

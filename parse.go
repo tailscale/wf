@@ -219,22 +219,22 @@ func fromNetEvent1(array **fwpmNetEvent1, num uint32) ([]*DropEvent, error) {
 		e := &DropEvent{
 			Timestamp:  time.Unix(0, event.Header.Timestamp.Nanoseconds()),
 			IPProtocol: event.Header.IPProtocol,
-			LocalAddr: netaddr.IPPort{
-				Port: event.Header.LocalPort,
-			},
-			RemoteAddr: netaddr.IPPort{
-				Port: event.Header.RemotePort,
-			},
-			LayerID:  event.Drop.LayerID,
-			FilterID: event.Drop.FilterID,
+			LocalAddr:  netaddr.IPPortFrom(netaddr.IP{}, event.Header.LocalPort),
+			RemoteAddr: netaddr.IPPortFrom(netaddr.IP{}, event.Header.RemotePort),
+			LayerID:    event.Drop.LayerID,
+			FilterID:   event.Drop.FilterID,
 		}
 		switch event.Header.IPVersion {
 		case fwpIPVersion4:
-			e.LocalAddr.IP = ipv4From32(*(*uint32)(unsafe.Pointer(&event.Header.LocalAddr[0])))
-			e.RemoteAddr.IP = ipv4From32(*(*uint32)(unsafe.Pointer(&event.Header.RemoteAddr[0])))
+			localIP := ipv4From32(*(*uint32)(unsafe.Pointer(&event.Header.LocalAddr[0])))
+			e.LocalAddr = e.LocalAddr.WithIP(localIP)
+			remoteIP := ipv4From32(*(*uint32)(unsafe.Pointer(&event.Header.RemoteAddr[0])))
+			e.RemoteAddr = e.RemoteAddr.WithIP(remoteIP)
 		case fwpIPVersion6:
-			e.LocalAddr.IP = netaddr.IPFrom16(event.Header.LocalAddr)
-			e.RemoteAddr.IP = netaddr.IPFrom16(event.Header.RemoteAddr)
+			localIP := netaddr.IPFrom16(event.Header.LocalAddr)
+			e.LocalAddr = e.LocalAddr.WithIP(localIP)
+			remoteIP := netaddr.IPFrom16(event.Header.RemoteAddr)
+			e.RemoteAddr = e.RemoteAddr.WithIP(remoteIP)
 		}
 		appID, err := fromByteBlobToString(&event.Header.AppID)
 		if err != nil {
@@ -388,18 +388,12 @@ func parseV4AddrAndMask(v *uintptr) netaddr.IPPrefix {
 	v4 := *(**fwpV4AddrAndMask)(unsafe.Pointer(v))
 	ip := netaddr.IPv4(uint8(v4.Addr>>24), uint8(v4.Addr>>16), uint8(v4.Addr>>8), uint8(v4.Addr))
 	bits := uint8(32 - bits.TrailingZeros32(v4.Mask))
-	return netaddr.IPPrefix{
-		IP:   ip,
-		Bits: bits,
-	}
+	return netaddr.IPPrefixFrom(ip, bits)
 }
 
 func parseV6AddrAndMask(v *uintptr) netaddr.IPPrefix {
 	v6 := *(**fwpV6AddrAndMask)(unsafe.Pointer(v))
-	return netaddr.IPPrefix{
-		IP:   netaddr.IPFrom16(v6.Addr),
-		Bits: v6.PrefixLength,
-	}
+	return netaddr.IPPrefixFrom(netaddr.IPFrom16(v6.Addr), v6.PrefixLength)
 }
 
 func parseSID(v *uintptr) (*windows.SID, error) {
@@ -436,10 +430,7 @@ func parseRange0(v *uintptr, ftype reflect.Type) (interface{}, error) {
 		return nil, fmt.Errorf("range.From and range.To types don't match: %s / %s", reflect.TypeOf(from), reflect.TypeOf(to))
 	}
 	if reflect.TypeOf(from) == typeIP {
-		return netaddr.IPRange{
-			From: from.(netaddr.IP),
-			To:   to.(netaddr.IP),
-		}, nil
+		return netaddr.IPRangeFrom(from.(netaddr.IP), to.(netaddr.IP)), nil
 	}
 	return Range{from, to}, nil
 }
