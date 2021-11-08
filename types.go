@@ -164,6 +164,9 @@ type fwpmAction0 struct {
 	GUID CalloutID
 }
 
+// fwpmFilter0 is the Go representation of FWPM_FILTER0,
+// which stores the state associated with a filter.
+// See https://docs.microsoft.com/en-us/windows/win32/api/fwpmtypes/ns-fwpmtypes-fwpm_filter0
 //go:notinheap
 type fwpmFilter0 struct {
 	FilterKey           RuleID
@@ -177,10 +180,14 @@ type fwpmFilter0 struct {
 	NumFilterConditions uint32
 	FilterConditions    *fwpmFilterCondition0
 	Action              fwpmAction0
-	ProviderContextKey  windows.GUID
-	Reserved            *windows.GUID
-	FilterID            uint64
-	EffectiveWeight     fwpValue0
+
+	// Only one of RawContext/ProviderContextKey must be set.
+	RawContext         uint64
+	ProviderContextKey windows.GUID
+
+	Reserved        *windows.GUID
+	FilterID        uint64
+	EffectiveWeight fwpValue0
 }
 
 //go:notinheap
