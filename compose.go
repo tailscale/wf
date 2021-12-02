@@ -57,6 +57,9 @@ func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
 		},
 		Weight: sl.Weight,
 	}
+  if sl.Persistent {
+    ret.Flags = fwpmSublayerFlagsPersistent
+  }
 
 	return ret
 }
