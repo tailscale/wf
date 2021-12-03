@@ -57,9 +57,9 @@ func toSublayer0(a *arena, sl *Sublayer) *fwpmSublayer0 {
 		},
 		Weight: sl.Weight,
 	}
-  if sl.Persistent {
-    ret.Flags = fwpmSublayerFlagsPersistent
-  }
+	if sl.Persistent {
+		ret.Flags = fwpmSublayerFlagsPersistent
+	}
 
 	return ret
 }
@@ -318,8 +318,18 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		if err != nil {
 			return 0, 0, err
 		}
+
+		// This should be a FWP_BYTE_BLOB pointing to a
+		// SECURITY_DESCRIPTOR struct according to the Win32
+		// Documentation.
+		// https://docs.microsoft.com/en-us/windows/win32/api/fwptypes/ns-fwptypes-fwp_condition_value0
+		p := a.Alloc(unsafe.Sizeof(fwpByteBlob{}))
+		*(*fwpByteBlob)(p) = fwpByteBlob{
+			Size: uint32(sd.Length()),
+			Data: (*uint8)(unsafe.Pointer(csd)),
+		}
 		typ = dataTypeSecurityDescriptor
-		val = uintptr(unsafe.Pointer(csd))
+		val = uintptr(p)
 	case typeRange:
 		r, ok := v.(Range)
 		if !ok {
