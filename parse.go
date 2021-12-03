@@ -92,6 +92,15 @@ func fieldType(f *fwpmField0) (reflect.Type, error) {
 		return typeString, nil
 	}
 
+	// According to documentation, the UserID field is a SECURITY_DESCRIPTOR
+	// type. For some reason, WFP responds with a TOKEN_ACCESS_INFORMATION
+	// type when enumerating fields. Force the security descriptor type here
+	// to align with documentation.
+	// https://docs.microsoft.com/en-us/windows/win32/fwp/filtering-condition-identifiers-
+	if *f.FieldKey == FieldALEUserID {
+		return typeSecurityDescriptor, nil
+	}
+
 	// For everything else, there's a simple mapping.
 	if t, ok := fieldTypeMap[f.DataType]; ok {
 		return t, nil
