@@ -44,6 +44,11 @@ var (
 
 // fieldTypeMap maps a layer field's dataType to a Go value of that
 // type.
+// NOTE: According to documentation, all fields which report TokenAccessInformation
+// are actually a SECURITY_DESCRIPTOR type. For some reason, WFP responds
+// with a TOKEN_ACCESS_INFORMATION type when enumerating fields. This forces the
+// security descriptor type here to align with documentation.
+// https://docs.microsoft.com/en-us/windows/win32/fwp/filtering-condition-identifiers-
 var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeUint8:                  typeUint8,
 	dataTypeUint16:                 typeUint16,
@@ -54,7 +59,7 @@ var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeSID:                    typeSID,
 	dataTypeSecurityDescriptor:     typeSecurityDescriptor,
 	dataTypeTokenInformation:       typeTokenInformation,
-	dataTypeTokenAccessInformation: typeTokenAccessInformation,
+	dataTypeTokenAccessInformation: typeSecurityDescriptor,
 	dataTypeArray6:                 typeMAC,
 	dataTypeBitmapIndex:            typeBitmapIndex,
 	dataTypeV4AddrMask:             typePrefix,
@@ -90,15 +95,6 @@ func fieldType(f *fwpmField0) (reflect.Type, error) {
 	// case for thtat one field.
 	if f.DataType == dataTypeByteBlob && *f.FieldKey == FieldALEAppID {
 		return typeString, nil
-	}
-
-	// According to documentation, the UserID field is a SECURITY_DESCRIPTOR
-	// type. For some reason, WFP responds with a TOKEN_ACCESS_INFORMATION
-	// type when enumerating fields. Force the security descriptor type here
-	// to align with documentation.
-	// https://docs.microsoft.com/en-us/windows/win32/fwp/filtering-condition-identifiers-
-	if *f.FieldKey == FieldALEUserID {
-		return typeSecurityDescriptor, nil
 	}
 
 	// For everything else, there's a simple mapping.
