@@ -9,12 +9,13 @@ import (
 	"fmt"
 	"math/bits"
 	"net"
+	"net/netip"
 	"reflect"
 	"time"
 	"unsafe"
 
+	"go4.org/netipx"
 	"golang.org/x/sys/windows"
-	"inet.af/netaddr"
 )
 
 // This file contains parsing code for structures returned by the WFP
@@ -36,8 +37,8 @@ var (
 	typeTokenAccessInformation = reflect.TypeOf(TokenAccessInformation{})
 	typeMAC                    = reflect.TypeOf(net.HardwareAddr{})
 	typeBitmapIndex            = reflect.TypeOf(uint8(0))
-	typeIP                     = reflect.TypeOf(netaddr.IP{})
-	typePrefix                 = reflect.TypeOf(netaddr.IPPrefix{})
+	typeIP                     = reflect.TypeOf(netip.Addr{})
+	typePrefix                 = reflect.TypeOf(netip.Prefix{})
 	typeRange                  = reflect.TypeOf(Range{})
 	typeString                 = reflect.TypeOf("")
 )
@@ -219,22 +220,22 @@ func fromNetEvent1(array **fwpmNetEvent1, num uint32) ([]*DropEvent, error) {
 		e := &DropEvent{
 			Timestamp:  time.Unix(0, event.Header.Timestamp.Nanoseconds()),
 			IPProtocol: event.Header.IPProtocol,
-			LocalAddr:  netaddr.IPPortFrom(netaddr.IP{}, event.Header.LocalPort),
-			RemoteAddr: netaddr.IPPortFrom(netaddr.IP{}, event.Header.RemotePort),
+			LocalAddr:  netip.AddrPortFrom(netip.Addr{}, event.Header.LocalPort),
+			RemoteAddr: netip.AddrPortFrom(netip.Addr{}, event.Header.RemotePort),
 			LayerID:    event.Drop.LayerID,
 			FilterID:   event.Drop.FilterID,
 		}
 		switch event.Header.IPVersion {
 		case fwpIPVersion4:
 			localIP := ipv4From32(*(*uint32)(unsafe.Pointer(&event.Header.LocalAddr[0])))
-			e.LocalAddr = e.LocalAddr.WithIP(localIP)
+			e.LocalAddr = netip.AddrPortFrom(localIP, e.LocalAddr.Port())
 			remoteIP := ipv4From32(*(*uint32)(unsafe.Pointer(&event.Header.RemoteAddr[0])))
-			e.RemoteAddr = e.RemoteAddr.WithIP(remoteIP)
+			e.RemoteAddr = netip.AddrPortFrom(remoteIP, e.RemoteAddr.Port())
 		case fwpIPVersion6:
-			localIP := netaddr.IPFrom16(event.Header.LocalAddr)
-			e.LocalAddr = e.LocalAddr.WithIP(localIP)
-			remoteIP := netaddr.IPFrom16(event.Header.RemoteAddr)
-			e.RemoteAddr = e.RemoteAddr.WithIP(remoteIP)
+			localIP := netip.AddrFrom16(event.Header.LocalAddr).Unmap()
+			e.LocalAddr = netip.AddrPortFrom(localIP, e.LocalAddr.Port())
+			remoteIP := netip.AddrFrom16(event.Header.RemoteAddr).Unmap()
+			e.RemoteAddr = netip.AddrPortFrom(remoteIP, e.RemoteAddr.Port())
 		}
 		appID, err := fromByteBlobToString(&event.Header.AppID)
 		if err != nil {
@@ -353,7 +354,7 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 		var ret [16]byte
 		copy(ret[:], fromBytes(v.Value, 16))
 		if ftype == typeIP {
-			return netaddr.IPFrom16(ret), nil
+			return netip.AddrFrom16(ret).Unmap(), nil
 		}
 		return ret, nil
 	case dataTypeByteBlob:
@@ -384,16 +385,16 @@ func fromValue0(v *fwpValue0, ftype reflect.Type) (interface{}, error) {
 	return nil, fmt.Errorf("don't know how to map API type %s into Go", v.Type)
 }
 
-func parseV4AddrAndMask(v *uintptr) netaddr.IPPrefix {
+func parseV4AddrAndMask(v *uintptr) netip.Prefix {
 	v4 := *(**fwpV4AddrAndMask)(unsafe.Pointer(v))
-	ip := netaddr.IPv4(uint8(v4.Addr>>24), uint8(v4.Addr>>16), uint8(v4.Addr>>8), uint8(v4.Addr))
-	bits := uint8(32 - bits.TrailingZeros32(v4.Mask))
-	return netaddr.IPPrefixFrom(ip, bits)
+	ip := netip.AddrFrom4([4]byte{uint8(v4.Addr >> 24), uint8(v4.Addr >> 16), uint8(v4.Addr >> 8), uint8(v4.Addr)})
+	bits := 32 - bits.TrailingZeros32(v4.Mask)
+	return netip.PrefixFrom(ip, bits)
 }
 
-func parseV6AddrAndMask(v *uintptr) netaddr.IPPrefix {
+func parseV6AddrAndMask(v *uintptr) netip.Prefix {
 	v6 := *(**fwpV6AddrAndMask)(unsafe.Pointer(v))
-	return netaddr.IPPrefixFrom(netaddr.IPFrom16(v6.Addr), v6.PrefixLength)
+	return netip.PrefixFrom(netip.AddrFrom16(v6.Addr).Unmap(), int(v6.PrefixLength))
 }
 
 func parseSID(v *uintptr) (*windows.SID, error) {
@@ -430,13 +431,13 @@ func parseRange0(v *uintptr, ftype reflect.Type) (interface{}, error) {
 		return nil, fmt.Errorf("range.From and range.To types don't match: %s / %s", reflect.TypeOf(from), reflect.TypeOf(to))
 	}
 	if reflect.TypeOf(from) == typeIP {
-		return netaddr.IPRangeFrom(from.(netaddr.IP), to.(netaddr.IP)), nil
+		return netipx.IPRangeFrom(from.(netip.Addr), to.(netip.Addr)), nil
 	}
 	return Range{from, to}, nil
 }
 
-func ipv4From32(v uint32) netaddr.IP {
-	return netaddr.IPv4(uint8(v>>24), uint8(v>>16), uint8(v>>8), uint8(v))
+func ipv4From32(v uint32) netip.Addr {
+	return netip.AddrFrom4([4]byte{uint8(v >> 24), uint8(v >> 16), uint8(v >> 8), uint8(v)})
 }
 
 func fromBytes(bb uintptr, length int) []byte {

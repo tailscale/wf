@@ -10,7 +10,7 @@ on:
 
 jobs:
   staticcheck:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Set up Go
@@ -24,7 +24,9 @@ jobs:
         fetch-depth: 0
 
     - name: Check license
-      run: ./check_license_headers.sh
+      run: ./check_license_headers.sh .
 
     - name: Run staticcheck
-      run: go run honnef.co/go/tools/cmd/staticcheck
+      run: |
+        go install honnef.co/go/tools/cmd/staticcheck
+        GOOS=windows $(go list -f {{.Target}} honnef.co/go/tools/cmd/staticcheck) -checks=inherit,-SA1019

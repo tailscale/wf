@@ -5,7 +5,7 @@
 check_file() {
     got=$1
 
-    for year in `seq 2019 2021`; do
+    for year in `seq 2019 2025`; do
         want=$(cat <<EOF
 // Copyright (c) $year The Inet.Af AUTHORS. All rights reserved.
 // Use of this source code is governed by a BSD-style
