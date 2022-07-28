@@ -9,11 +9,12 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/netip"
 	"reflect"
 	"unsafe"
 
+	"go4.org/netipx"
 	"golang.org/x/sys/windows"
-	"inet.af/netaddr"
 )
 
 // toSession0 converts opts into an arena-allocated fwpmSession0.
@@ -279,7 +280,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		val = uintptr(unsafe.Pointer(toBytes(a, mac[:])))
 	case typeIP:
 		switch m := v.(type) {
-		case netaddr.IP:
+		case netip.Addr:
 			if m.Is4() {
 				typ = dataTypeUint32
 				*(*uint32)(unsafe.Pointer(&val)) = u32FromIPv4(m)
@@ -288,16 +289,16 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 				b16 := m.As16()
 				val = uintptr(unsafe.Pointer(toBytes(a, b16[:])))
 			}
-		case netaddr.IPPrefix:
-			if m.IP().Is4() {
+		case netip.Prefix:
+			if m.Addr().Is4() {
 				typ = dataTypeV4AddrMask
 				val = uintptr(unsafe.Pointer(toFwpV4AddrAndMask(a, m)))
 			} else {
 				typ = dataTypeV6AddrMask
 				val = uintptr(unsafe.Pointer(toFwpV6AddrAndMask(a, m)))
 			}
-		case netaddr.IPRange:
-			if !m.Valid() {
+		case netipx.IPRange:
+			if !m.IsValid() {
 				return 0, 0, fmt.Errorf("invalid IPRange %v", m)
 			}
 			r, err := toRange0(a, Range{m.From, m.To}, ftype)
@@ -454,19 +455,19 @@ func toGUID(a *arena, guid windows.GUID) *windows.GUID {
 
 // toFwpV4AddrAndMask converts pfx into an arena-allocated
 // fwpV4AddrAndMask.
-func toFwpV4AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV4AddrAndMask {
+func toFwpV4AddrAndMask(a *arena, pfx netip.Prefix) *fwpV4AddrAndMask {
 	ret := (*fwpV4AddrAndMask)(a.Alloc(unsafe.Sizeof(fwpV4AddrAndMask{})))
-	ret.Addr = u32FromIPv4(pfx.Masked().IP())
+	ret.Addr = u32FromIPv4(pfx.Masked().Addr())
 	ret.Mask = (^uint32(0)) << (32 - pfx.Bits())
 	return ret
 }
 
 // toFwpV6AddrAndMask converts pfx into an arena-allocated
 // fwpV6AddrAndMask.
-func toFwpV6AddrAndMask(a *arena, pfx netaddr.IPPrefix) *fwpV6AddrAndMask {
+func toFwpV6AddrAndMask(a *arena, pfx netip.Prefix) *fwpV6AddrAndMask {
 	ret := (*fwpV6AddrAndMask)(a.Alloc(unsafe.Sizeof(fwpV6AddrAndMask{})))
-	ret.Addr = pfx.IP().As16()
-	ret.PrefixLength = pfx.Bits()
+	ret.Addr = pfx.Addr().As16()
+	ret.PrefixLength = uint8(pfx.Bits())
 	return ret
 }
 
@@ -497,7 +498,7 @@ func toSecurityDescriptor(a *arena, s *windows.SECURITY_DESCRIPTOR) (*windows.SE
 }
 
 // u32FromIPv4 returns ip as a big-endian uint32.
-func u32FromIPv4(ip netaddr.IP) uint32 {
+func u32FromIPv4(ip netip.Addr) uint32 {
 	b4 := ip.As4()
 	return binary.BigEndian.Uint32(b4[:])
 }

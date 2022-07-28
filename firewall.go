@@ -7,12 +7,12 @@ package wf
 import (
 	"errors"
 	"fmt"
+	"net/netip"
 	"reflect"
 	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
-	"inet.af/netaddr"
 )
 
 type fieldTypes map[FieldID]reflect.Type
@@ -710,8 +710,8 @@ func (s *Session) DeleteRule(id RuleID) error {
 type DropEvent struct {
 	Timestamp  time.Time
 	IPProtocol uint8
-	LocalAddr  netaddr.IPPort
-	RemoteAddr netaddr.IPPort
+	LocalAddr  netip.AddrPort
+	RemoteAddr netip.AddrPort
 	AppID      string
 
 	LayerID  uint16
