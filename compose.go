@@ -187,68 +187,115 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 
 	switch ftype {
 	case typeUint8:
-		typ = dataTypeUint8
 		switch u := v.(type) {
 		case uint8:
+			typ = dataTypeUint8
 			*(*uint8)(unsafe.Pointer(&val)) = u
 		case IPProto:
+			typ = dataTypeUint8
 			*(*uint8)(unsafe.Pointer(&val)) = uint8(u)
+		case Range:
+			r0, err := toRange0(a, u, ftype)
+			if err != nil {
+				return 0, 0, err
+			}
+			typ = dataTypeRange
+			val = uintptr(unsafe.Pointer(r0))
 		default:
 			return mapErr()
 		}
 	case typeUint16:
-		typ = dataTypeUint16
-		u, ok := v.(uint16)
-		if !ok {
+		switch u := v.(type) {
+		case uint16:
+			typ = dataTypeUint16
+			*(*uint16)(unsafe.Pointer(&val)) = u
+		case Range:
+			r0, err := toRange0(a, u, ftype)
+			if err != nil {
+				return 0, 0, err
+			}
+			typ = dataTypeRange
+			val = uintptr(unsafe.Pointer(r0))
+		default:
 			return mapErr()
 		}
-		*(*uint16)(unsafe.Pointer(&val)) = u
 	case typeUint32:
-		typ = dataTypeUint32
 		switch u := v.(type) {
 		case uint32:
+			typ = dataTypeUint32
 			*(*uint32)(unsafe.Pointer(&val)) = u
 		case ConditionFlag:
+			typ = dataTypeUint32
 			*(*uint32)(unsafe.Pointer(&val)) = uint32(u)
+		case Range:
+			r0, err := toRange0(a, u, ftype)
+			if err != nil {
+				return 0, 0, err
+			}
+			typ = dataTypeRange
+			val = uintptr(unsafe.Pointer(r0))
 		default:
 			return mapErr()
 		}
 	case typeUint64:
-		typ = dataTypeUint64
-		u, ok := v.(uint64)
-		if !ok {
+		switch u := v.(type) {
+		case uint64:
+			typ = dataTypeUint64
+			p := a.Alloc(unsafe.Sizeof(u))
+			*(*uint64)(p) = u
+			val = uintptr(p)
+		case Range:
+			r0, err := toRange0(a, u, ftype)
+			if err != nil {
+				return 0, 0, err
+			}
+			typ = dataTypeRange
+			val = uintptr(unsafe.Pointer(r0))
+		default:
 			return mapErr()
 		}
-		p := a.Alloc(unsafe.Sizeof(u))
-		*(*uint64)(p) = u
-		val = uintptr(p)
 	case typeBytes:
-		typ = dataTypeByteBlob
-		bb, ok := v.([]byte)
-		if !ok {
+		switch bb := v.(type) {
+		case []byte:
+			typ = dataTypeByteBlob
+			p := a.Alloc(unsafe.Sizeof(fwpByteBlob{}))
+			*(*fwpByteBlob)(p) = fwpByteBlob{
+				Size: uint32(len(bb)),
+				Data: toBytes(a, bb),
+			}
+			val = uintptr(p)
+		case Range:
+			r0, err := toRange0(a, bb, ftype)
+			if err != nil {
+				return 0, 0, err
+			}
+			typ = dataTypeRange
+			val = uintptr(unsafe.Pointer(r0))
+		default:
 			return mapErr()
 		}
-
-		p := a.Alloc(unsafe.Sizeof(fwpByteBlob{}))
-		*(*fwpByteBlob)(p) = fwpByteBlob{
-			Size: uint32(len(bb)),
-			Data: toBytes(a, bb),
-		}
-		val = uintptr(p)
 	case typeString:
-		s, ok := v.(string)
-		if !ok {
+		switch s := v.(type) {
+		case string:
+			bb, l := toBytesFromString(a, s)
+
+			p := a.Alloc(unsafe.Sizeof(fwpByteBlob{}))
+			*(*fwpByteBlob)(p) = fwpByteBlob{
+				Size: uint32(l),
+				Data: bb,
+			}
+			typ = dataTypeByteBlob
+			val = uintptr(p)
+		case Range:
+			r0, err := toRange0(a, s, ftype)
+			if err != nil {
+				return 0, 0, err
+			}
+			typ = dataTypeRange
+			val = uintptr(unsafe.Pointer(r0))
+		default:
 			return mapErr()
 		}
-		bb, l := toBytesFromString(a, s)
-
-		p := a.Alloc(unsafe.Sizeof(fwpByteBlob{}))
-		*(*fwpByteBlob)(p) = fwpByteBlob{
-			Size: uint32(l),
-			Data: bb,
-		}
-		typ = dataTypeByteBlob
-		val = uintptr(p)
 	case typeSID:
 		typ = dataTypeSID
 		s, ok := v.(*windows.SID)
@@ -262,12 +309,20 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 		}
 		val = uintptr(p)
 	case typeArray16:
-		typ = dataTypeByteArray16
-		bs, ok := v.([16]byte)
-		if !ok {
+		switch bs := v.(type) {
+		case [16]byte:
+			typ = dataTypeByteArray16
+			val = uintptr(unsafe.Pointer(toBytes(a, bs[:])))
+		case Range:
+			r0, err := toRange0(a, bs, ftype)
+			if err != nil {
+				return 0, 0, err
+			}
+			typ = dataTypeRange
+			val = uintptr(unsafe.Pointer(r0))
+		default:
 			return mapErr()
 		}
-		val = uintptr(unsafe.Pointer(toBytes(a, bs[:])))
 	case typeMAC:
 		typ = dataTypeArray6
 		mac, ok := v.(net.HardwareAddr)
@@ -301,7 +356,7 @@ func toValue0(a *arena, v interface{}, ftype reflect.Type) (typ dataType, val ui
 			if !m.IsValid() {
 				return 0, 0, fmt.Errorf("invalid IPRange %v", m)
 			}
-			r, err := toRange0(a, Range{m.From, m.To}, ftype)
+			r, err := toRange0(a, Range{m.From(), m.To()}, ftype)
 			if err != nil {
 				return 0, 0, err
 			}
