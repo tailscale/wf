@@ -34,7 +34,6 @@ var (
 	typeSID                    = reflect.TypeOf(&windows.SID{})
 	typeSecurityDescriptor     = reflect.TypeOf(windows.SECURITY_DESCRIPTOR{})
 	typeTokenInformation       = reflect.TypeOf(TokenInformation{})
-	typeTokenAccessInformation = reflect.TypeOf(TokenAccessInformation{})
 	typeMAC                    = reflect.TypeOf(net.HardwareAddr{})
 	typeBitmapIndex            = reflect.TypeOf(uint8(0))
 	typeIP                     = reflect.TypeOf(netip.Addr{})
