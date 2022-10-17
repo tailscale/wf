@@ -34,7 +34,6 @@ var (
 	typeSID                    = reflect.TypeOf(&windows.SID{})
 	typeSecurityDescriptor     = reflect.TypeOf(windows.SECURITY_DESCRIPTOR{})
 	typeTokenInformation       = reflect.TypeOf(TokenInformation{})
-	typeTokenAccessInformation = reflect.TypeOf(TokenAccessInformation{})
 	typeMAC                    = reflect.TypeOf(net.HardwareAddr{})
 	typeBitmapIndex            = reflect.TypeOf(uint8(0))
 	typeIP                     = reflect.TypeOf(netip.Addr{})
@@ -45,6 +44,11 @@ var (
 
 // fieldTypeMap maps a layer field's dataType to a Go value of that
 // type.
+// NOTE: According to documentation, all fields which report TokenAccessInformation
+// are actually a SECURITY_DESCRIPTOR type. For some reason, WFP responds
+// with a TOKEN_ACCESS_INFORMATION type when enumerating fields. This forces the
+// security descriptor type here to align with documentation.
+// https://docs.microsoft.com/en-us/windows/win32/fwp/filtering-condition-identifiers-
 var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeUint8:                  typeUint8,
 	dataTypeUint16:                 typeUint16,
@@ -55,7 +59,7 @@ var fieldTypeMap = map[dataType]reflect.Type{
 	dataTypeSID:                    typeSID,
 	dataTypeSecurityDescriptor:     typeSecurityDescriptor,
 	dataTypeTokenInformation:       typeTokenInformation,
-	dataTypeTokenAccessInformation: typeTokenAccessInformation,
+	dataTypeTokenAccessInformation: typeSecurityDescriptor,
 	dataTypeArray6:                 typeMAC,
 	dataTypeBitmapIndex:            typeBitmapIndex,
 	dataTypeV4AddrMask:             typePrefix,
