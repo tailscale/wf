@@ -15,8 +15,8 @@ import (
 	"strings"
 
 	"github.com/peterbourgon/ff/v3/ffcli"
+	"github.com/tailscale/wf"
 	"golang.org/x/sys/windows"
-	"inet.af/wf"
 )
 
 var (

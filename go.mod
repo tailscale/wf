@@ -1,4 +1,4 @@
-module inet.af/wf
+module github.com/tailscale/wf
 
 go 1.18
 

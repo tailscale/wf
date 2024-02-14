@@ -5,7 +5,7 @@
 This is a package for controlling the Windows Filtering Platform
 (WFP), also known as the Windows firewall.
 
-See its docs: https://godoc.org/inet.af/wf
+See its docs: https://pkg.go.dev/github.com/tailscale/wf
 
 ## Maturity
 
