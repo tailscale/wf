@@ -182,7 +182,7 @@ type fwpmFilter0 struct {
 	Action              fwpmAction0
 
 	// Only one of RawContext/ProviderContextKey must be set.
-	RawContext         uint64
+	// RawContext         uint64 //Keep only one for var alignment
 	ProviderContextKey windows.GUID
 
 	Reserved        *windows.GUID
